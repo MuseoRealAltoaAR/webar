@@ -84,6 +84,49 @@ export class AppComponent implements OnInit, OnDestroy {
     }
   };
 
+  loadingPercentage = 0;
+  loadingStatusText = 'Iniciando descarga de modelos 3D y assets...';
+  private preloadingFinished = false;
+
+  private getAutoDiscoveredAssets(): { url: string; type: string; label: string }[] {
+    const assetMap = new Map<string, { url: string; type: string; label: string }>();
+
+    const addAsset = (url: string, type?: string, label?: string) => {
+      if (!url || assetMap.has(url)) return;
+      assetMap.set(url, {
+        url,
+        type: type || (url.endsWith('.glb') ? 'model' : 'image'),
+        label: label || url.split('/').pop() || url
+      });
+    };
+
+    // Base visual shell assets
+    addAsset('assets/img/background.webp', 'image', 'Fondo');
+    addAsset('assets/img/logo.webp', 'image', 'Logo');
+    addAsset('assets/icon/favicon.ico', 'image', 'Icono');
+    addAsset('assets/shapes.svg', 'image', 'Shapes');
+
+    // Auto-discover all assets from configured experiences & 3D models
+    if (this.stateService && this.stateService.experiences) {
+      this.stateService.experiences.forEach(exp => {
+        if (exp.scanImage) addAsset(exp.scanImage, 'image', exp.name);
+        if (exp.layer) {
+          if (exp.layer.mainImage) addAsset(exp.layer.mainImage, 'image', exp.layer.name);
+          if (exp.layer.backgroundImage) addAsset(exp.layer.backgroundImage, 'image', exp.layer.name);
+          if (exp.layer.foregroundImage) addAsset(exp.layer.foregroundImage, 'image', 'Mesa');
+          if (exp.layer.elements) {
+            exp.layer.elements.forEach(el => {
+              if (el.glb) addAsset(el.glb, 'model', `Modelo 3D ${el.name} (.glb)`);
+              if (el.png) addAsset(el.png, 'image', `Miniatura ${el.name}`);
+            });
+          }
+        }
+      });
+    }
+
+    return Array.from(assetMap.values());
+  }
+
   constructor(public stateService: StateService, private i18n: I18nService) {}
 
   async ngOnInit() {
@@ -112,9 +155,9 @@ export class AppComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.stateService.activeExperienceId$.subscribe(experienceId => {
         this.activeExperienceId = experienceId;
-        const activeExperience = this.stateService.getActiveExperience();
-        this.activeMarkerId = `marker-${activeExperience.markerPreset}`;
-        this.activeScanImage = activeExperience.scanImage;
+        const activeExp = this.stateService.getActiveExperience();
+        this.activeMarkerId = `marker-${activeExp.markerPreset}`;
+        this.activeScanImage = activeExp.scanImage;
         this.showFixedChoza = false;
         this.detectedExperienceId = '';
       })
@@ -139,17 +182,94 @@ export class AppComponent implements OnInit, OnDestroy {
       })
     );
 
-    // Desvanecer la pantalla de carga después de 2 segundos para dar tiempo a que los recursos de A-Frame se inicialicen
+    this.initServiceWorkerAndPreload();
+  }
+
+  private initServiceWorkerAndPreload() {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => {
+          console.log('[Service Worker Angular] Registrado en el scope:', reg.scope);
+          navigator.serviceWorker.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'PRECACHE_PROGRESS') {
+              const pct = event.data.percentage;
+              this.loadingPercentage = pct;
+              this.loadingStatusText = `Guardando en caché offline (${pct}%)...`;
+            } else if (event.data && event.data.type === 'PRECACHE_COMPLETE') {
+              this.dismissLoading();
+            }
+          });
+
+          if (navigator.serviceWorker.controller) {
+            const assets = this.getAutoDiscoveredAssets();
+            navigator.serviceWorker.controller.postMessage({
+              type: 'CACHE_DYNAMIC_ASSETS',
+              assets: assets.map(a => a.url)
+            });
+          }
+        })
+        .catch(err => {
+          console.error('[Service Worker Angular] Error al registrar:', err);
+        });
+    }
+
+    this.startAssetPreloading();
+
+    // Fallback de seguridad
     setTimeout(() => {
-      // Hacemos una transición suave cambiando la opacidad antes de destruir el nodo del DOM con ngIf
+      if (!this.preloadingFinished) {
+        this.dismissLoading();
+      }
+    }, 10000);
+  }
+
+  private async startAssetPreloading() {
+    const assets = this.getAutoDiscoveredAssets();
+    const total = assets.length;
+    let loaded = 0;
+
+    const promises = assets.map(async (asset) => {
+      try {
+        if (asset.type === 'image') {
+          await new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => resolve(true);
+            img.onerror = () => resolve(false);
+            img.src = asset.url;
+          });
+        } else {
+          const res = await fetch(asset.url);
+          if (res.ok) await res.blob();
+        }
+      } catch (e) {
+        console.warn(`[Asset Preload] Error en ${asset.url}:`, e);
+      } finally {
+        loaded++;
+        this.loadingPercentage = Math.round((loaded / total) * 100);
+        this.loadingStatusText = `Descargando: ${asset.label}`;
+      }
+    });
+
+    await Promise.all(promises);
+    this.dismissLoading();
+  }
+
+  private dismissLoading() {
+    if (this.preloadingFinished) return;
+    this.preloadingFinished = true;
+
+    this.loadingPercentage = 100;
+    this.loadingStatusText = '¡Modelos y recursos listos!';
+
+    setTimeout(() => {
       const element = document.getElementById('loading-screen');
       if (element) {
         element.style.opacity = '0';
       }
       setTimeout(() => {
         this.showLoadingScreen = false;
-      }, 800); // Coincide con la duración de la transición CSS
-    }, 2000);
+      }, 800);
+    }, 400);
   }
 
   ngOnDestroy() {
