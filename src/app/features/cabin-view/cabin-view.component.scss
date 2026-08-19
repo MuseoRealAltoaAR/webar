@@ -6,7 +6,7 @@
   width: 100vw;
   height: 100vh;
   z-index: 150; /* Above A-Frame and HUD UI */
-  display: none; /* Controlled via JS */
+  display: block !important;
   overflow: hidden;
   pointer-events: auto;
 }
@@ -24,21 +24,25 @@
   border-radius: 999px;
   padding: 10px 14px;
   font-weight: 700;
+  cursor: pointer;
 }
 
 .interior-bg {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: #0d0c0b;
-  background-size: auto 112%;
-  background-repeat: repeat-x;
-  background-position: 0 50%;
-  transition: filter 0.8s ease-in-out;
-  will-change: background-position;
+  top: -15%;
+  left: -25%;
+  width: 150%;
+  height: 130%;
+  background-size: cover;
+  background-position: center;
+  transition: filter 0.8s ease-in-out, transform 0.12s ease-out;
+  transform: scale(1.35);
   pointer-events: none;
+  will-change: transform;
+}
+
+.interior-bg.blurred {
+  filter: brightness(0.7);
 }
 
 .table-container {
@@ -113,40 +117,79 @@
   transform: scale(0.95);
 }
 
-.model-modal-ionic {
-  --background: #0b1220;
-  --height: 80%;
-  --width: 90%;
-  --max-width: 460px;
-  --border-radius: 20px;
-  --box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+/* Custom Modal Backdrop and Overlay Card */
+.custom-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 10000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  animation: fadeIn 0.25s ease-out;
+  pointer-events: auto;
 }
 
-.model-modal-ionic::part(content) {
-  width: min(90vw, 460px);
-  height: min(80vh, 700px);
-  border-radius: 20px;
+.custom-modal-card {
+  width: min(92vw, 480px);
+  max-height: min(88vh, 680px);
   background: #0b1220;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: auto;
 }
 
-.model-modal-ionic ion-toolbar {
-  --background: #111827;
-  --color: #ffffff;
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  background: #111827;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.model-modal-ionic ion-content {
-  --background: #0b1220;
-  --color: #e5e7eb;
+.modal-header-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ffffff;
 }
 
-.model-modal-ionic ion-content::part(scroll) {
-  overflow-y: auto;
-  padding-bottom: 18px;
+.modal-close-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #ffffff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
 }
 
 .modal-body-layout {
+  padding: 16px;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 .modal-info-card {
@@ -157,70 +200,64 @@
 
 .model-viewer-container {
   width: 100%;
-  height: 250px;
-  background: transparent !important;
-  border-radius: 16px;
+  height: 260px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 14px;
   overflow: hidden;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   position: relative;
-  border: none !important;
 }
 
 model-viewer {
-  width: 100%;
-  height: 100%;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 240px !important;
 }
 
 .modal-title {
   font-size: 1.35rem;
   font-weight: 800;
-  margin-bottom: 6px;
+  margin: 0 0 6px 0;
   text-align: center;
-  color: #111827;
+  color: #ffffff;
 }
 
 .modal-desc {
   font-size: 0.9rem;
-  color: #1f2937;
+  color: #d1d5db;
   text-align: center;
   line-height: 1.45;
-  margin-bottom: 8px;
+  margin: 0;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 @media (orientation: landscape) {
-  .model-modal-ionic {
-    --height: min(74vh, 460px);
-    --width: min(94vw, 840px);
-    --max-width: 840px;
-  }
-
-  .model-modal-ionic::part(content) {
-    width: min(94vw, 840px);
-    height: min(74vh, 460px);
-  }
-
-  .model-modal-ionic ion-content::part(scroll) {
-    overflow: hidden;
-    padding-bottom: 0;
+  .custom-modal-card {
+    width: min(94vw, 820px);
+    max-height: min(85vh, 480px);
   }
 
   .modal-body-layout {
     display: grid;
     grid-template-columns: minmax(220px, 1fr) minmax(220px, 1fr);
     align-items: center;
-    gap: 14px;
+    gap: 16px;
     height: 100%;
   }
 
   .model-viewer-container {
-    height: clamp(150px, 42vh, 250px);
+    height: clamp(180px, 45vh, 280px);
     margin-bottom: 0;
-  }
-
-  .modal-info-card {
-    justify-content: center;
-    gap: 8px;
-    min-height: 0;
   }
 
   .modal-title {

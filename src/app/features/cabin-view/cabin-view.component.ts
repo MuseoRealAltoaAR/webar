@@ -22,10 +22,12 @@ export class CabinViewComponent implements OnInit, OnDestroy {
   
   private isDragging = false;
   private startTouchX = 0;
-  private dragStartOffsetX = 0;
-  private panoramaOffsetX = 0;
-  private lastYawDeg: number | null = null;
-  private readonly pxPerYawDegree = 6;
+  private startTouchY = 0;
+  private baseOffsetX = 0;
+  private baseOffsetY = 0;
+  private initialGamma: number | null = null;
+  private initialBeta: number | null = null;
+  private initialParallaxSaved = false;
   private touchControlsInitialized = false;
   private readonly boundParallaxHandler = this.handleParallax.bind(this);
   private subscriptions: Subscription = new Subscription();
@@ -52,8 +54,11 @@ export class CabinViewComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.stateService.interiorActive$.subscribe(active => {
         if (active) {
-          this.lastYawDeg = null;
-          this.panoramaOffsetX = 0;
+          this.initialParallaxSaved = false;
+          this.initialGamma = null;
+          this.initialBeta = null;
+          this.baseOffsetX = 0;
+          this.baseOffsetY = 0;
           this.applyPanoramaPosition();
           this.requestOrientationPermission();
           this.setupTouchControls();
@@ -83,48 +88,54 @@ export class CabinViewComponent implements OnInit, OnDestroy {
   }
 
   handleParallax(event: DeviceOrientationEvent) {
-    if (this.showModal) return;
-    if (this.isDragging) return;
+    if (this.showModal || this.isDragging) return;
 
-    const yaw = this.getYaw(event);
-    if (yaw === null) return;
+    const rawGamma = event.gamma; // Roll [-90, 90]
+    const rawBeta = event.beta;   // Pitch [-180, 180]
 
-    if (this.lastYawDeg === null) {
-      this.lastYawDeg = yaw;
+    if (rawGamma === null || rawBeta === null) return;
+
+    // Calibrate baseline when first entering the interior
+    if (!this.initialParallaxSaved || this.initialGamma === null || this.initialBeta === null) {
+      this.initialGamma = rawGamma;
+      this.initialBeta = rawBeta;
+      this.initialParallaxSaved = true;
       return;
     }
 
-    let deltaYaw = yaw - this.lastYawDeg;
-    if (deltaYaw > 180) {
-      deltaYaw -= 360;
-    } else if (deltaYaw < -180) {
-      deltaYaw += 360;
-    }
-    this.lastYawDeg = yaw;
+    // Calculate change relative to initial position
+    let diffX = rawGamma - this.initialGamma;
+    let diffY = rawBeta - this.initialBeta;
 
-    this.panoramaOffsetX += deltaYaw * this.pxPerYawDegree;
+    // Detect orientation to swap axes if in landscape mode
+    const orientationType = (screen.orientation && screen.orientation.type) || "";
+    const isLandscape = orientationType.includes("landscape") || window.innerWidth > window.innerHeight;
+
+    if (isLandscape) {
+      // In landscape: tilting the phone left/right moves the Pitch (beta),
+      // and tilting forward/backward moves the Roll (gamma).
+      diffX = rawBeta - this.initialBeta;
+      diffY = rawGamma - this.initialGamma;
+    }
+
+    const maxOffsetX = 150; // Horizontal range
+    const maxOffsetY = 30;  // Vertical range
+    
+    // Apply sensitivity scale factor
+    const targetX = -diffX * 4.5; 
+    const targetY = -diffY * 2.5;
+
+    // Clamp boundaries to prevent image edges from showing
+    this.baseOffsetX = Math.max(-maxOffsetX, Math.min(maxOffsetX, targetX));
+    this.baseOffsetY = Math.max(-maxOffsetY, Math.min(maxOffsetY, targetY));
 
     this.applyPanoramaPosition();
-  }
-
-  private getYaw(event: DeviceOrientationEvent): number | null {
-    const anyEvent = event as any;
-
-    if (typeof anyEvent.webkitCompassHeading === 'number') {
-      return anyEvent.webkitCompassHeading;
-    }
-
-    if (typeof event.alpha === 'number') {
-      return event.alpha;
-    }
-
-    return null;
   }
 
   private applyPanoramaPosition() {
     const interiorBg = document.getElementById('interior-bg');
     if (interiorBg) {
-      interiorBg.style.backgroundPosition = `${this.panoramaOffsetX}px 50%`;
+      interiorBg.style.transform = `translate(${this.baseOffsetX}px, ${this.baseOffsetY}px) scale(1.35)`;
     }
   }
 
@@ -139,35 +150,30 @@ export class CabinViewComponent implements OnInit, OnDestroy {
     overlay.addEventListener('touchstart', (e: TouchEvent) => {
       if (this.showModal) return;
       this.isDragging = true;
-      this.startTouchX = e.touches[0].clientX;
-      this.dragStartOffsetX = this.panoramaOffsetX;
+      this.startTouchX = e.touches[0].clientX - this.baseOffsetX;
+      this.startTouchY = e.touches[0].clientY - this.baseOffsetY;
     }, { passive: true });
 
     overlay.addEventListener('touchmove', (e: TouchEvent) => {
-      if (this.showModal) return;
-      if (!this.isDragging) return;
+      if (this.showModal || !this.isDragging) return;
 
       const currentX = e.touches[0].clientX;
-      const deltaX = currentX - this.startTouchX;
+      const currentY = e.touches[0].clientY;
 
-      const dragX = this.dragStartOffsetX + deltaX * 1.2;
-      const interiorBg = document.getElementById('interior-bg');
-      if (interiorBg) {
-        interiorBg.style.backgroundPosition = `${dragX}px 50%`;
-      }
+      const targetX = currentX - this.startTouchX;
+      const targetY = currentY - this.startTouchY;
+
+      const maxOffsetX = 150;
+      const maxOffsetY = 30;
+
+      this.baseOffsetX = Math.max(-maxOffsetX, Math.min(maxOffsetX, targetX));
+      this.baseOffsetY = Math.max(-maxOffsetY, Math.min(maxOffsetY, targetY));
+
+      this.applyPanoramaPosition();
     }, { passive: true });
 
-    overlay.addEventListener('touchend', (e: TouchEvent) => {
-      if (this.showModal) return;
-      if (!this.isDragging) return;
+    overlay.addEventListener('touchend', () => {
       this.isDragging = false;
-
-      const touch = e.changedTouches?.[0];
-      if (!touch) return;
-
-      const deltaX = touch.clientX - this.startTouchX;
-      this.panoramaOffsetX = this.dragStartOffsetX + deltaX * 1.2;
-      this.applyPanoramaPosition();
     }, { passive: true });
   }
 

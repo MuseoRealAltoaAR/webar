@@ -36,7 +36,9 @@
               }
             ],
             "styles": ["src/global.scss", "src/theme/variables.scss"],
-            "scripts": [],
+            "scripts": [
+              "node_modules/@google/model-viewer/dist/model-viewer.min.js"
+            ],
             "browser": "src/main.ts"
           },
           "configurations": {
