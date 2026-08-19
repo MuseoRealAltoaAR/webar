@@ -1,4 +1,26 @@
+// Register Service Worker for offline capability
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then((reg) => console.log('Service Worker registrado con éxito:', reg.scope))
+      .catch((err) => console.error('Error al registrar el Service Worker:', err));
+
+    // Desvanecer la pantalla de carga (Fade out loading screen)
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen) {
+      setTimeout(() => {
+        loadingScreen.style.opacity = '0';
+        loadingScreen.style.pointerEvents = 'none';
+        setTimeout(() => {
+          loadingScreen.style.display = 'none';
+        }, 800); // Coincide con la transición CSS
+      }, 1500); // Retraso de 1.5s para apreciar la animación premium
+    }
+  });
+}
+
 // Application State & WebAR Control Logic
+
 const state = {
   arStarted: false,
   activeModelId: 'robot', // Default model/marker
@@ -32,7 +54,7 @@ const state = {
           id: 'pato',
           name: 'Pato Silbato',
           glb: 'assets/models/duck.glb',
-          png: 'assets/models/duck.png',
+          png: 'assets/models/valdivia.png', // Fallback or placeholder png
           desc: 'Instrumento ceremonial musical zoomorfo recreado en modelado 3D.'
         }
       ]
@@ -64,189 +86,6 @@ const state = {
     }
   }
 };
-
-/**
- * 100% AUTOMATIC ASSET DISCOVERY
- * Scans state (models, layers, backgrounds, 3D glb files) dynamically.
- * Any new model added to state is automatically detected, preloaded, and cached!
- */
-function getAutoDiscoveredAssets() {
-  const assetMap = new Map();
-
-  const addAsset = (url, type, label) => {
-    if (!url || assetMap.has(url)) return;
-    assetMap.set(url, {
-      url,
-      type: type || (url.endsWith('.glb') ? 'model' : 'image'),
-      label: label || url.split('/').pop()
-    });
-  };
-
-  // 1. Core visual shell assets
-  addAsset('assets/img/background.webp', 'image', 'Fondo de la aplicación');
-  addAsset('assets/img/logo.webp', 'image', 'Logotipo');
-  addAsset('assets/icon/favicon.ico', 'image', 'Icono');
-  addAsset('assets/shapes.svg', 'image', 'Gráficos vectoriales');
-
-  // 2. Automatically extract from all layers and interactive 3D elements
-  if (Array.isArray(state.layers)) {
-    state.layers.forEach(layer => {
-      if (layer.mainImage) addAsset(layer.mainImage, 'image', `Entorno ${layer.name || ''}`);
-      if (layer.backgroundImage) addAsset(layer.backgroundImage, 'image', `Fondo ${layer.name || ''}`);
-      if (layer.foregroundImage) addAsset(layer.foregroundImage, 'image', 'Mesa interactiva');
-      if (Array.isArray(layer.elements)) {
-        layer.elements.forEach(el => {
-          if (el.glb) addAsset(el.glb, 'model', `Modelo 3D ${el.name || el.id} (.glb)`);
-          if (el.png) addAsset(el.png, 'image', `Miniatura ${el.name || el.id}`);
-        });
-      }
-    });
-  }
-
-  // 3. Automatically extract from AR markers models
-  if (state.models) {
-    Object.values(state.models).forEach(m => {
-      if (m.url) addAsset(m.url, 'image', m.name);
-      if (m.modelUrl) addAsset(m.modelUrl, 'model', `Modelo AR ${m.name} (.glb)`);
-    });
-  }
-
-  return Array.from(assetMap.values());
-}
-
-let preloadingFinished = false;
-
-function updateLoadingProgress(percentage, statusText) {
-  const progressBar = document.getElementById('loading-progress-bar');
-  const percentageEl = document.getElementById('loading-percentage');
-  const statusEl = document.getElementById('loading-status-text');
-
-  const clamped = Math.min(100, Math.max(0, Math.round(percentage)));
-
-  if (progressBar) {
-    progressBar.style.width = `${clamped}%`;
-  }
-  if (percentageEl) {
-    percentageEl.textContent = `${clamped}%`;
-  }
-  if (statusEl && statusText) {
-    statusEl.textContent = statusText;
-  }
-}
-
-function dismissLoadingScreen() {
-  if (preloadingFinished) return;
-  preloadingFinished = true;
-
-  updateLoadingProgress(100, '¡Todos los modelos y assets están listos!');
-
-  const loadingScreen = document.getElementById('loading-screen');
-  if (loadingScreen) {
-    setTimeout(() => {
-      loadingScreen.style.opacity = '0';
-      loadingScreen.style.pointerEvents = 'none';
-      setTimeout(() => {
-        loadingScreen.style.display = 'none';
-      }, 800); // Coincide con la transición CSS
-    }, 450);
-  }
-}
-
-// Preload assets dynamically and sync with Service Worker
-async function startAssetPreloader() {
-  const assets = getAutoDiscoveredAssets();
-  const total = assets.length;
-  let loadedCount = 0;
-
-  updateLoadingProgress(5, 'Detectando y descargando modelos 3D y texturas...');
-
-  // Automatically inform Service Worker to store all dynamic assets in offline cache
-  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-    navigator.serviceWorker.controller.postMessage({
-      type: 'CACHE_DYNAMIC_ASSETS',
-      assets: assets.map(a => a.url)
-    });
-  }
-
-  const assetPromises = assets.map(async (asset) => {
-    try {
-      if (asset.type === 'image') {
-        await new Promise((resolve) => {
-          const img = new Image();
-          img.onload = () => resolve(true);
-          img.onerror = () => {
-            console.warn(`[Auto-Preloader] Advertencia al precargar imagen: ${asset.url}`);
-            resolve(false);
-          };
-          img.src = asset.url;
-        });
-      } else {
-        // Fetch 3D GLB model and cache
-        const res = await fetch(asset.url);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        await res.blob();
-      }
-    } catch (err) {
-      console.warn(`[Auto-Preloader] Error al precargar ${asset.url}:`, err);
-    } finally {
-      loadedCount++;
-      const currentPercent = Math.round((loadedCount / total) * 100);
-      updateLoadingProgress(currentPercent, `Descargando: ${asset.label}`);
-    }
-  });
-
-  await Promise.all(assetPromises);
-  dismissLoadingScreen();
-}
-
-// Register Service Worker for offline capability & listen for precache broadcast
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then((reg) => {
-        console.log('[Service Worker] Registrado con éxito en el scope:', reg.scope);
-        
-        // Listen for updates or progress from active/installing SW
-        navigator.serviceWorker.addEventListener('message', (event) => {
-          if (event.data && event.data.type === 'PRECACHE_PROGRESS') {
-            const pct = event.data.percentage;
-            updateLoadingProgress(pct, `Almacenando en caché offline (${pct}%)...`);
-          } else if (event.data && event.data.type === 'PRECACHE_COMPLETE') {
-            console.log('[Service Worker] Precaché completado.');
-            dismissLoadingScreen();
-          }
-        });
-
-        // If controller is already available, trigger dynamic sync
-        if (navigator.serviceWorker.controller) {
-          const assets = getAutoDiscoveredAssets();
-          navigator.serviceWorker.controller.postMessage({
-            type: 'CACHE_DYNAMIC_ASSETS',
-            assets: assets.map(a => a.url)
-          });
-        }
-      })
-      .catch((err) => {
-        console.error('[Service Worker] Error al registrar:', err);
-      });
-
-    // Start downloading automatically discovered assets
-    startAssetPreloader();
-
-    // Safety fallback timeout: Never block the user for more than 10 seconds on slow networks
-    setTimeout(() => {
-      if (!preloadingFinished) {
-        console.warn('[Preloader] Tiempo límite alcanzado. Mostrando experiencia...');
-        dismissLoadingScreen();
-      }
-    }, 10000);
-  });
-} else {
-  // If Service Worker is not supported, still preload assets
-  window.addEventListener('load', () => {
-    startAssetPreloader();
-  });
-}
 
 // UI Elements
 const welcomeScreen = document.getElementById('welcome-screen');

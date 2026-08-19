@@ -2,13 +2,8 @@
   <!-- Pantalla de Carga (Loading Screen) -->
   <div id="loading-screen" *ngIf="showLoadingScreen">
     <div class="loading-logo-container">
-      <img src="assets/img/logo.webp" [alt]="'common.logo' | t" class="loading-logo" onerror="this.onerror=null; this.src='assets/img/logo.webp';">
+      <img src="assets/img/logo.webp" [alt]="'common.logo' | t" class="loading-logo" onerror="this.onerror=null; this.src='assets/img/logo.webpn';">
       <div class="spinner"></div>
-      <div class="loading-progress-container">
-        <div class="loading-progress-bar" [style.width.%]="loadingPercentage"></div>
-      </div>
-      <div class="loading-status-text">{{ loadingStatusText }}</div>
-      <div class="loading-percentage">{{ loadingPercentage }}%</div>
     </div>
   </div>
 
