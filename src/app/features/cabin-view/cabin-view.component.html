@@ -21,45 +21,39 @@
     </div>
   </div>
 
-  <!-- 3D Model Viewer Modal using ion-modal -->
-  <ion-modal [isOpen]="showModal" (didDismiss)="closeModal()" class="model-modal-ionic">
-    <ng-template>
-      <ion-header>
-        <ion-toolbar color="dark">
-          <ion-title>{{ selectedElement?.name ? (selectedElement!.name | t) : ('common.detail' | t) }}</ion-title>
-          <ion-buttons slot="end">
-            <ion-button (click)="closeModal()">{{ 'common.close' | t }}</ion-button>
-          </ion-buttons>
-        </ion-toolbar>
-      </ion-header>
-      <ion-content color="dark" class="ion-padding">
-        <div class="modal-body-layout">
-          <div class="model-viewer-container">
-            <model-viewer 
-              *ngIf="selectedElement"
-              [src]="selectedElement.glb"
-              [attr.src]="selectedElement.glb"
-              draco-decoder-path="assets/draco/"
-              camera-controls
-              touch-action="pan-y"
-              auto-rotate
-              rotation-per-second="25deg"
-              interaction-prompt="auto"
-              interaction-prompt-style="basic"
-              shadow-intensity="1"
-              shadow-softness="0.5"
-              exposure="1"
-              loading="eager"
-              style="display: block; width: 100%; height: 100%; min-height: 250px;"
-              [alt]="selectedElement.name | t">
-            </model-viewer>
-          </div>
-          <div class="modal-info-card">
-            <h2 class="modal-title">{{ selectedElement?.name | t }}</h2>
-            <p class="modal-desc">{{ selectedElement?.desc | t }}</p>
-          </div>
+  <!-- 3D Model Viewer Modal Overlay -->
+  <div class="custom-modal-backdrop" *ngIf="showModal" (click)="closeModal()">
+    <div class="custom-modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-header-title">{{ selectedElement?.name ? (selectedElement!.name | t) : ('common.detail' | t) }}</h3>
+        <button class="modal-close-btn" (click)="closeModal()">✕</button>
+      </div>
+      <div class="modal-body-layout">
+        <div class="model-viewer-container">
+          <model-viewer 
+            *ngIf="selectedElement"
+            [src]="selectedElement.glb"
+            [attr.src]="selectedElement.glb"
+            draco-decoder-path="assets/draco/"
+            camera-controls
+            touch-action="pan-y"
+            auto-rotate
+            rotation-per-second="25deg"
+            interaction-prompt="auto"
+            interaction-prompt-style="basic"
+            shadow-intensity="1"
+            shadow-softness="0.5"
+            exposure="1"
+            loading="eager"
+            style="display: block; width: 100%; height: 100%; min-height: 250px;"
+            [alt]="selectedElement.name | t">
+          </model-viewer>
         </div>
-      </ion-content>
-    </ng-template>
-  </ion-modal>
+        <div class="modal-info-card">
+          <h2 class="modal-title">{{ selectedElement?.name | t }}</h2>
+          <p class="modal-desc">{{ selectedElement?.desc | t }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
