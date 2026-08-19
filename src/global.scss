@@ -66,3 +66,14 @@ video, .a-canvas {
   left: 0 !important;
   margin: 0 !important;
 }
+
+/* Ensure model-viewer inside Ionic modals renders with full dimensions */
+model-viewer {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 240px;
+  background-color: transparent;
+  outline: none;
+  --poster-color: transparent;
+}
