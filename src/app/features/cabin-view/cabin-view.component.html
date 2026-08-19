@@ -35,11 +35,11 @@
       <ion-content color="dark" class="ion-padding">
         <div class="modal-body-layout">
           <div class="model-viewer-container">
-            <!-- Google Model Viewer Interactivo -->
             <model-viewer 
               *ngIf="selectedElement"
               [src]="selectedElement.glb"
               [attr.src]="selectedElement.glb"
+              draco-decoder-path="assets/draco/"
               camera-controls
               touch-action="pan-y"
               auto-rotate
