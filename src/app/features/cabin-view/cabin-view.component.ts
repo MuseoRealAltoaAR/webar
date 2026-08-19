@@ -22,12 +22,10 @@ export class CabinViewComponent implements OnInit, OnDestroy {
   
   private isDragging = false;
   private startTouchX = 0;
-  private startTouchY = 0;
-  private baseOffsetX = 0;
-  private baseOffsetY = 0;
-  private initialGamma: number | null = null;
-  private initialBeta: number | null = null;
-  private initialParallaxSaved = false;
+  private dragStartOffsetX = 0;
+  private panoramaOffsetX = 0;
+  private lastYawDeg: number | null = null;
+  private readonly pxPerYawDegree = 6;
   private touchControlsInitialized = false;
   private readonly boundParallaxHandler = this.handleParallax.bind(this);
   private subscriptions: Subscription = new Subscription();
@@ -54,11 +52,8 @@ export class CabinViewComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.stateService.interiorActive$.subscribe(active => {
         if (active) {
-          this.initialParallaxSaved = false;
-          this.initialGamma = null;
-          this.initialBeta = null;
-          this.baseOffsetX = 0;
-          this.baseOffsetY = 0;
+          this.lastYawDeg = null;
+          this.panoramaOffsetX = 0;
           this.applyPanoramaPosition();
           this.requestOrientationPermission();
           this.setupTouchControls();
@@ -88,54 +83,48 @@ export class CabinViewComponent implements OnInit, OnDestroy {
   }
 
   handleParallax(event: DeviceOrientationEvent) {
-    if (this.showModal || this.isDragging) return;
+    if (this.showModal) return;
+    if (this.isDragging) return;
 
-    const rawGamma = event.gamma; // Roll [-90, 90]
-    const rawBeta = event.beta;   // Pitch [-180, 180]
+    const yaw = this.getYaw(event);
+    if (yaw === null) return;
 
-    if (rawGamma === null || rawBeta === null) return;
-
-    // Calibrate baseline when first entering the interior
-    if (!this.initialParallaxSaved || this.initialGamma === null || this.initialBeta === null) {
-      this.initialGamma = rawGamma;
-      this.initialBeta = rawBeta;
-      this.initialParallaxSaved = true;
+    if (this.lastYawDeg === null) {
+      this.lastYawDeg = yaw;
       return;
     }
 
-    // Calculate change relative to initial position
-    let diffX = rawGamma - this.initialGamma;
-    let diffY = rawBeta - this.initialBeta;
-
-    // Detect orientation to swap axes if in landscape mode
-    const orientationType = (screen.orientation && screen.orientation.type) || "";
-    const isLandscape = orientationType.includes("landscape") || window.innerWidth > window.innerHeight;
-
-    if (isLandscape) {
-      // In landscape: tilting the phone left/right moves the Pitch (beta),
-      // and tilting forward/backward moves the Roll (gamma).
-      diffX = rawBeta - this.initialBeta;
-      diffY = rawGamma - this.initialGamma;
+    let deltaYaw = yaw - this.lastYawDeg;
+    if (deltaYaw > 180) {
+      deltaYaw -= 360;
+    } else if (deltaYaw < -180) {
+      deltaYaw += 360;
     }
+    this.lastYawDeg = yaw;
 
-    const maxOffsetX = 150; // Horizontal range
-    const maxOffsetY = 30;  // Vertical range
-    
-    // Apply sensitivity scale factor
-    const targetX = -diffX * 4.5; 
-    const targetY = -diffY * 2.5;
-
-    // Clamp boundaries to prevent image edges from showing
-    this.baseOffsetX = Math.max(-maxOffsetX, Math.min(maxOffsetX, targetX));
-    this.baseOffsetY = Math.max(-maxOffsetY, Math.min(maxOffsetY, targetY));
+    this.panoramaOffsetX += deltaYaw * this.pxPerYawDegree;
 
     this.applyPanoramaPosition();
+  }
+
+  private getYaw(event: DeviceOrientationEvent): number | null {
+    const anyEvent = event as any;
+
+    if (typeof anyEvent.webkitCompassHeading === 'number') {
+      return anyEvent.webkitCompassHeading;
+    }
+
+    if (typeof event.alpha === 'number') {
+      return event.alpha;
+    }
+
+    return null;
   }
 
   private applyPanoramaPosition() {
     const interiorBg = document.getElementById('interior-bg');
     if (interiorBg) {
-      interiorBg.style.transform = `translate(${this.baseOffsetX}px, ${this.baseOffsetY}px) scale(1.35)`;
+      interiorBg.style.backgroundPosition = `${this.panoramaOffsetX}px 50%`;
     }
   }
 
@@ -149,49 +138,47 @@ export class CabinViewComponent implements OnInit, OnDestroy {
 
     overlay.addEventListener('touchstart', (e: TouchEvent) => {
       if (this.showModal) return;
-      const target = e.target as HTMLElement | null;
-      if (target && target.closest('.interactive, button, img, .valdivia-btn, .back-to-scan-btn')) {
-        return;
-      }
       this.isDragging = true;
-      this.startTouchX = e.touches[0].clientX - this.baseOffsetX;
-      this.startTouchY = e.touches[0].clientY - this.baseOffsetY;
+      this.startTouchX = e.touches[0].clientX;
+      this.dragStartOffsetX = this.panoramaOffsetX;
     }, { passive: true });
 
     overlay.addEventListener('touchmove', (e: TouchEvent) => {
-      if (this.showModal || !this.isDragging) return;
+      if (this.showModal) return;
+      if (!this.isDragging) return;
 
       const currentX = e.touches[0].clientX;
-      const currentY = e.touches[0].clientY;
+      const deltaX = currentX - this.startTouchX;
 
-      const targetX = currentX - this.startTouchX;
-      const targetY = currentY - this.startTouchY;
+      const dragX = this.dragStartOffsetX + deltaX * 1.2;
+      const interiorBg = document.getElementById('interior-bg');
+      if (interiorBg) {
+        interiorBg.style.backgroundPosition = `${dragX}px 50%`;
+      }
+    }, { passive: true });
 
-      const maxOffsetX = 150;
-      const maxOffsetY = 30;
+    overlay.addEventListener('touchend', (e: TouchEvent) => {
+      if (this.showModal) return;
+      if (!this.isDragging) return;
+      this.isDragging = false;
 
-      this.baseOffsetX = Math.max(-maxOffsetX, Math.min(maxOffsetX, targetX));
-      this.baseOffsetY = Math.max(-maxOffsetY, Math.min(maxOffsetY, targetY));
+      const touch = e.changedTouches?.[0];
+      if (!touch) return;
 
+      const deltaX = touch.clientX - this.startTouchX;
+      this.panoramaOffsetX = this.dragStartOffsetX + deltaX * 1.2;
       this.applyPanoramaPosition();
     }, { passive: true });
-
-    overlay.addEventListener('touchend', () => {
-      this.isDragging = false;
-    }, { passive: true });
-  }
-
-  onElementTouchEnd(event: Event, element: LayerElement) {
-    event.stopPropagation();
-    this.openElement(element);
   }
 
   openElement(element: LayerElement) {
-    if (!element) return;
     this.selectedElement = element;
-    this.activeElementId = element.id;
     this.stateService.setActiveElementId(element.id);
-    this.showModal = true;
+    
+    // Add micro delay for smooth UI transition
+    setTimeout(() => {
+      this.showModal = true;
+    }, 100);
   }
 
   closeModal() {
