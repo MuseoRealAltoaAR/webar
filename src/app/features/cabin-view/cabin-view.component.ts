@@ -149,6 +149,10 @@ export class CabinViewComponent implements OnInit, OnDestroy {
 
     overlay.addEventListener('touchstart', (e: TouchEvent) => {
       if (this.showModal) return;
+      const target = e.target as HTMLElement | null;
+      if (target && target.closest('.interactive, button, img, .valdivia-btn, .back-to-scan-btn')) {
+        return;
+      }
       this.isDragging = true;
       this.startTouchX = e.touches[0].clientX - this.baseOffsetX;
       this.startTouchY = e.touches[0].clientY - this.baseOffsetY;
@@ -177,14 +181,17 @@ export class CabinViewComponent implements OnInit, OnDestroy {
     }, { passive: true });
   }
 
+  onElementTouchEnd(event: Event, element: LayerElement) {
+    event.stopPropagation();
+    this.openElement(element);
+  }
+
   openElement(element: LayerElement) {
+    if (!element) return;
     this.selectedElement = element;
+    this.activeElementId = element.id;
     this.stateService.setActiveElementId(element.id);
-    
-    // Add micro delay for smooth UI transition
-    setTimeout(() => {
-      this.showModal = true;
-    }, 100);
+    this.showModal = true;
   }
 
   closeModal() {

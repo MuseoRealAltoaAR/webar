@@ -17,7 +17,8 @@
         class="valdivia-btn interactive" 
         [class.active]="activeElementId === element.id"
         [alt]="element.name | t"
-        (click)="openElement(element)">
+        (click)="openElement(element)"
+        (touchend)="onElementTouchEnd($event, element)">
     </div>
   </div>
 
