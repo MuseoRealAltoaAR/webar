@@ -35,15 +35,22 @@
       <ion-content color="dark" class="ion-padding">
         <div class="modal-body-layout">
           <div class="model-viewer-container">
-            <!-- Google Model Viewer -->
+            <!-- Google Model Viewer Interactivo -->
             <model-viewer 
               *ngIf="selectedElement"
               [src]="selectedElement.glb"
+              [attr.src]="selectedElement.glb"
               camera-controls
+              touch-action="pan-y"
               auto-rotate
-              loading="eager"
-              ar
+              rotation-per-second="25deg"
+              interaction-prompt="auto"
+              interaction-prompt-style="basic"
               shadow-intensity="1"
+              shadow-softness="0.5"
+              exposure="1"
+              loading="eager"
+              style="display: block; width: 100%; height: 100%; min-height: 250px;"
               [alt]="selectedElement.name | t">
             </model-viewer>
           </div>
