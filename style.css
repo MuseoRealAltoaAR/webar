@@ -3,8 +3,8 @@
   --primary: #ff9f1c;
   --primary-hover: #e08a13;
   --bg-dark: #0d0c0b;
-  --bg-glass: rgba(15, 23, 42, 0.65);
-  --border-glass: rgba(255, 255, 255, 0.12);
+  --bg-glass: rgba(15, 23, 42, 0.75);
+  --border-glass: rgba(255, 255, 255, 0.15);
   --text-primary: #ffffff;
   --text-secondary: #94a3b8;
   --accent: #10b981;
@@ -44,7 +44,7 @@ html, body {
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border-glass);
   border-radius: 16px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -112,19 +112,17 @@ html, body {
   z-index: -1;
 }
 
-/* Screen View Router Switcher */
-.screen-view {
+/* App Screen Views (Home & Info) */
+.app-screen {
   position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
-  display: none;
-  z-index: 10;
-}
-
-.screen-view.active {
   display: flex;
   flex-direction: column;
+  z-index: 100;
+  background-color: var(--bg-dark);
+  overflow-y: auto;
 }
 
 /* Header styling */
@@ -220,7 +218,6 @@ html, body {
   text-align: center;
   justify-content: flex-start;
   width: 100%;
-  overflow-y: auto;
 }
 
 .brand-container {
@@ -338,7 +335,6 @@ html, body {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  overflow-y: auto;
 }
 
 .info-card {
@@ -375,23 +371,29 @@ html, body {
   word-break: break-word;
 }
 
+/* A-Frame Escena WebAR */
+a-scene {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 1 !important;
+}
+
+video {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  z-index: -1 !important;
+}
+
 /* AR View HUD & Overlay */
-#ar-container {
-  z-index: 20;
-}
-
-#aframe-scene {
-  position: absolute;
+.ui-ar-overlay {
+  position: fixed;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-}
-
-#ui-container {
-  position: absolute;
-  inset: 0;
-  z-index: 30;
+  z-index: 50;
   pointer-events: none;
   display: flex;
   flex-direction: column;
@@ -472,7 +474,7 @@ html, body {
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.16);
   color: #f8fafc;
-  background: rgba(15, 23, 42, 0.65);
+  background: rgba(15, 23, 42, 0.75);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -519,7 +521,7 @@ html, body {
 .fixed-choza-overlay {
   position: fixed;
   inset: 0;
-  z-index: 40;
+  z-index: 70;
   display: flex;
   flex-direction: column;
   justify-content: center;

@@ -253,7 +253,6 @@ function setLanguage(lang) {
     el.textContent = t(key);
   });
 
-  // Actualizar el menú de marcadores si está presente
   renderMarkerMenu();
   updateStatusText();
 }
@@ -263,10 +262,11 @@ function showScreen(tabName) {
   state.currentTab = tabName;
   
   // Ocultar vistas principales
-  document.getElementById('home-screen').classList.remove('active');
-  document.getElementById('info-screen').classList.remove('active');
-  document.getElementById('ar-container').classList.remove('active');
+  document.getElementById('home-screen').classList.add('hidden');
+  document.getElementById('info-screen').classList.add('hidden');
+  document.getElementById('ui-ar').classList.add('hidden');
   document.getElementById('interior-overlay').classList.add('hidden');
+  document.getElementById('fixed-choza-overlay').classList.add('hidden');
 
   // Actualizar clase activa en menú lateral
   document.querySelectorAll('.nav-item').forEach(item => {
@@ -274,13 +274,13 @@ function showScreen(tabName) {
   });
 
   if (tabName === 'inicio') {
-    document.getElementById('home-screen').classList.add('active');
-    stopARTracking();
+    document.getElementById('home-screen').classList.remove('hidden');
+    state.arStarted = false;
   } else if (tabName === 'informacion') {
-    document.getElementById('info-screen').classList.add('active');
-    stopARTracking();
+    document.getElementById('info-screen').classList.remove('hidden');
+    state.arStarted = false;
   } else if (tabName === 'ar') {
-    document.getElementById('ar-container').classList.add('active');
+    document.getElementById('ui-ar').classList.remove('hidden');
     startARTracking();
   }
 }
@@ -292,22 +292,19 @@ function getActiveExperience() {
 
 function startARTracking() {
   state.arStarted = true;
-  const exp = getActiveExperience();
   state.statusMode = 'scanning';
   updateStatusText();
   
   const statusDot = document.getElementById('status-dot');
   if (statusDot) statusDot.classList.add('active');
 
-  setupSceneMarkers();
   checkOrientation();
   requestDeviceOrientation();
-}
 
-function stopARTracking() {
-  state.arStarted = false;
-  const fixedOverlay = document.getElementById('fixed-choza-overlay');
-  if (fixedOverlay) fixedOverlay.classList.add('hidden');
+  // Forzar trigger de resize para que AR.js calibre el feed de la cámara
+  setTimeout(() => {
+    window.dispatchEvent(new Event('resize'));
+  }, 100);
 }
 
 function resetExperience() {
@@ -321,19 +318,7 @@ function resetExperience() {
   setTimeout(() => {
     state.statusMode = 'scanning';
     updateStatusText();
-    setupSceneMarkers();
   }, 300);
-}
-
-function setupSceneMarkers() {
-  const activeExp = getActiveExperience();
-  experiences.forEach(exp => {
-    const markerEl = document.getElementById(`marker-${exp.markerPreset}`);
-    if (markerEl) {
-      const isCurrent = exp.id === activeExp.id && state.isLandscape;
-      markerEl.setAttribute('visible', isCurrent ? 'true' : 'false');
-    }
-  });
 }
 
 function renderMarkerMenu() {
@@ -379,27 +364,42 @@ function updateStatusText() {
   }
 }
 
-// --- DETECCIÓN DE MARCADORES (A-Frame / AR.js) ---
-function onMarkerDetected(preset) {
-  if (!state.isLandscape || !state.arStarted) return;
+// --- DETECCIÓN DE MARCADORES (Custom Events desde A-Frame) ---
+function handleMarkerFound(event) {
+  if (!state.isLandscape || !state.arStarted || state.interiorActive) return;
+
+  const detail = event.detail || {};
   const activeExp = getActiveExperience();
-  if (activeExp.markerPreset.toLowerCase() === (preset || '').toLowerCase()) {
+  const detectedPreset = (detail.preset || '').toLowerCase();
+  const detectedId = (detail.id || '').toLowerCase();
+
+  const isMatching = detectedPreset === activeExp.markerPreset.toLowerCase() ||
+                     detectedId === `marker-${activeExp.markerPreset.toLowerCase()}`;
+
+  if (isMatching) {
     state.markerVisible = true;
     state.statusMode = 'detected';
     updateStatusText();
 
-    // Mostrar overlay de Choza fija tras 600ms
+    // Mostrar overlay de Choza fija tras 500ms
     setTimeout(() => {
-      if (state.markerVisible && state.arStarted) {
+      if (state.markerVisible && state.arStarted && !state.interiorActive) {
         showFixedChozaOverlay(activeExp);
       }
-    }, 600);
+    }, 500);
   }
 }
 
-function onMarkerLost(preset) {
+function handleMarkerLost(event) {
+  const detail = event.detail || {};
   const activeExp = getActiveExperience();
-  if (activeExp.markerPreset.toLowerCase() === (preset || '').toLowerCase()) {
+  const detectedPreset = (detail.preset || '').toLowerCase();
+  const detectedId = (detail.id || '').toLowerCase();
+
+  const isMatching = detectedPreset === activeExp.markerPreset.toLowerCase() ||
+                     detectedId === `marker-${activeExp.markerPreset.toLowerCase()}`;
+
+  if (isMatching) {
     state.markerVisible = false;
     if (state.arStarted && !state.interiorActive) {
       state.statusMode = 'searching';
@@ -423,9 +423,9 @@ function enterInteriorCabin() {
   state.panoramaOffsetX = 0;
   state.lastYawDeg = null;
 
-  // Ocultar AR overlay y escena
+  // Ocultar AR overlay
   document.getElementById('fixed-choza-overlay').classList.add('hidden');
-  document.getElementById('ar-container').classList.remove('active');
+  document.getElementById('ui-ar').classList.add('hidden');
 
   // Configurar y mostrar interior
   const interiorOverlay = document.getElementById('interior-overlay');
@@ -485,7 +485,7 @@ function openModelDialog(elem) {
   // Limpiar modelo previo
   if (viewer) viewer.removeAttribute('src');
 
-  // 1. Abrir diálogo nativo PRIMERO para garantizar dimensiones calculadas
+  // 1. Abrir diálogo nativo PRIMERO para que el contenedor tenga tamaño calculado
   if (dialog && typeof dialog.showModal === 'function') {
     dialog.showModal();
   }
@@ -534,7 +534,7 @@ function handleDeviceOrientation(event) {
   else if (deltaYaw < -180) deltaYaw += 360;
 
   state.lastYawDeg = yaw;
-  state.panoramaOffsetX += deltaYaw * 6; // Factor de sensibilidad horizontal
+  state.panoramaOffsetX += deltaYaw * 6;
 
   const interiorBg = document.getElementById('interior-bg');
   if (interiorBg) {
@@ -610,25 +610,7 @@ function checkOrientation() {
   } else if (state.isLandscape && state.arStarted) {
     state.statusMode = 'scanning';
     updateStatusText();
-    setupSceneMarkers();
   }
-}
-
-// --- REGISTRO DEL COMPONENTE AFRAME REGISTEREVENTS ---
-if (typeof AFRAME !== 'undefined') {
-  AFRAME.registerComponent('registerevents', {
-    init: function () {
-      const marker = this.el;
-      marker.addEventListener('markerFound', () => {
-        const preset = marker.getAttribute('preset');
-        onMarkerDetected(preset);
-      });
-      marker.addEventListener('markerLost', () => {
-        const preset = marker.getAttribute('preset');
-        onMarkerLost(preset);
-      });
-    }
-  });
 }
 
 // --- INICIALIZACIÓN DE LA APLICACIÓN ---
@@ -725,19 +707,23 @@ document.addEventListener('DOMContentLoaded', () => {
     closeModelDialog();
   });
 
-  // 10. Listeners de pantalla / resize
+  // 10. Escuchar eventos de marcadores emitidos por A-Frame registerevents
+  window.addEventListener('ar-marker-found', handleMarkerFound);
+  window.addEventListener('ar-marker-lost', handleMarkerLost);
+
+  // 11. Listeners de pantalla / resize
   window.addEventListener('resize', checkOrientation);
   window.addEventListener('orientationchange', checkOrientation);
 
-  // 11. Configurar touch controls para interior 360
+  // 12. Configurar touch controls para interior 360
   setupTouchPanControls();
 
-  // 12. Render inicial
+  // 13. Render inicial
   setLanguage(state.lang);
   renderMarkerMenu();
   checkOrientation();
 
-  // 13. Service Worker
+  // 14. Service Worker
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js')
       .then(reg => console.log('SW registrado:', reg.scope))
