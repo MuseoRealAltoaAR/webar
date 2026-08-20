@@ -1,6 +1,20 @@
-/**
- * RealAlto WebAR Experience - Pure Vanilla JavaScript con soporte 100% Offline
- */
+// --- COMPONENTES A-FRAME ---
+function initAframeComponents() {
+  if (typeof AFRAME !== 'undefined' && !AFRAME.components['registerevents']) {
+    AFRAME.registerComponent('registerevents', {
+      init: function () {
+        var marker = this.el;
+        marker.addEventListener('markerFound', function () {
+          window.dispatchEvent(new CustomEvent('ar-marker-found', { detail: { id: marker.id, preset: marker.getAttribute('preset') } }));
+        });
+        marker.addEventListener('markerLost', function () {
+          window.dispatchEvent(new CustomEvent('ar-marker-lost', { detail: { id: marker.id, preset: marker.getAttribute('preset') } }));
+        });
+      }
+    });
+  }
+}
+initAframeComponents();
 
 // --- LISTA COMPLETA DE RECURSOS PARA DESCARGA Y CACHÉ OFFLINE ---
 const OFFLINE_ASSETS_TO_PRELOAD = [
@@ -8,6 +22,9 @@ const OFFLINE_ASSETS_TO_PRELOAD = [
   './index.html',
   './style.css',
   './app.js',
+  './robots.txt',
+  './sitemap.xml',
+  './llms.txt',
   './assets/img/choza.webp',
   './assets/img/choza2.webp',
   './assets/img/background.webp',
@@ -495,6 +512,9 @@ function renderInteriorElements(elements) {
     imgBtn.src = elem.png;
     imgBtn.alt = t(elem.nameKey);
     imgBtn.className = 'valdivia-btn interactive';
+    imgBtn.width = 75;
+    imgBtn.height = 75;
+    imgBtn.loading = 'lazy';
     imgBtn.addEventListener('click', () => {
       openModelDialog(elem);
     });
@@ -641,82 +661,47 @@ function checkOrientation() {
   }
 }
 
-// --- FUNCIÓN DE PRECARGA COMPLETA OFFLINE ---
-async function preloadAllAppAssets() {
+// --- GESTIÓN DE SERVICE WORKER Y MODO OFFLINE ---
+function initOfflineSupport() {
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').then(reg => {
+        console.log('[App] Service Worker registrado para offline:', reg.scope);
+      }).catch(err => {
+        console.warn('[App] Error al registrar Service Worker:', err);
+      });
+    });
+  }
+}
+
+function hideLoadingScreen() {
+  const loadingScreen = document.getElementById('loading-screen');
   const fillEl = document.getElementById('preload-progress-fill');
   const percentEl = document.getElementById('preload-percent');
   const statusEl = document.getElementById('preload-status');
-  const loadingScreen = document.getElementById('loading-screen');
 
-  const totalAssets = OFFLINE_ASSETS_TO_PRELOAD.length;
-  let loadedCount = 0;
+  if (fillEl) fillEl.style.width = '100%';
+  if (percentEl) percentEl.textContent = '100%';
+  if (statusEl) statusEl.innerHTML = '<span>¡Listo!</span>';
 
-  // Registrar Service Worker
-  if ('serviceWorker' in navigator) {
-    try {
-      const reg = await navigator.serviceWorker.register('./sw.js');
-      console.log('[App] Service Worker registrado para offline:', reg.scope);
-    } catch (err) {
-      console.warn('[App] Error al registrar Service Worker:', err);
-    }
-  }
-
-  // Abrir caché directamente si es compatible para guardar todo
-  let cacheStorage = null;
-  if ('caches' in window) {
-    try {
-      cacheStorage = await caches.open('realalto-offline-v3');
-    } catch (e) {
-      console.warn('[Cache] No se pudo abrir caché directamente:', e);
-    }
-  }
-
-  // Descargar y cachear activamente cada recurso
-  for (const assetUrl of OFFLINE_ASSETS_TO_PRELOAD) {
-    try {
-      const response = await fetch(assetUrl, { mode: assetUrl.startsWith('http') ? 'cors' : 'same-origin' });
-      if (response && (response.ok || response.type === 'opaque') && cacheStorage) {
-        try {
-          await cacheStorage.put(assetUrl, response.clone());
-        } catch (cacheErr) {
-          // Ignore cache put errors on opaque CDN responses
-        }
-      }
-    } catch (e) {
-      console.warn('[Preload] Descarga de respaldo para:', assetUrl, e);
-    }
-
-    loadedCount++;
-    const percent = Math.round((loadedCount / totalAssets) * 100);
-
-    if (fillEl) fillEl.style.width = `${percent}%`;
-    if (percentEl) percentEl.textContent = `${percent}%`;
-    if (statusEl) {
-      statusEl.innerHTML = `Descargando recursos para uso offline... <span>${percent}%</span>`;
-    }
-  }
-
-  // Finalizado al 100%
-  if (statusEl) {
-    statusEl.innerHTML = `<span>¡Todo listo para usar sin conexión!</span>`;
-  }
-
-  // Esperar un instante para apreciar el 100% y desvanecer la pantalla de carga
-  setTimeout(() => {
-    if (loadingScreen) {
+  if (loadingScreen) {
+    setTimeout(() => {
       loadingScreen.style.opacity = '0';
       loadingScreen.style.pointerEvents = 'none';
       setTimeout(() => {
         loadingScreen.style.display = 'none';
-      }, 500);
-    }
-  }, 400);
+      }, 300);
+    }, 150);
+  }
 }
 
 // --- INICIALIZACIÓN DE LA APLICACIÓN ---
-document.addEventListener('DOMContentLoaded', () => {
-  // 1. Iniciar precarga total offline y desvanecimiento
-  preloadAllAppAssets();
+function initializeApp() {
+  initAframeComponents();
+
+  // 1. Ocultar splash y activar Service Worker en segundo plano
+  hideLoadingScreen();
+  initOfflineSupport();
 
   // 2. Configurar botones de cambio de idioma
   document.querySelectorAll('.lang-btn').forEach(btn => {
@@ -813,4 +798,10 @@ document.addEventListener('DOMContentLoaded', () => {
   setLanguage(state.lang);
   renderMarkerMenu();
   checkOrientation();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+  initializeApp();
+}

@@ -2,48 +2,45 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Real Alto - Museo Interactivo WebAR</title>
+  <meta name="description" content="Guía interactiva en Realidad Aumentada del Complejo Cultural Real Alto en Santa Elena, Ecuador. Descubre réplicas arqueológicas y recorridos 3D.">
+  <meta name="theme-color" content="#0d0c0b">
 
-  <!-- Google Fonts -->
+  <!-- Open Graph / Meta Social -->
+  <meta property="og:title" content="Real Alto - Museo Interactivo WebAR">
+  <meta property="og:description" content="Descubre réplicas arqueológicas tridimensionales e historia interactiva directamente en el área abierta del museo.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://realalto-webar.netlify.app/">
+  <meta property="og:image" content="https://realalto-webar.netlify.app/assets/img/logovaldivia.webp">
+  <link rel="canonical" href="https://realalto-webar.netlify.app/">
+  <link rel="icon" href="assets/icon/favicon.ico">
+
+  <!-- Google Fonts con precarga y swap -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-  <!-- A-Frame and AR.js libraries -->
-  <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+  <!-- App Stylesheet -->
+  <link rel="stylesheet" href="style.css">
 
-  <!-- Registrar componente de detección de marcadores ANTES de parsear la escena -->
-  <script>
-    if (typeof AFRAME !== 'undefined') {
-      AFRAME.registerComponent('registerevents', {
-        init: function () {
-          var marker = this.el;
-          marker.addEventListener('markerFound', function () {
-            window.dispatchEvent(new CustomEvent('ar-marker-found', { detail: { id: marker.id, preset: marker.getAttribute('preset') } }));
-          });
-          marker.addEventListener('markerLost', function () {
-            window.dispatchEvent(new CustomEvent('ar-marker-lost', { detail: { id: marker.id, preset: marker.getAttribute('preset') } }));
-          });
-        }
-      });
-    }
-  </script>
+  <!-- A-Frame and AR.js libraries diferidas -->
+  <script defer src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+  <script defer src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
 
   <!-- Google Model Viewer for interactive 3D inspection -->
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 
-  <!-- App Stylesheet -->
-  <link rel="stylesheet" href="style.css">
+  <!-- App Logic (Diferida) -->
+  <script defer src="app.js"></script>
 </head>
 <body style="margin: 0; overflow: hidden;">
 
-  <!-- Pantalla de Carga (Loading Screen con Descarga Offline) -->
+  <!-- Pantalla de Carga Rápida / Splash Inicial -->
   <div id="loading-screen">
     <div class="loading-logo-container">
-      <img src="assets/img/logo.webp" alt="Real Alto Logo" class="loading-logo" onerror="this.onerror=null; this.src='assets/img/logovaldivia.webp';">
+      <img src="assets/img/logo.webp" alt="Real Alto Logo" class="loading-logo" width="120" height="120" onerror="this.onerror=null; this.src='assets/img/logovaldivia.webp';">
       <div class="spinner"></div>
       
       <!-- Indicador de Descarga Offline Completa -->
@@ -51,7 +48,7 @@
         <div class="preload-bar">
           <div id="preload-progress-fill" class="preload-fill" style="width: 0%;"></div>
         </div>
-        <p id="preload-status" class="preload-status-text">Preparando experiencia offline... <span id="preload-percent">0%</span></p>
+        <p id="preload-status" class="preload-status-text">Iniciando experiencia... <span id="preload-percent">0%</span></p>
       </div>
     </div>
   </div>
@@ -61,7 +58,7 @@
     <div class="background-overlay"></div>
     
     <header class="home-header">
-      <button id="home-menu-btn" class="menu-btn" aria-label="Menú">
+      <button id="home-menu-btn" class="menu-btn" aria-label="Abrir menú de navegación">
         <span class="menu-icon">☰</span>
       </button>
       <div class="header-right">
@@ -69,8 +66,8 @@
           <span data-i18n="common.complex">COMPLEJO CULTURAL</span>
         </div>
         <div class="language-switcher">
-          <button type="button" class="lang-btn active" data-lang="es">ES</button>
-          <button type="button" class="lang-btn" data-lang="en">EN</button>
+          <button type="button" class="lang-btn active" data-lang="es" aria-label="Cambiar a Español">ES</button>
+          <button type="button" class="lang-btn" data-lang="en" aria-label="Switch to English">EN</button>
         </div>
       </div>
     </header>
@@ -78,7 +75,7 @@
     <main class="home-content">
       <div class="brand-container">
         <div class="logo-wrapper">
-          <img src="assets/img/logovaldivia.webp" alt="Logo Valdivia">
+          <img src="assets/img/logovaldivia.webp" alt="Logo Valdivia" width="90" height="90">
         </div>
         <div class="brand-divider"></div>
         <div class="brand-text">
@@ -108,7 +105,7 @@
     <div class="background-overlay"></div>
     
     <header class="info-header">
-      <button id="info-menu-btn" class="menu-btn" aria-label="Menú">
+      <button id="info-menu-btn" class="menu-btn" aria-label="Abrir menú de navegación">
         <span class="menu-icon">☰</span>
       </button>
       <div class="badge-complejo">
@@ -154,7 +151,7 @@
     </div>
 
     <div id="marker-dropdown-wrapper" class="marker-dropdown">
-      <button id="marker-dropdown-toggle" class="marker-dropdown-toggle glass interactive" type="button">
+      <button id="marker-dropdown-toggle" class="marker-dropdown-toggle glass interactive" type="button" aria-label="Seleccionar marcador">
         <span data-i18n="ar.markerMenu">Marcadores (toca para desplegar)</span>
         <span id="marker-arrow" class="marker-dropdown-arrow">▾</span>
       </button>
@@ -166,7 +163,7 @@
 
   <!-- Choza fija en pantalla completa al detectar marcador -->
   <div id="fixed-choza-overlay" class="fixed-choza-overlay hidden">
-    <img id="fixed-choza-img" src="assets/img/choza.webp" alt="Choza Real Alto" class="fixed-choza-image">
+    <img id="fixed-choza-img" src="assets/img/choza.webp" alt="Choza Real Alto" class="fixed-choza-image" width="800" height="600">
     <div class="fixed-choza-controls">
       <button id="enter-choza-btn" class="enter-choza-button interactive" data-i18n="app.enterCabin">Entrar a la choza</button>
     </div>
@@ -202,7 +199,7 @@
 
     <!-- Mesa con elementos en primer plano -->
     <div class="table-container">
-      <img id="mesa-img" src="assets/entorno/mesa.png" class="mesa-img" alt="Mesa">
+      <img id="mesa-img" src="assets/entorno/mesa.png" class="mesa-img" alt="Mesa de exhibición" width="1200" height="400">
       
       <!-- Lista horizontal de piezas interactivas -->
       <div id="elements-horizontal-container" class="elements-horizontal-container interactive">
@@ -216,7 +213,7 @@
     <div class="dialog-content-wrapper">
       <div class="dialog-header">
         <h3 id="dialog-header-title" data-i18n="common.detail">Detalle</h3>
-        <button id="close-dialog-btn" class="dialog-close-btn" aria-label="Cerrar">✕</button>
+        <button id="close-dialog-btn" class="dialog-close-btn" aria-label="Cerrar modal de detalle">✕</button>
       </div>
 
       <div class="dialog-body">
@@ -228,7 +225,7 @@
             auto-rotate
             ar
             shadow-intensity="1"
-            loading="eager"
+            loading="lazy"
             reveal="auto"
             alt="Modelo 3D Arqueológico">
           </model-viewer>
@@ -247,7 +244,7 @@
     <aside class="sidebar-container">
       <div class="sidebar-brand">
         <div class="logo-side-wrapper">
-          <img src="assets/img/logoside.webp" alt="Logo Lateral" class="logoside">
+          <img src="assets/img/logoside.webp" alt="Logo Lateral" class="logoside" width="80" height="80">
         </div>
       </div>
 
@@ -258,7 +255,7 @@
       </nav>
 
       <div class="sidebar-footer">
-        <button id="btn-sidebar-exit" class="btn-logout" aria-label="Salir" data-i18n="sidebar.exit">
+        <button id="btn-sidebar-exit" class="btn-logout" aria-label="Cerrar menú lateral" data-i18n="sidebar.exit">
           <svg viewBox="0 0 24 24" class="logout-icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
             <polyline points="16 17 21 12 16 7" />
@@ -268,8 +265,5 @@
       </div>
     </aside>
   </div>
-
-  <!-- App Main Logic -->
-  <script src="app.js"></script>
 </body>
 </html>

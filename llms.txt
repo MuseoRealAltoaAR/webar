@@ -1,0 +1,16 @@
+# Real Alto - Museo Interactivo WebAR
+
+> Guía Interactiva en Realidad Aumentada del Complejo Cultural Real Alto en Santa Elena, Ecuador.
+
+## Descripción General
+Esta aplicación web progresiva (PWA) permite a los visitantes del Complejo Cultural Real Alto explorar réplicas arqueológicas tridimensionales (cultura Valdivia) e historia interactiva directamente desde el navegador de su teléfono móvil utilizando WebAR (Realidad Aumentada basada en marcadores Hiro y Kanji).
+
+## Enlaces Principales
+- [Sitio WebAR Principal](https://realalto-webar.netlify.app/)
+- [Museo 360 Oficial](https://museorealalto.github.io/Museo360oficial/)
+
+## Tecnologías y Características
+- WebAR con A-Frame y AR.js
+- Google Model-Viewer para inspección de modelos 3D
+- Soporte 100% offline con Service Worker
+- Soporte bilingüe (Español / Inglés)
