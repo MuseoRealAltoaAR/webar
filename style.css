@@ -558,53 +558,67 @@ video {
   border-color: var(--primary);
 }
 
-/* Fixed Choza Overlay upon Marker Detection - SIN BLUR Y OCUPA TODO EL ANCHO */
+/* Fixed Choza Overlay upon Marker Detection - SIN BLUR, ANCHO COMPLETO Y BOTÓN SIEMPRE VISIBLE */
 .fixed-choza-overlay {
   position: fixed;
   inset: 0;
   width: 100vw;
-  height: 100vh;
+  height: 100dvh;
   z-index: 70;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  background: rgba(0, 0, 0, 0.35); /* Sin backdrop-filter blur */
-  animation: fadeIn 0.3s ease-out;
-  padding: 0;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 10px 0 max(16px, env(safe-area-inset-bottom)) 0;
+  box-sizing: border-box;
   overflow: hidden;
+  animation: fadeIn 0.3s ease-out;
 }
 
 .fixed-choza-image {
   width: 100vw !important;
   max-width: 100% !important;
-  height: auto !important;
-  max-height: 75vh !important;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: calc(100dvh - 85px) !important;
   object-fit: contain !important;
-  filter: drop-shadow(0 10px 30px rgba(0,0,0,0.8));
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.85));
   display: block;
 }
 
 .fixed-choza-controls {
-  margin-top: 16px;
+  flex-shrink: 0;
+  margin-top: 8px;
   z-index: 75;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 16px;
+  box-sizing: border-box;
 }
 
 .enter-choza-button {
-  padding: 14px 32px;
+  width: auto;
+  min-width: 200px;
+  padding: 12px 32px;
   background: var(--primary);
   color: #000000;
-  border: none;
-  border-radius: 14px;
-  font-size: 1.05rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  font-size: 1rem;
   font-weight: 800;
   cursor: pointer;
-  box-shadow: 0 6px 20px rgba(255, 159, 28, 0.45);
-  transition: transform 0.2s ease;
+  box-shadow: 0 6px 20px rgba(255, 159, 28, 0.6);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  letter-spacing: 0.3px;
+  pointer-events: auto !important;
 }
 
 .enter-choza-button:active {
   transform: scale(0.96);
+  box-shadow: 0 2px 10px rgba(255, 159, 28, 0.4);
 }
 
 /* Interior Choza 360 Overlay (Cabin View) */
@@ -959,12 +973,25 @@ model-viewer {
     max-width: 580px;
   }
 
+  .fixed-choza-overlay {
+    padding: 6px 0 max(10px, env(safe-area-inset-bottom)) 0;
+  }
+
   .fixed-choza-image {
     width: 100vw !important;
     max-width: 100% !important;
-    height: auto !important;
-    max-height: 72vh !important;
+    max-height: calc(100dvh - 65px) !important;
     object-fit: contain !important;
+  }
+
+  .fixed-choza-controls {
+    margin-top: 4px;
+  }
+
+  .enter-choza-button {
+    min-width: 180px;
+    padding: 9px 24px;
+    font-size: 0.92rem;
   }
 
   .table-container {
