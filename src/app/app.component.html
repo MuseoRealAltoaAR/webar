@@ -16,12 +16,12 @@
     renderer="logarithmicDepthBuffer: true; colorManagement: true;">
     
     <a-assets>
-      <img *ngFor="let exp of stateService.experiences" [id]="'scan-img-' + exp.id" [src]="exp.scanImage">
+      <img *ngFor="let exp of stateService.experiences" [id]="'scan-img-' + exp.id" [attr.src]="exp.scanImage">
       <ng-container *ngFor="let exp of stateService.experiences">
         <a-asset-item 
           *ngFor="let elem of exp.layer.elements" 
           [id]="'glb-' + elem.id" 
-          [src]="elem.glb">
+          [attr.src]="elem.glb">
         </a-asset-item>
       </ng-container>
     </a-assets>
@@ -33,7 +33,7 @@
       registerevents>
       <a-entity
         *ngFor="let elem of exp.layer.elements"
-        [attr.gltf-model]="'#glb-' + elem.id"
+        [attr.gltf-model]="'url(' + elem.glb + ')'"
         scale="0.5 0.5 0.5"
         position="0 0 0"
         rotation="0 0 0"
