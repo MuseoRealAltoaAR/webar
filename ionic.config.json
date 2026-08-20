@@ -1,7 +1,0 @@
-{
-  "name": "temp-app",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "angular-standalone"
-}
