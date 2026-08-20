@@ -15,7 +15,7 @@
     vr-mode-ui="enabled: false"
     renderer="logarithmicDepthBuffer: true; colorManagement: true;">
     
-    <a-assets>
+    <a-assets timeout="10000">
       <img *ngFor="let exp of stateService.experiences" [id]="'scan-img-' + exp.id" [attr.src]="exp.scanImage">
       <ng-container *ngFor="let exp of stateService.experiences">
         <a-asset-item 
@@ -33,7 +33,7 @@
       registerevents>
       <a-entity
         *ngFor="let elem of exp.layer.elements"
-        [attr.gltf-model]="'url(' + elem.glb + ')'"
+        [attr.gltf-model]="'#glb-' + elem.id"
         scale="0.5 0.5 0.5"
         position="0 0 0"
         rotation="0 0 0"
