@@ -172,18 +172,23 @@ export class CabinViewComponent implements OnInit, OnDestroy {
   }
 
   openElement(element: LayerElement) {
-    this.selectedElement = element;
     this.stateService.setActiveElementId(element.id);
     
-    // Add micro delay for smooth UI transition
+    // Open modal first with no element — model-viewer won't render yet.
+    // After the modal animation completes (~300ms), assign the element
+    // so model-viewer gets real layout dimensions when it starts loading.
+    this.showModal = true;
     setTimeout(() => {
-      this.showModal = true;
-    }, 100);
+      this.selectedElement = element;
+    }, 350);
   }
 
   closeModal() {
     this.showModal = false;
-    this.selectedElement = null;
+    // Clear element after dismiss animation so model-viewer src resets cleanly
+    setTimeout(() => {
+      this.selectedElement = null;
+    }, 300);
   }
 
   backToScan() {
