@@ -1,20 +1,72 @@
-// --- COMPONENTES A-FRAME ---
-function initAframeComponents() {
-  if (typeof AFRAME !== 'undefined' && !AFRAME.components['registerevents']) {
-    AFRAME.registerComponent('registerevents', {
-      init: function () {
-        var marker = this.el;
-        marker.addEventListener('markerFound', function () {
-          window.dispatchEvent(new CustomEvent('ar-marker-found', { detail: { id: marker.id, preset: marker.getAttribute('preset') } }));
-        });
-        marker.addEventListener('markerLost', function () {
-          window.dispatchEvent(new CustomEvent('ar-marker-lost', { detail: { id: marker.id, preset: marker.getAttribute('preset') } }));
-        });
-      }
-    });
-  }
+// --- CARGA DINÁMICA DE SCRIPTS (Lazy Loading para máximo rendimiento) ---
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) {
+      resolve();
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = src;
+    script.onload = () => resolve();
+    script.onerror = (err) => reject(err);
+    document.head.appendChild(script);
+  });
 }
-initAframeComponents();
+
+let arScriptsLoaded = false;
+let arLoadingPromise = null;
+
+async function ensureARScriptsLoaded() {
+  if (arScriptsLoaded) return;
+  if (arLoadingPromise) return arLoadingPromise;
+
+  arLoadingPromise = (async () => {
+    console.log('[WebAR] Cargando A-Frame...');
+    await loadScript('https://aframe.io/releases/1.3.0/aframe.min.js');
+
+    // Registrar componente registerevents inmediatamente después de AFRAME
+    if (typeof AFRAME !== 'undefined' && !AFRAME.components['registerevents']) {
+      AFRAME.registerComponent('registerevents', {
+        init: function () {
+          var marker = this.el;
+          marker.addEventListener('markerFound', function () {
+            window.dispatchEvent(new CustomEvent('ar-marker-found', { detail: { id: marker.id, preset: marker.getAttribute('preset') } }));
+          });
+          marker.addEventListener('markerLost', function () {
+            window.dispatchEvent(new CustomEvent('ar-marker-lost', { detail: { id: marker.id, preset: marker.getAttribute('preset') } }));
+          });
+        }
+      });
+    }
+
+    console.log('[WebAR] Cargando AR.js y complementos...');
+    await loadScript('https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js');
+    await loadScript('https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js');
+
+    arScriptsLoaded = true;
+    console.log('[WebAR] Motor WebAR listo.');
+  })();
+
+  return arLoadingPromise;
+}
+
+let modelViewerLoaded = false;
+async function ensureModelViewerLoaded() {
+  if (modelViewerLoaded || customElements.get('model-viewer')) return;
+  await loadScript('https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js');
+  modelViewerLoaded = true;
+}
+
+// Prefetch en background durante idle time sin bloquear renderizado inicial
+if ('requestIdleCallback' in window) {
+  window.requestIdleCallback(() => {
+    ensureARScriptsLoaded().catch(() => {});
+  }, { timeout: 3500 });
+} else {
+  setTimeout(() => {
+    ensureARScriptsLoaded().catch(() => {});
+  }, 2500);
+}
 
 // --- LISTA COMPLETA DE RECURSOS PARA DESCARGA Y CACHÉ OFFLINE ---
 const OFFLINE_ASSETS_TO_PRELOAD = [
@@ -97,12 +149,14 @@ const i18n = {
       orientationWarning: 'Para escanear marcadores, gira el teléfono a horizontal.',
       markerMenu: 'Marcadores (toca para desplegar)',
       status: {
-        loading: 'Cargando cámara...',
+        loading: 'Solicitando cámara...',
         scanning: 'Escaneando marcador [{marker}]',
         detected: 'Marcador detectado',
         searching: 'Buscando marcador...',
         paused: 'Escaneo pausado',
-        resetting: 'Reiniciando escaneo...'
+        resetting: 'Reiniciando escaneo...',
+        cameraError: 'Permiso de cámara requerido',
+        loadingEngine: 'Cargando motor WebAR...'
       }
     },
     cabin: {
@@ -174,12 +228,14 @@ const i18n = {
       orientationWarning: 'To scan markers, rotate your phone to landscape.',
       markerMenu: 'Markers (tap to open)',
       status: {
-        loading: 'Loading camera...',
+        loading: 'Requesting camera...',
         scanning: 'Scanning marker [{marker}]',
         detected: 'Marker detected',
         searching: 'Searching for marker...',
         paused: 'Scanning paused',
-        resetting: 'Resetting scan...'
+        resetting: 'Resetting scan...',
+        cameraError: 'Camera permission required',
+        loadingEngine: 'Loading WebAR engine...'
       }
     },
     cabin: {
@@ -339,21 +395,97 @@ function getActiveExperience() {
   return experiences.find(exp => exp.id === state.activeExperienceId) || experiences[0];
 }
 
-function startARTracking() {
+let cameraStreamActive = false;
+let arSceneInitialized = false;
+
+async function requestCameraAccess() {
+  try {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      console.warn('[WebAR] getUserMedia no está disponible directamente en este contexto');
+      return true;
+    }
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' } },
+      audio: false
+    });
+    // Liberamos el stream temporal para que el motor AR.js tome control exclusivo del dispositivo
+    stream.getTracks().forEach(t => t.stop());
+    cameraStreamActive = true;
+    return true;
+  } catch (err) {
+    console.error('[WebAR] Permiso de cámara no concedido o error:', err);
+    return false;
+  }
+}
+
+async function startARTracking() {
   state.arStarted = true;
-  state.statusMode = 'scanning';
+  state.statusMode = 'loading';
   updateStatusText();
   
   const statusDot = document.getElementById('status-dot');
   if (statusDot) statusDot.classList.add('active');
 
   checkOrientation();
+
+  // 1. Solicitar permisos de cámara de manera explícita al usuario
+  const cameraGranted = await requestCameraAccess();
+  if (!cameraGranted) {
+    state.statusMode = 'cameraError';
+    updateStatusText();
+    alert(state.lang === 'es'
+      ? 'Se requiere acceso a la cámara para escanear marcadores WebAR. Por favor permite los permisos de cámara en tu navegador.'
+      : 'Camera permission is required to scan WebAR markers. Please grant permissions in your browser.');
+    return;
+  }
+
+  // 2. Asegurar que las librerías AR (A-Frame y AR.js) estén cargadas
+  state.statusMode = 'loadingEngine';
+  updateStatusText();
+  try {
+    await ensureARScriptsLoaded();
+  } catch (err) {
+    console.error('[WebAR] Error cargando scripts de AR:', err);
+    state.statusMode = 'loading';
+    updateStatusText();
+    return;
+  }
+
+  // 3. Inyectar escena A-Frame si aún no ha sido creada
+  const container = document.getElementById('ar-scene-container');
+  if (container && !arSceneInitialized) {
+    container.innerHTML = `
+      <a-scene 
+        id="aframe-scene"
+        embedded 
+        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+        vr-mode-ui="enabled: false"
+        renderer="logarithmicDepthBuffer: true; colorManagement: true;">
+        
+        <!-- Marcador HIRO (Choza Real Alto) -->
+        <a-marker id="marker-hiro" preset="hiro" registerevents>
+        </a-marker>
+
+        <!-- Marcador KANJI (Choza Valdivia) -->
+        <a-marker id="marker-kanji" preset="kanji" registerevents>
+        </a-marker>
+
+        <a-entity camera>
+          <a-cursor raycaster="objects: a-image, a-entity" cursor="fuse: false" visible="false"></a-cursor>
+        </a-entity>
+      </a-scene>
+    `;
+    arSceneInitialized = true;
+  }
+
+  state.statusMode = 'scanning';
+  updateStatusText();
   requestDeviceOrientation();
 
-  // Forzar trigger de resize para que AR.js calibre el feed de la cámara
+  // Forzar resize para que AR.js calibre el feed de la cámara
   setTimeout(() => {
     window.dispatchEvent(new Event('resize'));
-  }, 100);
+  }, 350);
 }
 
 function resetExperience() {
@@ -523,7 +655,10 @@ function renderInteriorElements(elements) {
 }
 
 // --- DIÁLOGO MODAL 3D (Google model-viewer) ---
-function openModelDialog(elem) {
+async function openModelDialog(elem) {
+  // Asegurar que el componente <model-viewer> esté cargado antes de abrir el modal
+  await ensureModelViewerLoaded();
+
   const modal = document.getElementById('model-dialog');
   const viewer = document.getElementById('main-model-viewer');
   const titleEl = document.getElementById('modal-piece-title');

@@ -419,6 +419,7 @@ html, body {
 }
 
 /* A-Frame Escena WebAR */
+#ar-scene-container,
 a-scene {
   position: absolute !important;
   inset: 0 !important;

@@ -24,15 +24,7 @@
   <!-- App Stylesheet -->
   <link rel="stylesheet" href="style.css">
 
-  <!-- A-Frame and AR.js libraries diferidas -->
-  <script defer src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-  <script defer src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
-
-  <!-- Google Model Viewer for interactive 3D inspection -->
-  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
-
-  <!-- App Logic (Diferida) -->
+  <!-- App Logic (Diferida, ligera y modular) -->
   <script defer src="app.js"></script>
 </head>
 <body style="margin: 0; overflow: hidden;">
@@ -40,7 +32,7 @@
   <!-- Pantalla de Carga Rápida / Splash Inicial -->
   <div id="loading-screen">
     <div class="loading-logo-container">
-      <img src="assets/img/logo.webp" alt="Real Alto Logo" class="loading-logo" width="120" height="120" onerror="this.onerror=null; this.src='assets/img/logovaldivia.webp';">
+      <img src="assets/img/logo.webp" alt="Real Alto Logo" class="loading-logo" width="393" height="304" onerror="this.onerror=null; this.src='assets/img/logovaldivia.webp';">
       <div class="spinner"></div>
       
       <!-- Indicador de Descarga Offline Completa -->
@@ -75,7 +67,7 @@
     <main class="home-content">
       <div class="brand-container">
         <div class="logo-wrapper">
-          <img src="assets/img/logovaldivia.webp" alt="Logo Valdivia" width="90" height="90">
+          <img src="assets/img/logovaldivia.webp" alt="Logo Valdivia" width="126" height="116">
         </div>
         <div class="brand-divider"></div>
         <div class="brand-text">
@@ -163,32 +155,14 @@
 
   <!-- Choza fija en pantalla completa al detectar marcador -->
   <div id="fixed-choza-overlay" class="fixed-choza-overlay hidden">
-    <img id="fixed-choza-img" src="assets/img/choza.webp" alt="Choza Real Alto" class="fixed-choza-image" width="800" height="600">
+    <img id="fixed-choza-img" src="assets/img/choza.webp" alt="Choza Real Alto" class="fixed-choza-image" width="3186" height="1344">
     <div class="fixed-choza-controls">
       <button id="enter-choza-btn" class="enter-choza-button interactive" data-i18n="app.enterCabin">Entrar a la choza</button>
     </div>
   </div>
 
-  <!-- ESCENA A-FRAME WEBAR (Directa en el DOM para cámara WebAR continua) -->
-  <a-scene 
-    id="aframe-scene"
-    embedded 
-    arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
-    vr-mode-ui="enabled: false"
-    renderer="logarithmicDepthBuffer: true; colorManagement: true;">
-    
-    <!-- Marcador HIRO (Choza Real Alto) -->
-    <a-marker id="marker-hiro" preset="hiro" registerevents>
-    </a-marker>
-
-    <!-- Marcador KANJI (Choza Valdivia) -->
-    <a-marker id="marker-kanji" preset="kanji" registerevents>
-    </a-marker>
-
-    <a-entity camera>
-      <a-cursor raycaster="objects: a-image, a-entity" cursor="fuse: false" visible="false"></a-cursor>
-    </a-entity>
-  </a-scene>
+  <!-- CONTENEDOR DE LA ESCENA WEBAR (Inyectado bajo demanda sin bloquear) -->
+  <div id="ar-scene-container"></div>
 
   <!-- VISTA INTERIOR DE LA CHOZA / EXPERIENCIA 360 (Cabin View) -->
   <div id="interior-overlay" class="interior-overlay hidden">
@@ -199,7 +173,7 @@
 
     <!-- Mesa con elementos en primer plano -->
     <div class="table-container">
-      <img id="mesa-img" src="assets/entorno/mesa.png" class="mesa-img" alt="Mesa de exhibición" width="1200" height="400">
+      <img id="mesa-img" src="assets/entorno/mesa.png" class="mesa-img" alt="Mesa de exhibición" width="1200" height="494">
       
       <!-- Lista horizontal de piezas interactivas -->
       <div id="elements-horizontal-container" class="elements-horizontal-container interactive">
@@ -208,7 +182,7 @@
     </div>
   </div>
 
-  <!-- MODAL PARA VISOR 3D (Google model-viewer) -->
+  <!-- MODAL PARA VISOR 3D (Google model-viewer bajo demanda) -->
   <div id="model-dialog" class="model-modal-dialog hidden">
     <div class="dialog-content-wrapper">
       <div class="dialog-header">
@@ -244,7 +218,7 @@
     <aside class="sidebar-container">
       <div class="sidebar-brand">
         <div class="logo-side-wrapper">
-          <img src="assets/img/logoside.webp" alt="Logo Lateral" class="logoside" width="80" height="80">
+          <img src="assets/img/logoside.webp" alt="Logo Lateral" class="logoside" width="442" height="156">
         </div>
       </div>
 
