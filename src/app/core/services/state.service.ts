@@ -39,19 +39,19 @@ export class StateService {
       name: 'experience.choza_realalto.name',
       markerPreset: 'hiro',
       markerLabel: 'Hiro',
-      scanImage: 'assets/img/choza.webp',
+      scanImage: '/assets/img/choza.webp',
       layer: {
         id: 'layer_choza',
         name: 'experience.choza_realalto.layerName',
-        mainImage: 'assets/img/choza.webp',
-        backgroundImage: 'assets/img/interiorchoza.webp',
-        foregroundImage: 'assets/entorno/mesa.png',
+        mainImage: '/assets/img/choza.webp',
+        backgroundImage: '/assets/img/interiorchoza.webp',
+        foregroundImage: '/assets/entorno/mesa.png',
         elements: [
           {
             id: 'valdivia',
             name: 'element.valdivia.name',
-            glb: 'assets/models/valdivia.glb',
-            png: 'assets/models/valdivia.png',
+            glb: '/assets/models/valdivia.glb',
+            png: '/assets/models/valdivia.png',
             desc: 'element.valdivia.desc'
           }
         ]
@@ -62,19 +62,19 @@ export class StateService {
       name: 'experience.choza2_realalto.name',
       markerPreset: 'kanji',
       markerLabel: 'Kanji',
-      scanImage: 'assets/img/choza2.webp',
+      scanImage: '/assets/img/choza2.webp',
       layer: {
         id: 'layer_choza2',
         name: 'experience.choza2_realalto.layerName',
-        mainImage: 'assets/img/choza2.webp',
-        backgroundImage: 'assets/img/interiorchoza2.webp',
-        foregroundImage: 'assets/entorno/mesa.png',
+        mainImage: '/assets/img/choza2.webp',
+        backgroundImage: '/assets/img/interiorchoza2.webp',
+        foregroundImage: '/assets/entorno/mesa.png',
         elements: [
           {
             id: 'choza2_realalto',
             name: 'element.choza2_realalto.name',
-            glb: 'assets/models/duck.glb',
-            png: 'assets/models/duck.png',
+            glb: '/assets/models/duck.glb',
+            png: '/assets/models/duck.png',
             desc: 'element.choza2_realalto.desc'
           }
         ]
