@@ -225,8 +225,8 @@
     </div>
   </div>
 
-  <!-- DIÁLOGO MODAL NATIVO PARA VISOR 3D (Google model-viewer) -->
-  <dialog id="model-dialog" class="model-modal-dialog">
+  <!-- MODAL PARA VISOR 3D (Google model-viewer) -->
+  <div id="model-dialog" class="model-modal-dialog hidden">
     <div class="dialog-content-wrapper">
       <div class="dialog-header">
         <h3 id="dialog-header-title" data-i18n="common.detail">Detalle</h3>
@@ -242,6 +242,8 @@
             auto-rotate
             ar
             shadow-intensity="1"
+            loading="eager"
+            reveal="auto"
             alt="Modelo 3D Arqueológico">
           </model-viewer>
         </div>
@@ -252,7 +254,7 @@
         </div>
       </div>
     </div>
-  </dialog>
+  </div>
 
   <!-- SIDEBAR DRAWER NAVEGACIÓN -->
   <div id="sidebar-wrapper" class="sidebar-wrapper">

@@ -413,12 +413,12 @@ function handleMarkerFound(event) {
     state.statusMode = 'detected';
     updateStatusText();
 
-    // Mostrar overlay de Choza fija tras 500ms
+    // Mostrar overlay de Choza fija a pantalla completa sin blur
     setTimeout(() => {
       if (state.markerVisible && state.arStarted && !state.interiorActive) {
         showFixedChozaOverlay(activeExp);
       }
-    }, 500);
+    }, 400);
   }
 }
 
@@ -504,7 +504,7 @@ function renderInteriorElements(elements) {
 
 // --- DIÁLOGO MODAL 3D (Google model-viewer) ---
 function openModelDialog(elem) {
-  const dialog = document.getElementById('model-dialog');
+  const modal = document.getElementById('model-dialog');
   const viewer = document.getElementById('main-model-viewer');
   const titleEl = document.getElementById('modal-piece-title');
   const descEl = document.getElementById('modal-piece-desc');
@@ -514,29 +514,25 @@ function openModelDialog(elem) {
   if (descEl) descEl.textContent = t(elem.descKey);
   if (interiorBg) interiorBg.classList.add('blurred');
 
-  // Limpiar modelo previo
-  if (viewer) viewer.removeAttribute('src');
-
-  // 1. Abrir diálogo nativo PRIMERO para que el contenedor tenga tamaño calculado
-  if (dialog && typeof dialog.showModal === 'function') {
-    dialog.showModal();
+  // 1. Mostrar modal
+  if (modal) {
+    modal.classList.remove('hidden');
   }
 
-  // 2. Asignar URL absoluta al model-viewer tras un micro-delay
-  const absoluteGlbUrl = new URL(elem.glb, window.location.href).href;
-  setTimeout(() => {
-    if (viewer) {
-      viewer.setAttribute('src', absoluteGlbUrl);
-    }
-  }, 200);
+  // 2. Asignar ruta al model-viewer
+  if (viewer) {
+    const absoluteGlbUrl = new URL(elem.glb, window.location.href).href;
+    console.log('[3D Viewer] Cargando modelo GLB desde:', absoluteGlbUrl);
+    viewer.setAttribute('src', absoluteGlbUrl);
+  }
 }
 
 function closeModelDialog() {
-  const dialog = document.getElementById('model-dialog');
+  const modal = document.getElementById('model-dialog');
   const viewer = document.getElementById('main-model-viewer');
   const interiorBg = document.getElementById('interior-bg');
 
-  if (dialog) dialog.close();
+  if (modal) modal.classList.add('hidden');
   if (viewer) viewer.removeAttribute('src');
   if (interiorBg) interiorBg.classList.remove('blurred');
 }
@@ -665,10 +661,27 @@ async function preloadAllAppAssets() {
     }
   }
 
+  // Abrir caché directamente si es compatible para guardar todo
+  let cacheStorage = null;
+  if ('caches' in window) {
+    try {
+      cacheStorage = await caches.open('realalto-offline-v3');
+    } catch (e) {
+      console.warn('[Cache] No se pudo abrir caché directamente:', e);
+    }
+  }
+
   // Descargar y cachear activamente cada recurso
   for (const assetUrl of OFFLINE_ASSETS_TO_PRELOAD) {
     try {
-      await fetch(assetUrl, { mode: assetUrl.startsWith('http') ? 'cors' : 'same-origin' });
+      const response = await fetch(assetUrl, { mode: assetUrl.startsWith('http') ? 'cors' : 'same-origin' });
+      if (response && (response.ok || response.type === 'opaque') && cacheStorage) {
+        try {
+          await cacheStorage.put(assetUrl, response.clone());
+        } catch (cacheErr) {
+          // Ignore cache put errors on opaque CDN responses
+        }
+      }
     } catch (e) {
       console.warn('[Preload] Descarga de respaldo para:', assetUrl, e);
     }
@@ -695,7 +708,7 @@ async function preloadAllAppAssets() {
       loadingScreen.style.pointerEvents = 'none';
       setTimeout(() => {
         loadingScreen.style.display = 'none';
-      }, 600);
+      }, 500);
     }
   }, 400);
 }
@@ -782,7 +795,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 9. Diálogo modal cerrar
   document.getElementById('close-dialog-btn')?.addEventListener('click', () => {
-    closePieceModal();
+    closeModelDialog();
   });
 
   // 10. Escuchar eventos de marcadores emitidos por A-Frame registerevents

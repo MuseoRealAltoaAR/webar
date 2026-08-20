@@ -48,7 +48,7 @@ html, body {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Pantalla de Carga (Loading Screen) */
+/* Pantalla de Carga (Loading Screen con Descarga Offline) */
 #loading-screen {
   position: fixed;
   inset: 0;
@@ -62,18 +62,18 @@ html, body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  transition: opacity 0.6s ease-in-out, visibility 0.6s ease-in-out;
+  transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
 }
 
 .loading-logo-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  gap: 20px;
 }
 
 .loading-logo {
-  width: 130px;
+  width: 120px;
   height: auto;
   filter: drop-shadow(0 4px 15px rgba(255, 159, 28, 0.4));
   animation: pulseLogo 2s infinite ease-in-out;
@@ -85,8 +85,8 @@ html, body {
 }
 
 .spinner {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border: 3.5px solid rgba(255, 159, 28, 0.2);
   border-radius: 50%;
   border-top-color: var(--primary);
@@ -104,14 +104,14 @@ html, body {
   align-items: center;
   gap: 10px;
   width: min(320px, 85vw);
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
 .preload-bar {
   width: 100%;
   height: 8px;
   background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 159, 28, 0.3);
+  border: 1px solid rgba(255, 159, 28, 0.35);
   border-radius: 999px;
   overflow: hidden;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5) inset;
@@ -121,14 +121,14 @@ html, body {
   height: 100%;
   background: linear-gradient(90deg, #ff9f1c, #ffd18e);
   border-radius: 999px;
-  transition: width 0.2s ease-out;
+  transition: width 0.15s ease-out;
   box-shadow: 0 0 12px rgba(255, 159, 28, 0.8);
 }
 
 .preload-status-text {
   font-size: 0.82rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.9);
   letter-spacing: 0.3px;
   text-align: center;
   margin: 0;
@@ -139,7 +139,7 @@ html, body {
   font-weight: 800;
 }
 
-/* Background overlay with blur and dimming */
+/* Background overlay with blur and dimming for Home & Info only */
 .background-overlay {
   position: fixed;
   inset: 0;
@@ -558,41 +558,48 @@ video {
   border-color: var(--primary);
 }
 
-/* Fixed Choza Overlay upon Marker Detection */
+/* Fixed Choza Overlay upon Marker Detection - SIN BLUR Y OCUPA TODO EL ANCHO */
 .fixed-choza-overlay {
   position: fixed;
   inset: 0;
+  width: 100vw;
+  height: 100vh;
   z-index: 70;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-  animation: fadeIn 0.4s ease-out;
+  background: rgba(0, 0, 0, 0.35); /* Sin backdrop-filter blur */
+  animation: fadeIn 0.3s ease-out;
+  padding: 0;
+  overflow: hidden;
 }
 
 .fixed-choza-image {
-  max-width: min(85vw, 680px);
-  max-height: 55vh;
-  object-fit: contain;
+  width: 100vw !important;
+  max-width: 100% !important;
+  height: auto !important;
+  max-height: 75vh !important;
+  object-fit: contain !important;
   filter: drop-shadow(0 10px 30px rgba(0,0,0,0.8));
+  display: block;
 }
 
 .fixed-choza-controls {
-  margin-top: 24px;
+  margin-top: 16px;
+  z-index: 75;
 }
 
 .enter-choza-button {
-  padding: 14px 28px;
+  padding: 14px 32px;
   background: var(--primary);
   color: #000000;
   border: none;
   border-radius: 14px;
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 800;
   cursor: pointer;
-  box-shadow: 0 6px 20px rgba(255, 159, 28, 0.4);
+  box-shadow: 0 6px 20px rgba(255, 159, 28, 0.45);
   transition: transform 0.2s ease;
 }
 
@@ -699,30 +706,31 @@ video {
   transform: scale(0.95);
 }
 
-/* NATIVE DIALOG MODAL (Google Model-Viewer 3D inspection) */
+/* MODAL OVERLAY (Google Model-Viewer 3D inspection) */
 .model-modal-dialog {
-  border: none;
-  border-radius: 20px;
-  background: #0b1220;
-  color: #e5e7eb;
-  padding: 0;
-  width: min(90vw, 460px);
-  max-height: min(85vh, 720px);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
-  overflow: hidden;
-  margin: auto;
-  z-index: 10000;
-}
-
-.model-modal-dialog::backdrop {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
   background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(8px);
+  z-index: 10000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
 }
 
 .dialog-content-wrapper {
+  background: #0b1220;
+  border-radius: 20px;
+  color: #e5e7eb;
+  width: min(90vw, 480px);
+  max-height: min(85vh, 720px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  height: 100%;
 }
 
 .dialog-header {
@@ -741,13 +749,13 @@ video {
 }
 
 .dialog-close-btn {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.12);
   border: none;
   color: #ffffff;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  font-size: 1rem;
+  font-size: 1.1rem;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -756,7 +764,7 @@ video {
 }
 
 .dialog-close-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .dialog-body {
@@ -769,7 +777,7 @@ video {
 
 .model-viewer-container {
   width: 100%;
-  height: 300px;
+  height: 320px;
   min-height: 280px;
   background: transparent;
   border-radius: 14px;
@@ -951,6 +959,14 @@ model-viewer {
     max-width: 580px;
   }
 
+  .fixed-choza-image {
+    width: 100vw !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: 72vh !important;
+    object-fit: contain !important;
+  }
+
   .table-container {
     max-width: min(47vw, 520px);
     height: 29%;
@@ -965,7 +981,7 @@ model-viewer {
     width: clamp(50px, 8vw, 75px);
   }
 
-  .model-modal-dialog {
+  .dialog-content-wrapper {
     width: min(90vw, 760px);
     max-height: min(85vh, 460px);
   }

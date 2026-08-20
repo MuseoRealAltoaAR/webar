@@ -7,7 +7,3 @@ Thumbs.db
 # Environment & local files
 node_modules/
 .vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
