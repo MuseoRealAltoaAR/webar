@@ -1,6 +1,38 @@
 /**
- * RealAlto WebAR Experience - Pure Vanilla JavaScript
+ * RealAlto WebAR Experience - Pure Vanilla JavaScript con soporte 100% Offline
  */
+
+// --- LISTA COMPLETA DE RECURSOS PARA DESCARGA Y CACHÉ OFFLINE ---
+const OFFLINE_ASSETS_TO_PRELOAD = [
+  './',
+  './index.html',
+  './style.css',
+  './app.js',
+  './assets/img/choza.webp',
+  './assets/img/choza2.webp',
+  './assets/img/background.webp',
+  './assets/img/interiorchoza.webp',
+  './assets/img/interiorchoza2.webp',
+  './assets/img/logo.webp',
+  './assets/img/logohome.webp',
+  './assets/img/logoside.webp',
+  './assets/img/logovaldivia.webp',
+  './assets/entorno/mesa.png',
+  './assets/models/valdivia.glb',
+  './assets/models/valdivia.png',
+  './assets/models/duck.glb',
+  './assets/models/duck.png',
+  './assets/i18n/es.json',
+  './assets/i18n/en.json',
+  './assets/i18n/main.json',
+  './assets/icon/favicon.ico',
+  './assets/shapes.svg',
+  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap',
+  'https://aframe.io/releases/1.3.0/aframe.min.js',
+  'https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js',
+  'https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js',
+  'https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js'
+];
 
 // --- DICCIONARIO DE INTERNACIONALIZACIÓN (i18n) ---
 const i18n = {
@@ -613,19 +645,65 @@ function checkOrientation() {
   }
 }
 
-// --- INICIALIZACIÓN DE LA APLICACIÓN ---
-document.addEventListener('DOMContentLoaded', () => {
-  // 1. Desvanecer loading screen tras 1.2s
+// --- FUNCIÓN DE PRECARGA COMPLETA OFFLINE ---
+async function preloadAllAppAssets() {
+  const fillEl = document.getElementById('preload-progress-fill');
+  const percentEl = document.getElementById('preload-percent');
+  const statusEl = document.getElementById('preload-status');
   const loadingScreen = document.getElementById('loading-screen');
-  if (loadingScreen) {
-    setTimeout(() => {
+
+  const totalAssets = OFFLINE_ASSETS_TO_PRELOAD.length;
+  let loadedCount = 0;
+
+  // Registrar Service Worker
+  if ('serviceWorker' in navigator) {
+    try {
+      const reg = await navigator.serviceWorker.register('./sw.js');
+      console.log('[App] Service Worker registrado para offline:', reg.scope);
+    } catch (err) {
+      console.warn('[App] Error al registrar Service Worker:', err);
+    }
+  }
+
+  // Descargar y cachear activamente cada recurso
+  for (const assetUrl of OFFLINE_ASSETS_TO_PRELOAD) {
+    try {
+      await fetch(assetUrl, { mode: assetUrl.startsWith('http') ? 'cors' : 'same-origin' });
+    } catch (e) {
+      console.warn('[Preload] Descarga de respaldo para:', assetUrl, e);
+    }
+
+    loadedCount++;
+    const percent = Math.round((loadedCount / totalAssets) * 100);
+
+    if (fillEl) fillEl.style.width = `${percent}%`;
+    if (percentEl) percentEl.textContent = `${percent}%`;
+    if (statusEl) {
+      statusEl.innerHTML = `Descargando recursos para uso offline... <span>${percent}%</span>`;
+    }
+  }
+
+  // Finalizado al 100%
+  if (statusEl) {
+    statusEl.innerHTML = `<span>¡Todo listo para usar sin conexión!</span>`;
+  }
+
+  // Esperar un instante para apreciar el 100% y desvanecer la pantalla de carga
+  setTimeout(() => {
+    if (loadingScreen) {
       loadingScreen.style.opacity = '0';
       loadingScreen.style.pointerEvents = 'none';
       setTimeout(() => {
         loadingScreen.style.display = 'none';
       }, 600);
-    }, 1200);
-  }
+    }
+  }, 400);
+}
+
+// --- INICIALIZACIÓN DE LA APLICACIÓN ---
+document.addEventListener('DOMContentLoaded', () => {
+  // 1. Iniciar precarga total offline y desvanecimiento
+  preloadAllAppAssets();
 
   // 2. Configurar botones de cambio de idioma
   document.querySelectorAll('.lang-btn').forEach(btn => {
@@ -704,7 +782,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 9. Diálogo modal cerrar
   document.getElementById('close-dialog-btn')?.addEventListener('click', () => {
-    closeModelDialog();
+    closePieceModal();
   });
 
   // 10. Escuchar eventos de marcadores emitidos por A-Frame registerevents
@@ -722,11 +800,4 @@ document.addEventListener('DOMContentLoaded', () => {
   setLanguage(state.lang);
   renderMarkerMenu();
   checkOrientation();
-
-  // 14. Service Worker
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js')
-      .then(reg => console.log('SW registrado:', reg.scope))
-      .catch(err => console.error('Error SW:', err));
-  }
 });

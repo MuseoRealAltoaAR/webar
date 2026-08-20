@@ -40,11 +40,19 @@
 </head>
 <body style="margin: 0; overflow: hidden;">
 
-  <!-- Pantalla de Carga (Loading Screen) -->
+  <!-- Pantalla de Carga (Loading Screen con Descarga Offline) -->
   <div id="loading-screen">
     <div class="loading-logo-container">
       <img src="assets/img/logo.webp" alt="Real Alto Logo" class="loading-logo" onerror="this.onerror=null; this.src='assets/img/logovaldivia.webp';">
       <div class="spinner"></div>
+      
+      <!-- Indicador de Descarga Offline Completa -->
+      <div class="preload-container">
+        <div class="preload-bar">
+          <div id="preload-progress-fill" class="preload-fill" style="width: 0%;"></div>
+        </div>
+        <p id="preload-status" class="preload-status-text">Preparando experiencia offline... <span id="preload-percent">0%</span></p>
+      </div>
     </div>
   </div>
 

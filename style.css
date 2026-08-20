@@ -98,6 +98,47 @@ html, body {
   to { transform: rotate(360deg); }
 }
 
+.preload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: min(320px, 85vw);
+  margin-top: 8px;
+}
+
+.preload-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 159, 28, 0.3);
+  border-radius: 999px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5) inset;
+}
+
+.preload-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff9f1c, #ffd18e);
+  border-radius: 999px;
+  transition: width 0.2s ease-out;
+  box-shadow: 0 0 12px rgba(255, 159, 28, 0.8);
+}
+
+.preload-status-text {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 0.3px;
+  text-align: center;
+  margin: 0;
+}
+
+.preload-status-text span {
+  color: var(--primary);
+  font-weight: 800;
+}
+
 /* Background overlay with blur and dimming */
 .background-overlay {
   position: fixed;
