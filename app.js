@@ -57,17 +57,6 @@ async function ensureModelViewerLoaded() {
   modelViewerLoaded = true;
 }
 
-// Prefetch en background durante idle time sin bloquear renderizado inicial
-if ('requestIdleCallback' in window) {
-  window.requestIdleCallback(() => {
-    ensureARScriptsLoaded().catch(() => {});
-  }, { timeout: 3500 });
-} else {
-  setTimeout(() => {
-    ensureARScriptsLoaded().catch(() => {});
-  }, 2500);
-}
-
 // --- LISTA COMPLETA DE RECURSOS PARA DESCARGA Y CACHÉ OFFLINE ---
 const OFFLINE_ASSETS_TO_PRELOAD = [
   './',
