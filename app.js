@@ -1,670 +1,746 @@
-// Register Service Worker for offline capability
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then((reg) => console.log('Service Worker registrado con éxito:', reg.scope))
-      .catch((err) => console.error('Error al registrar el Service Worker:', err));
+/**
+ * RealAlto WebAR Experience - Pure Vanilla JavaScript
+ */
 
-    // Desvanecer la pantalla de carga (Fade out loading screen)
-    const loadingScreen = document.getElementById('loading-screen');
-    if (loadingScreen) {
-      setTimeout(() => {
-        loadingScreen.style.opacity = '0';
-        loadingScreen.style.pointerEvents = 'none';
-        setTimeout(() => {
-          loadingScreen.style.display = 'none';
-        }, 800); // Coincide con la transición CSS
-      }, 1500); // Retraso de 1.5s para apreciar la animación premium
-    }
-  });
-}
-
-// Application State & WebAR Control Logic
-
-const state = {
-  arStarted: false,
-  activeModelId: 'robot', // Default model/marker
-  markerVisible: false,
-  modelLoaded: false,
-  modelAnchored: false,
-  initialPitch: null,
-  tiltThreshold: 15, // Degrees tilt up to trigger anchor
-  interiorActive: false, // For gyroscope parallax effect
-  initialParallaxSaved: false, // Baseline calibration
-  initialGamma: 0,
-  initialBeta: 0,
-  // Layer-based Experience Data Pattern
-  layers: [
-    {
-      id: 'layer_choza',
-      name: 'Entorno Choza',
-      mainImage: 'assets/img/choza.webp',
-      backgroundImage: 'assets/img/interiorchoza.webp',
-      foregroundImage: 'assets/entorno/mesa.png',
-      // Horizontal elements containing glb files & matching representative png button images
-      elements: [
-        {
-          id: 'valdivia',
-          name: 'Estatuilla Valdivia',
-          glb: 'assets/models/valdivia.glb',
-          png: 'assets/models/valdivia.png',
-          desc: 'Figura cerámica de la cultura Valdivia, representando la fertilidad y el arte precolombino.'
-        },
-        {
-          id: 'pato',
-          name: 'Pato Silbato',
-          glb: 'assets/models/duck.glb',
-          png: 'assets/models/valdivia.png', // Fallback or placeholder png
-          desc: 'Instrumento ceremonial musical zoomorfo recreado en modelado 3D.'
-        }
-      ]
-    }
-  ],
-  activeLayerIndex: 0,
-  activeElementId: 'valdivia',
-  models: {
-    robot: {
-      name: 'Choza RealAlto',
-      markerPreset: 'hiro',
-      type: 'image',
-      url: 'assets/img/choza.webp',
-      width: 2.37,
-      height: 1,
-      scale: '1.5 1.5 1.5',
-      position: '0 0.01 0',
-      rotation: '-90 0 0',
-      emoji: '🛖'
+// --- DICCIONARIO DE INTERNACIONALIZACIÓN (i18n) ---
+const i18n = {
+  es: {
+    app: {
+      enterCabin: 'Entrar a la choza',
+      arSceneAlt: 'Escena AR'
     },
-    spaceship: {
-      name: 'Nave Espacial',
-      markerPreset: 'kanji',
-      modelUrl: 'assets/models/duck.glb',
-      scale: '0.5 0.5 0.5',
-      position: '0 0 0',
-      rotation: '0 0 0',
-      emoji: '🦆'
+    common: {
+      menu: 'Menú',
+      logo: 'Logo',
+      complex: 'COMPLEJO CULTURAL',
+      close: 'Cerrar',
+      detail: 'Detalle'
+    },
+    home: {
+      location: 'Santa Elena · Ecuador',
+      pitch: 'Guía Interactiva en Realidad Aumentada',
+      description: 'Descubre réplicas arqueológicas tridimensionales e historia interactiva directamente en el área abierta del museo.',
+      startAr: 'Iniciar recorrido WebAR',
+      cameraWarning: 'Requiere permisos de cámara y un entorno bien iluminado'
+    },
+    sidebar: {
+      home: 'INICIO',
+      information: 'INFORMACIÓN',
+      ar: 'WEB AR EXP.',
+      exit: 'Salir',
+      language: 'Idioma'
+    },
+    information: {
+      title: 'Información',
+      hoursTitle: 'Horarios de Atención',
+      weekday: 'Lunes - Viernes: 9:00am - 5:00pm',
+      saturday: 'Sábados: 10:00am - 4:00pm',
+      sunday: 'Domingos: Cerrado',
+      locationTitle: 'Ubicación',
+      locationLine1: 'Complejo Cultural Real Alto',
+      locationLine2: 'Península de Santa Elena',
+      locationLine3: 'Ecuador',
+      moreTitle: 'Más Información'
+    },
+    ar: {
+      backMenu: 'Volver al menú',
+      reset: 'Reiniciar',
+      orientationWarning: 'Para escanear marcadores, gira el teléfono a horizontal.',
+      markerMenu: 'Marcadores (toca para desplegar)',
+      status: {
+        loading: 'Cargando cámara...',
+        scanning: 'Escaneando marcador [{marker}]',
+        detected: 'Marcador detectado',
+        searching: 'Buscando marcador...',
+        paused: 'Escaneo pausado',
+        resetting: 'Reiniciando escaneo...'
+      }
+    },
+    cabin: {
+      backToScan: 'Volver a escanear',
+      tableAlt: 'Mesa'
+    },
+    experience: {
+      choza_realalto: {
+        name: 'Choza Real Alto',
+        layerName: 'Entorno Choza'
+      },
+      choza2_realalto: {
+        name: 'Choza Valdivia',
+        layerName: 'Entorno Choza Valdivia'
+      }
+    },
+    element: {
+      valdivia: {
+        name: 'Estatuilla Valdivia',
+        desc: 'Figura cerámica de la cultura Valdivia, representando la fertilidad y el arte precolombino.'
+      },
+      choza2_realalto: {
+        name: 'Choza Valdivia',
+        desc: 'Representación 3D de la Choza Valdivia precolombina.'
+      }
+    }
+  },
+  en: {
+    app: {
+      enterCabin: 'Enter the cabin',
+      arSceneAlt: 'AR scene'
+    },
+    common: {
+      menu: 'Menu',
+      logo: 'Logo',
+      complex: 'CULTURAL COMPLEX',
+      close: 'Close',
+      detail: 'Detail'
+    },
+    home: {
+      location: 'Santa Elena · Ecuador',
+      pitch: 'Interactive Augmented Reality Guide',
+      description: "Discover 3D archaeological replicas and interactive history directly in the museum's open area.",
+      startAr: 'Start WebAR tour',
+      cameraWarning: 'Camera permission and good lighting are required'
+    },
+    sidebar: {
+      home: 'HOME',
+      information: 'INFORMATION',
+      ar: 'WEB AR EXP.',
+      exit: 'Exit',
+      language: 'Language'
+    },
+    information: {
+      title: 'Information',
+      hoursTitle: 'Opening Hours',
+      weekday: 'Monday - Friday: 9:00am - 5:00pm',
+      saturday: 'Saturday: 10:00am - 4:00pm',
+      sunday: 'Sunday: Closed',
+      locationTitle: 'Location',
+      locationLine1: 'Real Alto Cultural Complex',
+      locationLine2: 'Santa Elena Peninsula',
+      locationLine3: 'Ecuador',
+      moreTitle: 'More Information'
+    },
+    ar: {
+      backMenu: 'Back to menu',
+      reset: 'Reset',
+      orientationWarning: 'To scan markers, rotate your phone to landscape.',
+      markerMenu: 'Markers (tap to open)',
+      status: {
+        loading: 'Loading camera...',
+        scanning: 'Scanning marker [{marker}]',
+        detected: 'Marker detected',
+        searching: 'Searching for marker...',
+        paused: 'Scanning paused',
+        resetting: 'Resetting scan...'
+      }
+    },
+    cabin: {
+      backToScan: 'Back to scan',
+      tableAlt: 'Table'
+    },
+    experience: {
+      choza_realalto: {
+        name: 'Real Alto Hut',
+        layerName: 'Hut Environment'
+      },
+      choza2_realalto: {
+        name: 'Valdivia Hut',
+        layerName: 'Valdivia Hut Environment'
+      }
+    },
+    element: {
+      valdivia: {
+        name: 'Valdivia Figurine',
+        desc: 'Ceramic figurine from the Valdivia culture, representing fertility and pre-Columbian art.'
+      },
+      choza2_realalto: {
+        name: 'Valdivia Hut',
+        desc: '3D representation of the pre-Columbian Valdivia Hut.'
+      }
     }
   }
 };
 
-// UI Elements
-const welcomeScreen = document.getElementById('welcome-screen');
-const startBtn = document.getElementById('start-btn');
-const statusDot = document.getElementById('status-dot');
-const statusText = document.getElementById('status-text');
-const instructionBanner = document.getElementById('instruction-banner');
-const instructionText = document.getElementById('instruction-title');
-const instructionSubtext = document.getElementById('instruction-desc');
-const modelListContainer = document.getElementById('model-list');
-const resetBtn = document.getElementById('reset-btn');
-const deviceTiltBtn = document.getElementById('device-tilt-btn');
-
-// Start AR Experience
-startBtn.addEventListener('click', () => {
-  // 1. Hide welcome screen immediately
-  welcomeScreen.style.opacity = '0';
-  setTimeout(() => {
-    welcomeScreen.style.display = 'none';
-  }, 500);
-
-  // 2. Initialize AR.js Scene immediately
-  initializeAR();
-
-  // 3. Request permissions in the background without blocking the UI/Camera load
-  requestSensorPermissions();
-});
-
-async function requestSensorPermissions() {
-  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-    try {
-      const permissionState = await DeviceOrientationEvent.requestPermission();
-      if (permissionState === 'granted') {
-        window.addEventListener('deviceorientation', handleOrientation);
-        window.addEventListener('deviceorientation', handleParallax);
-        window.addEventListener('deviceorientationabsolute', handleParallax);
-      }
-    } catch (error) {
-      console.warn("Could not request DeviceOrientation permission:", error);
+// --- DATA DE EXPERIENCIAS ---
+const experiences = [
+  {
+    id: 'choza_realalto',
+    nameKey: 'experience.choza_realalto.name',
+    markerPreset: 'hiro',
+    markerLabel: 'Hiro',
+    scanImage: 'assets/img/choza.webp',
+    layer: {
+      backgroundImage: 'assets/img/interiorchoza.webp',
+      foregroundImage: 'assets/entorno/mesa.png',
+      elements: [
+        {
+          id: 'valdivia',
+          nameKey: 'element.valdivia.name',
+          descKey: 'element.valdivia.desc',
+          glb: 'assets/models/valdivia.glb',
+          png: 'assets/models/valdivia.png'
+        }
+      ]
     }
-  } else {
-    window.addEventListener('deviceorientation', handleOrientation);
-    window.addEventListener('deviceorientation', handleParallax);
-    window.addEventListener('deviceorientationabsolute', handleParallax);
+  },
+  {
+    id: 'choza2_realalto',
+    nameKey: 'experience.choza2_realalto.name',
+    markerPreset: 'kanji',
+    markerLabel: 'Kanji',
+    scanImage: 'assets/img/choza2.webp',
+    layer: {
+      backgroundImage: 'assets/img/interiorchoza2.webp',
+      foregroundImage: 'assets/entorno/mesa.png',
+      elements: [
+        {
+          id: 'choza2_realalto',
+          nameKey: 'element.choza2_realalto.name',
+          descKey: 'element.choza2_realalto.desc',
+          glb: 'assets/models/duck.glb',
+          png: 'assets/models/duck.png'
+        }
+      ]
+    }
+  }
+];
+
+// --- ESTADO DE LA APLICACIÓN ---
+const state = {
+  lang: localStorage.getItem('app.language') || 'es',
+  currentTab: 'inicio',
+  arStarted: false,
+  activeExperienceId: 'choza_realalto',
+  isLandscape: true,
+  isMarkerMenuOpen: false,
+  markerVisible: false,
+  interiorActive: false,
+  statusMode: 'loading',
+  panoramaOffsetX: 0,
+  lastYawDeg: null,
+  isDragging: false,
+  startTouchX: 0,
+  dragStartOffsetX: 0
+};
+
+// --- FUNCIONES DE INTERNACIONALIZACIÓN ---
+function t(key) {
+  if (!key) return '';
+  const parts = key.split('.');
+  let current = i18n[state.lang] || i18n.es;
+  for (const part of parts) {
+    if (current && current[part] !== undefined) {
+      current = current[part];
+    } else {
+      return key;
+    }
+  }
+  return typeof current === 'string' ? current : key;
+}
+
+function setLanguage(lang) {
+  if (!i18n[lang]) return;
+  state.lang = lang;
+  localStorage.setItem('app.language', lang);
+
+  // Actualizar botones de idioma
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+
+  // Traducir todos los elementos con data-i18n
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    el.textContent = t(key);
+  });
+
+  // Actualizar el menú de marcadores si está presente
+  renderMarkerMenu();
+  updateStatusText();
+}
+
+// --- NAVEGACIÓN Y PANTALLAS ---
+function showScreen(tabName) {
+  state.currentTab = tabName;
+  
+  // Ocultar vistas principales
+  document.getElementById('home-screen').classList.remove('active');
+  document.getElementById('info-screen').classList.remove('active');
+  document.getElementById('ar-container').classList.remove('active');
+  document.getElementById('interior-overlay').classList.add('hidden');
+
+  // Actualizar clase activa en menú lateral
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.toggle('active', item.dataset.tab === tabName);
+  });
+
+  if (tabName === 'inicio') {
+    document.getElementById('home-screen').classList.add('active');
+    stopARTracking();
+  } else if (tabName === 'informacion') {
+    document.getElementById('info-screen').classList.add('active');
+    stopARTracking();
+  } else if (tabName === 'ar') {
+    document.getElementById('ar-container').classList.add('active');
+    startARTracking();
   }
 }
 
-function initializeAR() {
-  state.arStarted = true;
-  statusDot.classList.add('active');
-  statusText.textContent = 'AR Activo - Escaneando';
-  
-  // Dynamically set up the scene
-  setupScene();
+// --- CONTROL DE WEBAR ---
+function getActiveExperience() {
+  return experiences.find(exp => exp.id === state.activeExperienceId) || experiences[0];
 }
 
-// Generate models selector UI list
-function buildSelectorUI() {
-  modelListContainer.innerHTML = '';
-  Object.keys(state.models).forEach(key => {
-    const model = state.models[key];
-    const card = document.createElement('div');
-    card.className = `model-card glass interactive ${state.activeModelId === key ? 'active' : ''}`;
-    card.innerHTML = `
-      <div class="model-icon">${model.emoji}</div>
-      <div class="model-name">${model.name}</div>
-      <div class="model-marker-info">Marcador: ${model.markerPreset.toUpperCase()}</div>
-    `;
-    card.addEventListener('click', () => {
-      if (state.activeModelId === key) return;
-      selectModel(key);
-    });
-    modelListContainer.appendChild(card);
+function startARTracking() {
+  state.arStarted = true;
+  const exp = getActiveExperience();
+  state.statusMode = 'scanning';
+  updateStatusText();
+  
+  const statusDot = document.getElementById('status-dot');
+  if (statusDot) statusDot.classList.add('active');
+
+  setupSceneMarkers();
+  checkOrientation();
+  requestDeviceOrientation();
+}
+
+function stopARTracking() {
+  state.arStarted = false;
+  const fixedOverlay = document.getElementById('fixed-choza-overlay');
+  if (fixedOverlay) fixedOverlay.classList.add('hidden');
+}
+
+function resetExperience() {
+  state.markerVisible = false;
+  state.statusMode = 'resetting';
+  updateStatusText();
+
+  const fixedOverlay = document.getElementById('fixed-choza-overlay');
+  if (fixedOverlay) fixedOverlay.classList.add('hidden');
+
+  setTimeout(() => {
+    state.statusMode = 'scanning';
+    updateStatusText();
+    setupSceneMarkers();
+  }, 300);
+}
+
+function setupSceneMarkers() {
+  const activeExp = getActiveExperience();
+  experiences.forEach(exp => {
+    const markerEl = document.getElementById(`marker-${exp.markerPreset}`);
+    if (markerEl) {
+      const isCurrent = exp.id === activeExp.id && state.isLandscape;
+      markerEl.setAttribute('visible', isCurrent ? 'true' : 'false');
+    }
   });
 }
 
-function selectModel(modelId) {
-  // Update state
-  state.activeModelId = modelId;
+function renderMarkerMenu() {
+  const container = document.getElementById('marker-dropdown-content');
+  if (!container) return;
+  container.innerHTML = '';
+
+  experiences.forEach(exp => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `marker-pill interactive ${exp.id === state.activeExperienceId ? 'active' : ''}`;
+    btn.textContent = `${exp.markerLabel || exp.markerPreset.toUpperCase()} - ${t(exp.nameKey)}`;
+    btn.addEventListener('click', () => {
+      selectExperience(exp.id);
+    });
+    container.appendChild(btn);
+  });
+}
+
+function selectExperience(expId) {
+  state.activeExperienceId = expId;
+  state.isMarkerMenuOpen = false;
+  
+  const content = document.getElementById('marker-dropdown-content');
+  const arrow = document.getElementById('marker-arrow');
+  if (content) content.classList.add('hidden');
+  if (arrow) arrow.classList.remove('open');
+
+  renderMarkerMenu();
   resetExperience();
-  buildSelectorUI();
-  
-  // Re-configure scene for active model
-  setupScene();
 }
 
-function setupScene() {
-  // Clean existing scene elements if any, or create/reset markers
-  const sceneEl = document.querySelector('a-scene');
-  if (!sceneEl) return;
+function updateStatusText() {
+  const statusTextEl = document.getElementById('status-text');
+  if (!statusTextEl) return;
 
-  // Find or create current active marker entity
-  let currentMarker = document.getElementById('active-marker-entity');
-  if (currentMarker) {
-    currentMarker.parentNode.removeChild(currentMarker);
-  }
-
-  // Create new active marker based on selected preset
-  const modelConfig = state.models[state.activeModelId];
-  currentMarker = document.createElement('a-marker');
-  currentMarker.setAttribute('id', 'active-marker-entity');
-  currentMarker.setAttribute('preset', modelConfig.markerPreset);
-  currentMarker.setAttribute('registerevents', '');
-
-  // Add the 3D model or 2D image entity
-  let modelEl;
-  if (modelConfig.type === 'image') {
-    modelEl = document.createElement('a-image');
-    modelEl.setAttribute('src', modelConfig.url);
-    if (modelConfig.width) modelEl.setAttribute('width', modelConfig.width);
-    if (modelConfig.height) modelEl.setAttribute('height', modelConfig.height);
+  if (state.statusMode === 'scanning') {
+    const exp = getActiveExperience();
+    const template = t('ar.status.scanning');
+    statusTextEl.textContent = template.replace('{marker}', (exp.markerPreset || '').toUpperCase());
   } else {
-    modelEl = document.createElement('a-entity');
-    modelEl.setAttribute('gltf-model', `url(${modelConfig.modelUrl})`);
-    
-    // Add animation mixing to model if robot is expressive
-    if (state.activeModelId === 'robot') {
-      modelEl.setAttribute('animation-mixer', 'clip: Idle; loop: repeat');
-    }
+    statusTextEl.textContent = t(`ar.status.${state.statusMode}`);
   }
-  
-  modelEl.setAttribute('id', 'ar-model');
-  modelEl.setAttribute('scale', modelConfig.scale);
-  modelEl.setAttribute('position', modelConfig.position);
-  modelEl.setAttribute('rotation', modelConfig.rotation);
-  
-  // Bind click event for transition zoom-and-fade
-  modelEl.classList.add('interactive');
-  modelEl.addEventListener('click', startZoomAndFade);
-
-  currentMarker.appendChild(modelEl);
-  sceneEl.appendChild(currentMarker);
-
-  // Status updates
-  statusText.textContent = `Escaneando marcador [${modelConfig.markerPreset.toUpperCase()}]`;
 }
 
-// Reset AR tracking and model anchoring
-function resetExperience() {
-  state.markerVisible = false;
-  state.modelLoaded = false;
-  state.modelAnchored = false;
-  state.initialPitch = null;
-  
-  hideInstruction();
+// --- DETECCIÓN DE MARCADORES (A-Frame / AR.js) ---
+function onMarkerDetected(preset) {
+  if (!state.isLandscape || !state.arStarted) return;
+  const activeExp = getActiveExperience();
+  if (activeExp.markerPreset.toLowerCase() === (preset || '').toLowerCase()) {
+    state.markerVisible = true;
+    state.statusMode = 'detected';
+    updateStatusText();
 
-  // If model was anchored to the scene, put it back or remove it
-  const anchoredModel = document.getElementById('anchored-model');
-  if (anchoredModel) {
-    anchoredModel.parentNode.removeChild(anchoredModel);
-  }
-  
-  setupScene();
-  statusText.textContent = `Escaneando marcador [${state.models[state.activeModelId].markerPreset.toUpperCase()}]`;
-}
-
-resetBtn.addEventListener('click', resetExperience);
-
-// Handle manual anchor override
-deviceTiltBtn.addEventListener('click', () => {
-  if (state.modelLoaded && !state.modelAnchored) {
-    anchorModel();
-  }
-});
-
-
-
-// A-Frame Custom Component to register events
-AFRAME.registerComponent('registerevents', {
-  init: function () {
-    const marker = this.el;
-    
-    marker.addEventListener('markerFound', () => {
-      state.markerVisible = true;
-      statusText.textContent = 'Marcador detectado';
-      
-      // Simulating model loading (standard loading events can be messy, wait 1s for model to load)
-      setTimeout(() => {
-        state.modelLoaded = true;
-        showInstruction(
-          'MUEVA EL CELULAR HACIA ARRIBA',
-          'Tensa el dispositivo hacia el cielo para fijar el modelo 3D.'
-        );
-      }, 1000);
-    });
-
-    marker.addEventListener('markerLost', () => {
-      state.markerVisible = false;
-      if (!state.modelAnchored) {
-        statusText.textContent = 'Buscando marcador...';
-        hideInstruction();
+    // Mostrar overlay de Choza fija tras 600ms
+    setTimeout(() => {
+      if (state.markerVisible && state.arStarted) {
+        showFixedChozaOverlay(activeExp);
       }
-    });
-  }
-});
-
-// Device Orientation Handling for Tilt-Up Action
-function handleOrientation(event) {
-  if (!state.modelLoaded || state.modelAnchored) return;
-
-  const pitch = event.beta; // rotation around X axis [-180, 180]
-  
-  if (pitch === null) return;
-
-  if (state.initialPitch === null) {
-    state.initialPitch = pitch;
-    return;
-  }
-
-  // Calculate change in tilt. Tilting phone up increases/decreases pitch depending on orientation.
-  // Generally, holding phone up tilts screen away from you, modifying pitch.
-  // We can track if pitch changes significantly (e.g. by state.tiltThreshold)
-  const diff = Math.abs(pitch - state.initialPitch);
-  
-  if (diff > state.tiltThreshold) {
-    anchorModel();
+    }, 600);
   }
 }
 
-// Anchor the model in space relative to the scene coordinate system
-function anchorModel() {
-  if (state.modelAnchored) return;
-  
-  const modelEl = document.getElementById('ar-model');
-  if (!modelEl) return;
-
-  const sceneEl = document.querySelector('a-scene');
-  
-  // Get current world coordinates of the model
-  const worldPos = new THREE.Vector3();
-  modelEl.object3D.getWorldPosition(worldPos);
-
-  const worldRot = new THREE.Quaternion();
-  modelEl.object3D.getWorldQuaternion(worldRot);
-
-  const worldScale = new THREE.Vector3();
-  modelEl.object3D.getWorldScale(worldScale);
-
-  // Create a new static model outside of the marker parent, directly in the scene
-  const activeModel = state.models[state.activeModelId];
-  const staticModel = document.createElement(activeModel.type === 'image' ? 'a-image' : 'a-entity');
-  staticModel.setAttribute('id', 'anchored-model');
-  
-  if (activeModel.type === 'image') {
-    staticModel.setAttribute('src', activeModel.url);
-    if (activeModel.width) staticModel.setAttribute('width', activeModel.width);
-    if (activeModel.height) staticModel.setAttribute('height', activeModel.height);
-  } else {
-    staticModel.setAttribute('gltf-model', `url(${activeModel.modelUrl})`);
-  }
-  
-  // Set scale
-  staticModel.setAttribute('scale', `${worldScale.x} ${worldScale.y} ${worldScale.z}`);
-
-  // Place it slightly in front of camera or at its tracked world position
-  // In standard AR.js camera is at 0 0 0, marker moves. Let's place it at the captured world coordinates!
-  staticModel.setAttribute('position', `${worldPos.x} ${worldPos.y} ${worldPos.z}`);
-  
-  // Bind click event for transition zoom-and-fade
-  staticModel.classList.add('interactive');
-  staticModel.addEventListener('click', startZoomAndFade);
-  
-  sceneEl.appendChild(staticModel);
-  
-  // Copy exact rotation
-  staticModel.object3D.quaternion.copy(worldRot);
-
-  // Hide the original marker model
-  modelEl.setAttribute('visible', 'false');
-
-  // Mark as anchored
-  state.modelAnchored = true;
-  statusText.textContent = 'Modelo Fijado en el Espacio';
-  
-  showInstruction(
-    'MODELO ANCLADO',
-    'El modelo ahora está fijo en la habitación. ¡Muévete alrededor!'
-  );
-  
-  // Automatically clear instruction banner after 3 seconds
-  setTimeout(() => {
-    if (state.modelAnchored) {
-      hideInstruction();
-    }
-  }, 4000);
-}
-
-// Banner controls
-function showInstruction(title, desc) {
-  instructionText.textContent = title;
-  instructionSubtext.textContent = desc;
-  instructionBanner.classList.add('visible');
-}
-
-function hideInstruction() {
-  instructionBanner.classList.remove('visible');
-}
-
-// --- Interactive Zoom and Fade Transition Logic ---
-let transitioning = false;
-
-function startZoomAndFade(event) {
-  if (transitioning) return;
-  transitioning = true;
-
-  const el = event.currentTarget;
-  
-  // Capture initial scale and position
-  const currentScale = el.getAttribute('scale') || {x: 1, y: 1, z: 1};
-  const startScaleX = currentScale.x;
-  const startScaleY = currentScale.y;
-  const startScaleZ = currentScale.z;
-  
-  const currentPos = el.getAttribute('position') || {x: 0, y: 0, z: 0};
-  const startPosX = currentPos.x;
-  const startPosY = currentPos.y;
-  const startPosZ = currentPos.z;
-
-  const duration = 1200; // 1.2 seconds for animation
-  const startTime = performance.now();
-
-  function animate(now) {
-    const elapsed = now - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    
-    // Ease-in animation curve
-    const easeProgress = progress * progress; 
-    const zoomFactor = 1 + easeProgress * 5.0; // Zoom up to 6x
-    const opacity = 1 - progress;
-
-    // Apply scale zoom
-    el.setAttribute('scale', `${startScaleX * zoomFactor} ${startScaleY * zoomFactor} ${startScaleZ * zoomFactor}`);
-    
-    // Move closer towards the screen
-    el.setAttribute('position', `${startPosX} ${startPosY + easeProgress * 0.8} ${startPosZ + easeProgress * 2.5}`);
-    
-    // Apply material opacity fadeout
-    el.setAttribute('material', `opacity: ${opacity}`);
-
-    if (progress < 1) {
-      requestAnimationFrame(animate);
-    } else {
-      showInteriorOverlay();
+function onMarkerLost(preset) {
+  const activeExp = getActiveExperience();
+  if (activeExp.markerPreset.toLowerCase() === (preset || '').toLowerCase()) {
+    state.markerVisible = false;
+    if (state.arStarted && !state.interiorActive) {
+      state.statusMode = 'searching';
+      updateStatusText();
     }
   }
-
-  requestAnimationFrame(animate);
 }
 
-function showInteriorOverlay() {
+function showFixedChozaOverlay(exp) {
+  const overlay = document.getElementById('fixed-choza-overlay');
+  const img = document.getElementById('fixed-choza-img');
+  if (overlay && img) {
+    img.src = exp.scanImage;
+    overlay.classList.remove('hidden');
+  }
+}
+
+// --- VISTA INTERIOR DE LA CHOZA (Cabin View 360) ---
+function enterInteriorCabin() {
   state.interiorActive = true;
-  state.initialParallaxSaved = false; // Reset baseline calibration for the transition
- 
-  // Hide UI HUD and A-Frame scene
-  const uiContainer = document.getElementById('ui-container');
-  const sceneEl = document.querySelector('a-scene');
-  
-  if (uiContainer) uiContainer.style.display = 'none';
-  if (sceneEl) sceneEl.style.display = 'none';
-  
-  // Stop and remove the webcam video stream to release camera hardware
-  // and prevent AR.js from triggering orientation resize conflicts in the background
-  const videoEl = document.querySelector('video');
-  if (videoEl) {
-    const stream = videoEl.srcObject;
-    if (stream) {
-      const tracks = stream.getTracks();
-      tracks.forEach(track => track.stop());
-    }
-    videoEl.parentNode.removeChild(videoEl);
-  }
-  
-  // Display fullscreen interior overlay
+  state.panoramaOffsetX = 0;
+  state.lastYawDeg = null;
+
+  // Ocultar AR overlay y escena
+  document.getElementById('fixed-choza-overlay').classList.add('hidden');
+  document.getElementById('ar-container').classList.remove('active');
+
+  // Configurar y mostrar interior
   const interiorOverlay = document.getElementById('interior-overlay');
   const interiorBg = document.getElementById('interior-bg');
   const mesaImg = document.getElementById('mesa-img');
-  const currentLayer = state.layers[state.activeLayerIndex];
-  
-  if (interiorOverlay) {
-    interiorOverlay.style.display = 'block';
-    if (interiorBg) {
-      interiorBg.style.backgroundImage = `url('${currentLayer.backgroundImage}')`;
-    }
-    if (mesaImg) {
-      mesaImg.src = currentLayer.foregroundImage;
-    }
-    
-    // Render the layer's interactive elements
-    renderLayerElements();
+  const activeExp = getActiveExperience();
+
+  if (interiorBg) {
+    interiorBg.style.backgroundImage = `url('${activeExp.layer.backgroundImage}')`;
+    interiorBg.style.backgroundPosition = '0px 50%';
+    interiorBg.classList.remove('blurred');
   }
+
+  if (mesaImg) {
+    mesaImg.src = activeExp.layer.foregroundImage;
+  }
+
+  renderInteriorElements(activeExp.layer.elements);
+  interiorOverlay.classList.remove('hidden');
 }
 
-// Setup Interior Overlay Interactive Actions
-// Render layered horizontal element buttons sitting on the table
-function renderLayerElements() {
+function exitInteriorCabin() {
+  state.interiorActive = false;
+  document.getElementById('interior-overlay').classList.add('hidden');
+  showScreen('ar');
+}
+
+function renderInteriorElements(elements) {
   const container = document.getElementById('elements-horizontal-container');
   if (!container) return;
   container.innerHTML = '';
-  
-  const currentLayer = state.layers[state.activeLayerIndex];
-  
-  currentLayer.elements.forEach(element => {
+
+  elements.forEach(elem => {
     const imgBtn = document.createElement('img');
-    imgBtn.src = element.png;
-    imgBtn.className = `valdivia-btn interactive ${state.activeElementId === element.id ? 'active' : ''}`;
-    imgBtn.alt = element.name;
-    imgBtn.dataset.id = element.id;
-    
-    // Custom inline positions to spread elements horizontally
+    imgBtn.src = elem.png;
+    imgBtn.alt = t(elem.nameKey);
+    imgBtn.className = 'valdivia-btn interactive';
     imgBtn.addEventListener('click', () => {
-      openElementModal(element);
+      openModelDialog(elem);
     });
-    
     container.appendChild(imgBtn);
   });
 }
 
-// Open Ionic Modal with selected element data
-function openElementModal(element) {
-  state.activeElementId = element.id;
-  
-  const modelModal = document.getElementById('model-modal');
-  const viewer = document.getElementById('valdivia-viewer');
-  const title = document.getElementById('modal-title');
-  const desc = document.getElementById('modal-desc');
-  const ionTitle = document.getElementById('modal-ion-title');
+// --- DIÁLOGO MODAL 3D (Google model-viewer) ---
+function openModelDialog(elem) {
+  const dialog = document.getElementById('model-dialog');
+  const viewer = document.getElementById('main-model-viewer');
+  const titleEl = document.getElementById('modal-piece-title');
+  const descEl = document.getElementById('modal-piece-desc');
   const interiorBg = document.getElementById('interior-bg');
-  
-  // Set text content immediately
-  if (title) title.textContent = element.name;
-  if (desc) desc.textContent = element.desc;
-  if (ionTitle) ionTitle.textContent = element.name;
+
+  if (titleEl) titleEl.textContent = t(elem.nameKey);
+  if (descEl) descEl.textContent = t(elem.descKey);
   if (interiorBg) interiorBg.classList.add('blurred');
 
-  // Clear the current model before opening
+  // Limpiar modelo previo
   if (viewer) viewer.removeAttribute('src');
 
-  // Convert to absolute URL now (before the modal opens)
-  const absoluteGlbUrl = new URL(element.glb, window.location.href).href;
-
-  // Present the modal FIRST so model-viewer gets real layout dimensions,
-  // then assign the GLB src after the open animation (~300ms)
-  if (modelModal) {
-    modelModal.present().then(() => {
-      if (viewer) {
-        viewer.setAttribute('src', absoluteGlbUrl);
-      }
-    });
+  // 1. Abrir diálogo nativo PRIMERO para garantizar dimensiones calculadas
+  if (dialog && typeof dialog.showModal === 'function') {
+    dialog.showModal();
   }
+
+  // 2. Asignar URL absoluta al model-viewer tras un micro-delay
+  const absoluteGlbUrl = new URL(elem.glb, window.location.href).href;
+  setTimeout(() => {
+    if (viewer) {
+      viewer.setAttribute('src', absoluteGlbUrl);
+    }
+  }, 200);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const closeModalBtn = document.getElementById('close-modal-btn');
-  const modelModal = document.getElementById('model-modal');
+function closeModelDialog() {
+  const dialog = document.getElementById('model-dialog');
+  const viewer = document.getElementById('main-model-viewer');
   const interiorBg = document.getElementById('interior-bg');
 
-  if (closeModalBtn && modelModal) {
-    closeModalBtn.addEventListener('click', () => {
-      modelModal.dismiss();
-      if (interiorBg) interiorBg.classList.remove('blurred');
-    });
+  if (dialog) dialog.close();
+  if (viewer) viewer.removeAttribute('src');
+  if (interiorBg) interiorBg.classList.remove('blurred');
+}
+
+// --- GIROSCOPIO Y TOUCH CONTROLS PARA INTERIOR 360 ---
+function handleDeviceOrientation(event) {
+  if (!state.interiorActive || state.isDragging) return;
+
+  const anyEvent = event;
+  let yaw = null;
+
+  if (typeof anyEvent.webkitCompassHeading === 'number') {
+    yaw = anyEvent.webkitCompassHeading;
+  } else if (typeof event.alpha === 'number') {
+    yaw = event.alpha;
   }
-});
 
-// Gyroscope-based Parallax tilt effect for interior background
-function handleParallax(event) {
-  if (!state.interiorActive || isDragging) return; // Skip if touch dragging
+  if (yaw === null) return;
 
-  let rawGamma = event.gamma; // Roll [-90, 90]
-  let rawBeta = event.beta;   // Pitch [-180, 180]
-
-  if (rawGamma === null || rawBeta === null) return;
-
-  // Calibrate baseline when first entering the interior
-  if (!state.initialParallaxSaved) {
-    state.initialGamma = rawGamma;
-    state.initialBeta = rawBeta;
-    state.initialParallaxSaved = true;
+  if (state.lastYawDeg === null) {
+    state.lastYawDeg = yaw;
     return;
   }
 
-  // Calculate change relative to initial position
-  let diffX = rawGamma - state.initialGamma;
-  let diffY = rawBeta - state.initialBeta;
+  let deltaYaw = yaw - state.lastYawDeg;
+  if (deltaYaw > 180) deltaYaw -= 360;
+  else if (deltaYaw < -180) deltaYaw += 360;
 
-  // Detect orientation to swap axes if in landscape mode
-  const orientationType = (screen.orientation && screen.orientation.type) || "";
-  const isLandscape = orientationType.includes("landscape") || window.innerWidth > window.innerHeight;
-
-  if (isLandscape) {
-    // In landscape: tilting the phone left/right moves the Pitch (beta),
-    // and tilting forward/backward moves the Roll (gamma).
-    diffX = rawBeta - state.initialBeta;
-    diffY = rawGamma - state.initialGamma;
-  }
-
-  const maxOffsetX = 150; // Horizontal range
-  const maxOffsetY = 30;  // Vertical range
-  
-  // Apply sensitivity scale factor
-  const targetX = -diffX * 4.5; 
-  const targetY = -diffY * 2.5;
-
-  // Clamp boundaries to prevent image edges from showing
-  baseOffsetX = Math.max(-maxOffsetX, Math.min(maxOffsetX, targetX));
-  baseOffsetY = Math.max(-maxOffsetY, Math.min(maxOffsetY, targetY));
+  state.lastYawDeg = yaw;
+  state.panoramaOffsetX += deltaYaw * 6; // Factor de sensibilidad horizontal
 
   const interiorBg = document.getElementById('interior-bg');
   if (interiorBg) {
-    interiorBg.style.transform = `translate(${baseOffsetX}px, ${baseOffsetY}px) scale(1.35)`;
+    interiorBg.style.backgroundPosition = `${state.panoramaOffsetX}px 50%`;
   }
 }
 
-// Touch controls fallback/complement for swiping the cabin view
-let isDragging = false;
-let startTouchX = 0;
-let startTouchY = 0;
-let baseOffsetX = 0;
-let baseOffsetY = 0;
-
-function setupInteriorControls() {
+function setupTouchPanControls() {
   const overlay = document.getElementById('interior-overlay');
+  if (!overlay) return;
 
-  if (overlay) {
-    overlay.addEventListener('touchstart', (e) => {
-      if (!state.interiorActive) return;
-      isDragging = true;
-      startTouchX = e.touches[0].clientX;
-      startTouchY = e.touches[0].clientY;
-    }, { passive: true });
+  overlay.addEventListener('touchstart', (e) => {
+    if (!state.interiorActive) return;
+    state.isDragging = true;
+    state.startTouchX = e.touches[0].clientX;
+    state.dragStartOffsetX = state.panoramaOffsetX;
+  }, { passive: true });
 
-    overlay.addEventListener('touchmove', (e) => {
-      if (!isDragging || !state.interiorActive) return;
-      
-      const currentX = e.touches[0].clientX;
-      const currentY = e.touches[0].clientY;
-      
-      // Calculate touch offset delta
-      const deltaX = currentX - startTouchX;
-      const deltaY = currentY - startTouchY;
-      
-      const maxOffsetX = 150;
-      const maxOffsetY = 30;
-      
-      // Compute target coordinates
-      const targetX = baseOffsetX + deltaX * 1.5; // Touch sensitivity factor
-      const targetY = baseOffsetY + deltaY * 1.5;
-      
-      // Clamp coordinates
-      const clampedX = Math.max(-maxOffsetX, Math.min(maxOffsetX, targetX));
-      const clampedY = Math.max(-maxOffsetY, Math.min(maxOffsetY, targetY));
-      
-      const interiorBg = document.getElementById('interior-bg');
-      if (interiorBg) {
-        interiorBg.style.transform = `translate(${clampedX}px, ${clampedY}px) scale(1.35)`;
+  overlay.addEventListener('touchmove', (e) => {
+    if (!state.isDragging || !state.interiorActive) return;
+    const currentX = e.touches[0].clientX;
+    const deltaX = currentX - state.startTouchX;
+    const currentOffset = state.dragStartOffsetX + deltaX * 1.2;
+
+    const interiorBg = document.getElementById('interior-bg');
+    if (interiorBg) {
+      interiorBg.style.backgroundPosition = `${currentOffset}px 50%`;
+    }
+  }, { passive: true });
+
+  overlay.addEventListener('touchend', (e) => {
+    if (!state.isDragging) return;
+    state.isDragging = false;
+    const touch = e.changedTouches?.[0];
+    if (touch) {
+      const deltaX = touch.clientX - state.startTouchX;
+      state.panoramaOffsetX = state.dragStartOffsetX + deltaX * 1.2;
+    }
+  }, { passive: true });
+}
+
+async function requestDeviceOrientation() {
+  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+    try {
+      const perm = await DeviceOrientationEvent.requestPermission();
+      if (perm === 'granted') {
+        window.addEventListener('deviceorientation', handleDeviceOrientation);
       }
-    }, { passive: true });
+    } catch (err) {
+      console.warn('Orientation permission not granted:', err);
+    }
+  } else {
+    window.addEventListener('deviceorientation', handleDeviceOrientation);
+  }
+}
 
-    overlay.addEventListener('touchend', () => {
-      if (!isDragging) return;
-      isDragging = false;
-      
-      // Persist values after touch ends
-      const interiorBg = document.getElementById('interior-bg');
-      if (interiorBg) {
-        const style = window.getComputedStyle(interiorBg);
-        const matrix = new WebKitCSSMatrix(style.transform);
-        baseOffsetX = matrix.m41;
-        baseOffsetY = matrix.m42;
-      }
+// --- DETECCIÓN DE ORIENTACIÓN LANDSCAPE/PORTRAIT ---
+function checkOrientation() {
+  state.isLandscape = window.innerWidth > window.innerHeight;
+  const warningEl = document.getElementById('orientation-warning');
+  const dropdownEl = document.getElementById('marker-dropdown-wrapper');
+  
+  if (warningEl) {
+    warningEl.classList.toggle('hidden', state.isLandscape);
+  }
+  if (dropdownEl) {
+    dropdownEl.classList.toggle('hidden', !state.isLandscape);
+  }
+
+  if (!state.isLandscape && state.arStarted) {
+    state.statusMode = 'paused';
+    updateStatusText();
+  } else if (state.isLandscape && state.arStarted) {
+    state.statusMode = 'scanning';
+    updateStatusText();
+    setupSceneMarkers();
+  }
+}
+
+// --- REGISTRO DEL COMPONENTE AFRAME REGISTEREVENTS ---
+if (typeof AFRAME !== 'undefined') {
+  AFRAME.registerComponent('registerevents', {
+    init: function () {
+      const marker = this.el;
+      marker.addEventListener('markerFound', () => {
+        const preset = marker.getAttribute('preset');
+        onMarkerDetected(preset);
+      });
+      marker.addEventListener('markerLost', () => {
+        const preset = marker.getAttribute('preset');
+        onMarkerLost(preset);
+      });
+    }
+  });
+}
+
+// --- INICIALIZACIÓN DE LA APLICACIÓN ---
+document.addEventListener('DOMContentLoaded', () => {
+  // 1. Desvanecer loading screen tras 1.2s
+  const loadingScreen = document.getElementById('loading-screen');
+  if (loadingScreen) {
+    setTimeout(() => {
+      loadingScreen.style.opacity = '0';
+      loadingScreen.style.pointerEvents = 'none';
+      setTimeout(() => {
+        loadingScreen.style.display = 'none';
+      }, 600);
+    }, 1200);
+  }
+
+  // 2. Configurar botones de cambio de idioma
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      setLanguage(btn.dataset.lang);
+    });
+  });
+
+  // 3. Configurar Sidebar Drawer
+  const sidebarWrapper = document.getElementById('sidebar-wrapper');
+  const homeMenuBtn = document.getElementById('home-menu-btn');
+  const infoMenuBtn = document.getElementById('info-menu-btn');
+  const exitBtn = document.getElementById('btn-sidebar-exit');
+
+  const openSidebar = () => sidebarWrapper.classList.add('open');
+  const closeSidebar = () => sidebarWrapper.classList.remove('open');
+
+  if (homeMenuBtn) homeMenuBtn.addEventListener('click', openSidebar);
+  if (infoMenuBtn) infoMenuBtn.addEventListener('click', openSidebar);
+  if (sidebarWrapper) {
+    sidebarWrapper.addEventListener('click', (e) => {
+      if (e.target === sidebarWrapper) closeSidebar();
     });
   }
-}
+  if (exitBtn) exitBtn.addEventListener('click', closeSidebar);
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', setupInteriorControls);
-} else {
-  setupInteriorControls();
-}
+  // Tabs del Sidebar
+  document.getElementById('nav-inicio')?.addEventListener('click', () => {
+    closeSidebar();
+    showScreen('inicio');
+  });
+  document.getElementById('nav-informacion')?.addEventListener('click', () => {
+    closeSidebar();
+    showScreen('informacion');
+  });
+  document.getElementById('nav-ar')?.addEventListener('click', () => {
+    closeSidebar();
+    showScreen('ar');
+  });
 
-// Initialize selector on page load
-buildSelectorUI();
+  // 4. Botón Iniciar WebAR en el Home
+  document.getElementById('start-ar-btn')?.addEventListener('click', () => {
+    showScreen('ar');
+  });
+
+  // 5. Botones de la barra superior AR
+  document.getElementById('ar-back-home-btn')?.addEventListener('click', () => {
+    showScreen('inicio');
+  });
+  document.getElementById('ar-reset-btn')?.addEventListener('click', () => {
+    resetExperience();
+  });
+
+  // 6. Desplegable de marcadores
+  const markerToggle = document.getElementById('marker-dropdown-toggle');
+  const markerContent = document.getElementById('marker-dropdown-content');
+  const markerArrow = document.getElementById('marker-arrow');
+
+  if (markerToggle) {
+    markerToggle.addEventListener('click', () => {
+      state.isMarkerMenuOpen = !state.isMarkerMenuOpen;
+      markerContent.classList.toggle('hidden', !state.isMarkerMenuOpen);
+      markerArrow.classList.toggle('open', state.isMarkerMenuOpen);
+    });
+  }
+
+  // 7. Botón Entrar a la choza en overlay
+  document.getElementById('enter-choza-btn')?.addEventListener('click', () => {
+    enterInteriorCabin();
+  });
+
+  // 8. Botón Volver a escanear en vista interior
+  document.getElementById('back-to-scan-btn')?.addEventListener('click', () => {
+    exitInteriorCabin();
+  });
+
+  // 9. Diálogo modal cerrar
+  document.getElementById('close-dialog-btn')?.addEventListener('click', () => {
+    closeModelDialog();
+  });
+
+  // 10. Listeners de pantalla / resize
+  window.addEventListener('resize', checkOrientation);
+  window.addEventListener('orientationchange', checkOrientation);
+
+  // 11. Configurar touch controls para interior 360
+  setupTouchPanControls();
+
+  // 12. Render inicial
+  setLanguage(state.lang);
+  renderMarkerMenu();
+  checkOrientation();
+
+  // 13. Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('SW registrado:', reg.scope))
+      .catch(err => console.error('Error SW:', err));
+  }
+});

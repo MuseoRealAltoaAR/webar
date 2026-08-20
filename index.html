@@ -2,152 +2,262 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-  <title>RealAlto WebAR Experience</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Real Alto - Museo Interactivo WebAR</title>
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
+
   <!-- A-Frame and AR.js libraries -->
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-  <!-- A-Frame Extras for GLTF Animations -->
   <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
-  <!-- Google Model Viewer for interactive 3D modals -->
+  
+  <!-- Google Model Viewer for interactive 3D inspection -->
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 
-  <!-- Custom Stylesheet -->
+  <!-- App Stylesheet -->
   <link rel="stylesheet" href="style.css">
-  
-  <!-- Ionic CDN for layering/tabs structure -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css" />
-  <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
-  <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
 </head>
-<body style="margin: 0; overflow: hidden;">
+<body>
 
   <!-- Pantalla de Carga (Loading Screen) -->
   <div id="loading-screen">
     <div class="loading-logo-container">
-      <img src="assets/img/logo.webp" alt="Real Alto Logo" class="loading-logo" onerror="this.onerror=null; this.src='assets/img/logo.webpn';">
+      <img src="assets/img/logo.webp" alt="Real Alto Logo" class="loading-logo" onerror="this.onerror=null; this.src='assets/img/logovaldivia.webp';">
       <div class="spinner"></div>
     </div>
   </div>
 
-  <!-- Welcome / Intro Screen -->
-  <div id="welcome-screen">
-    <div class="welcome-card glass">
-      <div class="logo-container">
-        <!-- SVG Isometric Cube Logo representing AR -->
-        <svg viewBox="0 0 24 24">
-          <path d="M12,2L1,8.3v7.4L12,22l11-6.3V8.3L12,2z M12,4.4l8.3,4.8L12,14L3.7,9.2L12,4.4z M3,14.5v-4.3l8,4.6v4.3L3,14.5z M21,14.5l-8,4.6v-4.3l8-4.6V14.5z"/>
-        </svg>
-      </div>
-      <h1>RealAlto WebAR</h1>
-      <p class="subtitle">Explora modelos 3D interactivos fijados en tu espacio real con marcadores aumentados.</p>
-      <button id="start-btn" class="btn-primary interactive">
-        <span>Iniciar Experiencia AR</span>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="5 3 19 12 5 21 5 3"></polygon>
-        </svg>
+  <!-- PANTALLA INICIO (Home Screen) -->
+  <div id="home-screen" class="screen-view active">
+    <div class="background-overlay"></div>
+    
+    <header class="home-header">
+      <button id="home-menu-btn" class="menu-btn" aria-label="Menú">
+        <span class="menu-icon">☰</span>
       </button>
-    </div>
+      <div class="header-right">
+        <div class="badge-complejo">
+          <span data-i18n="common.complex">COMPLEJO CULTURAL</span>
+        </div>
+        <div class="language-switcher">
+          <button type="button" class="lang-btn active" data-lang="es">ES</button>
+          <button type="button" class="lang-btn" data-lang="en">EN</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="home-content">
+      <div class="brand-container">
+        <div class="logo-wrapper">
+          <img src="assets/img/logovaldivia.webp" alt="Logo Valdivia">
+        </div>
+        <div class="brand-divider"></div>
+        <div class="brand-text">
+          <h1 class="title-real">REAL</h1>
+          <h1 class="title-alto">ALTO</h1>
+        </div>
+      </div>
+
+      <p class="location-text" data-i18n="home.location">Santa Elena · Ecuador</p>
+      <h2 class="main-pitch" data-i18n="home.pitch">Guía Interactiva en Realidad Aumentada</h2>
+      <p class="description-text" data-i18n="home.description">
+        Descubre réplicas arqueológicas tridimensionales e historia interactiva directamente en el área abierta del museo.
+      </p>
+
+      <button id="start-ar-btn" class="btn-start-ar" data-i18n="home.startAr">
+        Iniciar recorrido WebAR
+      </button>
+
+      <p class="warning-text">
+        <span class="warning-icon">▲</span> <span data-i18n="home.cameraWarning">Requiere permisos de cámara y un entorno bien iluminado</span>
+      </p>
+    </main>
   </div>
 
-  <!-- Real-Time UI overlay -->
-  <div id="ui-container">
+  <!-- PANTALLA INFORMACIÓN (Information Screen) -->
+  <div id="info-screen" class="screen-view">
+    <div class="background-overlay"></div>
     
-    <!-- Top Bar Status info -->
-    <div class="ar-header">
-      <div class="badge glass">
-        <span id="status-dot" class="status-dot"></span>
-        <span id="status-text">Cargando cámara...</span>
+    <header class="info-header">
+      <button id="info-menu-btn" class="menu-btn" aria-label="Menú">
+        <span class="menu-icon">☰</span>
+      </button>
+      <div class="badge-complejo">
+        <span data-i18n="common.complex">COMPLEJO CULTURAL</span>
       </div>
-      <button id="reset-btn" class="btn-secondary interactive">Reiniciar</button>
-    </div>
+    </header>
 
-    <!-- Instruction Banner -->
-    <div id="instruction-banner" class="instruction-banner glass">
-      <div id="instruction-title" class="instruction-text">MUEVA EL CELULAR HACIA ARRIBA</div>
-      <div id="instruction-desc" class="instruction-subtext">Tensa el dispositivo hacia arriba para fijar el modelo en tu espacio.</div>
-      <div class="action-btn-container">
-        <button id="device-tilt-btn" class="btn-secondary interactive" style="background: var(--primary); border: none; margin-top: 8px;">Ya lo moví</button>
-      </div>
-    </div>
+    <main class="info-content">
+      <section class="info-card">
+        <h1 data-i18n="information.title">Información</h1>
 
-    <!-- Bottom Selection Bar -->
-    <div class="selector-container">
-      <div class="selector-title">Selecciona un modelo</div>
-      <div id="model-list" class="model-list">
-        <!-- Dynamically populated card selector -->
-      </div>
-    </div>
+        <h2 data-i18n="information.hoursTitle">Horarios de Atención</h2>
+        <p data-i18n="information.weekday">Lunes - Viernes: 9:00am - 5:00pm</p>
+        <p data-i18n="information.saturday">Sábados: 10:00am - 4:00pm</p>
+        <p data-i18n="information.sunday">Domingos: Cerrado</p>
 
+        <h2 data-i18n="information.locationTitle">Ubicación</h2>
+        <p data-i18n="information.locationLine1">Complejo Cultural Real Alto</p>
+        <p data-i18n="information.locationLine2">Península de Santa Elena</p>
+        <p data-i18n="information.locationLine3">Ecuador</p>
+
+        <h2 data-i18n="information.moreTitle">Más Información</h2>
+        <a href="https://museorealalto.github.io/Museo360oficial/" target="_blank" rel="noopener noreferrer">
+          https://museorealalto.github.io/Museo360oficial/
+        </a>
+      </section>
+    </main>
   </div>
 
-  <!-- A-Frame VR/AR Scene setup -->
-  <!-- Note: We configure AR.js to search for patterns and we set source to webcam -->
-  <a-scene 
-    embedded 
-    arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
-    vr-mode-ui="enabled: false"
-    renderer="logarithmicDepthBuffer: true; colorManagement: true;">
-    
-    <!-- Camera is standard static camera that supports WebAR controls -->
-    <a-entity camera>
-      <a-cursor raycaster="objects: a-image, a-entity" cursor="fuse: false" visible="false"></a-cursor>
-    </a-entity>
-    
-  </a-scene>
+  <!-- CONTENEDOR WEBAR (A-Frame + AR.js Scene) -->
+  <div id="ar-container" class="screen-view">
+    <!-- Overlay UI HUD -->
+    <div id="ui-container">
+      <div class="ar-header">
+        <button id="ar-back-home-btn" class="btn-secondary interactive" data-i18n="ar.backMenu">Volver al menú</button>
+        <div class="badge glass">
+          <span id="status-dot" class="status-dot"></span>
+          <span id="status-text">Cargando cámara...</span>
+        </div>
+        <button id="ar-reset-btn" class="btn-secondary interactive" data-i18n="ar.reset">Reiniciar</button>
+      </div>
 
-  <!-- Full Screen Interior Choza Overlay wrapped in an Ionic App component -->
-  <ion-app id="interior-overlay" class="interior-overlay">
-    <!-- Fullscreen background container -->
-    <div id="interior-bg" class="interior-bg"></div>
-    
-    <!-- Table overlayed at the bottom -->
-    <div class="table-container">
-      <img src="assets/entorno/mesa.png" id="mesa-img" class="mesa-img" alt="Mesa">
+      <div id="orientation-warning" class="orientation-warning glass">
+        <span data-i18n="ar.orientationWarning">Para escanear marcadores, gira el teléfono a horizontal.</span>
+      </div>
+
+      <div id="marker-dropdown-wrapper" class="marker-dropdown">
+        <button id="marker-dropdown-toggle" class="marker-dropdown-toggle glass interactive" type="button">
+          <span data-i18n="ar.markerMenu">Marcadores (toca para desplegar)</span>
+          <span id="marker-arrow" class="marker-dropdown-arrow">▾</span>
+        </button>
+        <div id="marker-dropdown-content" class="marker-dropdown-content glass hidden">
+          <!-- Dynamic marker pills inserted via JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Choza fija en pantalla completa al detectar marcador -->
+    <div id="fixed-choza-overlay" class="fixed-choza-overlay hidden">
+      <img id="fixed-choza-img" src="assets/img/choza.webp" alt="Choza Real Alto" class="fixed-choza-image">
+      <div class="fixed-choza-controls">
+        <button id="enter-choza-btn" class="enter-choza-button interactive" data-i18n="app.enterCabin">Entrar a la choza</button>
+      </div>
+    </div>
+
+    <!-- Escena A-Frame AR -->
+    <a-scene 
+      id="aframe-scene"
+      embedded 
+      arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+      vr-mode-ui="enabled: false"
+      renderer="logarithmicDepthBuffer: true; colorManagement: true;">
       
-      <!-- Horizontal list of elements on the table -->
+      <!-- Marcador HIRO -->
+      <a-marker id="marker-hiro" preset="hiro" registerevents>
+        <a-entity
+          id="model-hiro-preview"
+          scale="0.5 0.5 0.5"
+          position="0 0 0"
+          rotation="0 0 0">
+        </a-entity>
+      </a-marker>
+
+      <!-- Marcador KANJI -->
+      <a-marker id="marker-kanji" preset="kanji" registerevents>
+        <a-entity
+          id="model-kanji-preview"
+          scale="0.5 0.5 0.5"
+          position="0 0 0"
+          rotation="0 0 0">
+        </a-entity>
+      </a-marker>
+
+      <a-entity camera>
+        <a-cursor raycaster="objects: a-image, a-entity" cursor="fuse: false" visible="false"></a-cursor>
+      </a-entity>
+    </a-scene>
+  </div>
+
+  <!-- VISTA INTERIOR DE LA CHOZA / EXPERIENCIA 360 (Cabin View) -->
+  <div id="interior-overlay" class="interior-overlay hidden">
+    <button id="back-to-scan-btn" class="back-to-scan-btn interactive" data-i18n="cabin.backToScan">Volver a escanear</button>
+
+    <!-- Fondo panorámico 360 / Giroscopio y Touch Drag -->
+    <div id="interior-bg" class="interior-bg"></div>
+
+    <!-- Mesa con elementos en primer plano -->
+    <div class="table-container">
+      <img id="mesa-img" src="assets/entorno/mesa.png" class="mesa-img" alt="Mesa">
+      
+      <!-- Lista horizontal de piezas interactivas -->
       <div id="elements-horizontal-container" class="elements-horizontal-container interactive">
-        <!-- Dynamically rendered element buttons will go here -->
+        <!-- Renderizado dinámico de piezas -->
       </div>
     </div>
+  </div>
 
-    <!-- 3D Model Viewer Modal using ion-modal -->
-    <ion-modal id="model-modal" class="model-modal-ionic">
-      <ion-header>
-        <ion-toolbar color="dark">
-          <ion-title id="modal-ion-title">Detalle del Elemento</ion-title>
-          <ion-buttons slot="end">
-            <ion-button id="close-modal-btn">Cerrar</ion-button>
-          </ion-buttons>
-        </ion-toolbar>
-      </ion-header>
-      <ion-content color="dark" class="ion-padding">
+  <!-- DIÁLOGO MODAL NATIVO PARA VISOR 3D (Google model-viewer) -->
+  <dialog id="model-dialog" class="model-modal-dialog">
+    <div class="dialog-content-wrapper">
+      <div class="dialog-header">
+        <h3 id="dialog-header-title" data-i18n="common.detail">Detalle</h3>
+        <button id="close-dialog-btn" class="dialog-close-btn" aria-label="Cerrar">✕</button>
+      </div>
+
+      <div class="dialog-body">
         <div class="model-viewer-container">
           <!-- Google Model Viewer -->
-          <model-viewer 
-            id="valdivia-viewer"
-            src=""
+          <model-viewer
+            id="main-model-viewer"
             camera-controls
             auto-rotate
             ar
             shadow-intensity="1"
-            alt="Modelo 3D">
+            alt="Modelo 3D Arqueológico">
           </model-viewer>
         </div>
-        <div class="modal-info-card">
-          <h2 id="modal-title" class="modal-title">Título</h2>
-          <p id="modal-desc" class="modal-desc">Descripción detallada</p>
-        </div>
-      </ion-content>
-    </ion-modal>
-  </ion-app>
 
-  <!-- Control App Script -->
+        <div class="modal-info-card">
+          <h2 id="modal-piece-title" class="modal-title">Título</h2>
+          <p id="modal-piece-desc" class="modal-desc">Descripción detallada</p>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- SIDEBAR DRAWER NAVEGACIÓN -->
+  <div id="sidebar-wrapper" class="sidebar-wrapper">
+    <aside class="sidebar-container">
+      <div class="sidebar-brand">
+        <div class="logo-side-wrapper">
+          <img src="assets/img/logoside.webp" alt="Logo Lateral" class="logoside">
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button id="nav-inicio" class="nav-item active" data-tab="inicio" data-i18n="sidebar.home">INICIO</button>
+        <button id="nav-informacion" class="nav-item" data-tab="informacion" data-i18n="sidebar.information">INFORMACIÓN</button>
+        <button id="nav-ar" class="nav-item" data-tab="ar" data-i18n="sidebar.ar">WEB AR EXP.</button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="btn-sidebar-exit" class="btn-logout" aria-label="Salir" data-i18n="sidebar.exit">
+          <svg viewBox="0 0 24 24" class="logout-icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+        </button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- App Main Logic -->
   <script src="app.js"></script>
 </body>
 </html>
