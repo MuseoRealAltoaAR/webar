@@ -832,8 +832,6 @@ function hideLoadingScreen() {
 
 // --- INICIALIZACIÓN DE LA APLICACIÓN ---
 function initializeApp() {
-  initAframeComponents();
-
   // 1. Ocultar splash y activar Service Worker en segundo plano
   hideLoadingScreen();
   initOfflineSupport();
