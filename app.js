@@ -514,16 +514,26 @@ function openElementModal(element) {
   const ionTitle = document.getElementById('modal-ion-title');
   const interiorBg = document.getElementById('interior-bg');
   
-  if (viewer) viewer.setAttribute('src', element.glb);
+  // Set text content immediately
   if (title) title.textContent = element.name;
   if (desc) desc.textContent = element.desc;
   if (ionTitle) ionTitle.textContent = element.name;
-  
   if (interiorBg) interiorBg.classList.add('blurred');
-  
-  // Present Ionic modal
+
+  // Clear the current model before opening
+  if (viewer) viewer.removeAttribute('src');
+
+  // Convert to absolute URL now (before the modal opens)
+  const absoluteGlbUrl = new URL(element.glb, window.location.href).href;
+
+  // Present the modal FIRST so model-viewer gets real layout dimensions,
+  // then assign the GLB src after the open animation (~300ms)
   if (modelModal) {
-    modelModal.present();
+    modelModal.present().then(() => {
+      if (viewer) {
+        viewer.setAttribute('src', absoluteGlbUrl);
+      }
+    });
   }
 }
 

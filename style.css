@@ -590,6 +590,8 @@ video {
 .model-viewer-container {
   width: 100%;
   flex: 1;
+  min-height: 300px;                  /* Explicit floor so flex:1 resolves inside ion-modal */
+  height: 320px;
   background: transparent !important; /* Make model viewer background fully transparent */
   border-radius: 16px;
   overflow: hidden;
@@ -602,6 +604,8 @@ video {
 model-viewer {
   width: 100%;
   height: 100%;
+  min-height: 300px;                  /* Fallback in case parent height doesn't cascade */
+  display: block;
 }
 
 .modal-title {
