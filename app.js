@@ -300,7 +300,7 @@ const experiences = [
 
 // --- ESTADO DE LA APLICACIÓN ---
 const state = {
-  lang: localStorage.getItem('app.language') || 'es',
+  lang: (typeof localStorage !== 'undefined' && localStorage.getItem('app.language')) || 'es',
   currentTab: 'inicio',
   arStarted: false,
   activeExperienceId: 'choza_realalto',
@@ -334,21 +334,25 @@ function t(key) {
 function setLanguage(lang) {
   if (!i18n[lang]) return;
   state.lang = lang;
-  localStorage.setItem('app.language', lang);
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem('app.language', lang);
+  }
 
-  // Actualizar botones de idioma
-  document.querySelectorAll('.lang-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.lang === lang);
-  });
+  // Actualizar botones de idioma si estamos en entorno con DOM
+  if (typeof document !== 'undefined') {
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset?.lang === lang);
+    });
 
-  // Traducir todos los elementos con data-i18n
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    el.textContent = t(key);
-  });
+    // Traducir todos los elementos con data-i18n
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      el.textContent = t(key);
+    });
 
-  renderMarkerMenu();
-  updateStatusText();
+    renderMarkerMenu();
+    updateStatusText();
+  }
 }
 
 // --- NAVEGACIÓN Y PANTALLAS ---
@@ -922,8 +926,33 @@ function initializeApp() {
   checkOrientation();
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeApp);
-} else {
-  initializeApp();
+if (typeof window !== 'undefined' && typeof document !== 'undefined' && typeof process === 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeApp);
+  } else {
+    initializeApp();
+  }
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    i18n,
+    experiences,
+    state,
+    t,
+    setLanguage,
+    showScreen,
+    getActiveExperience,
+    selectExperience,
+    resetExperience,
+    updateStatusText,
+    handleMarkerFound,
+    handleMarkerLost,
+    enterInteriorCabin,
+    exitInteriorCabin,
+    loadScript,
+    ensureARScriptsLoaded,
+    ensureModelViewerLoaded,
+    OFFLINE_ASSETS_TO_PRELOAD
+  };
 }
