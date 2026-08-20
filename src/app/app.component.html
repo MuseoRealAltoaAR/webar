@@ -17,6 +17,13 @@
     
     <a-assets>
       <img *ngFor="let exp of stateService.experiences" [id]="'scan-img-' + exp.id" [src]="exp.scanImage">
+      <ng-container *ngFor="let exp of stateService.experiences">
+        <a-asset-item 
+          *ngFor="let elem of exp.layer.elements" 
+          [id]="'glb-' + elem.id" 
+          [src]="elem.glb">
+        </a-asset-item>
+      </ng-container>
     </a-assets>
 
     <a-marker
@@ -24,6 +31,14 @@
       [id]="'marker-' + exp.markerPreset"
       [attr.preset]="exp.markerPreset"
       registerevents>
+      <a-entity
+        *ngFor="let elem of exp.layer.elements"
+        [attr.gltf-model]="'#glb-' + elem.id"
+        scale="0.5 0.5 0.5"
+        position="0 0 0"
+        rotation="0 0 0"
+        animation-mixer="clip: *; loop: repeat">
+      </a-entity>
     </a-marker>
     
     <a-entity camera>
