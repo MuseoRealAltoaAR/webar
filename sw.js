@@ -1,7 +1,7 @@
 /**
  * Real Alto WebAR - Service Worker para Experiencia 100% Offline
  */
-const CACHE_NAME = 'realalto-offline-v6';
+const CACHE_NAME = 'realalto-offline-v7';
 
 const PRECACHE_ASSETS = [
   './',
@@ -46,7 +46,13 @@ const PRECACHE_ASSETS = [
   'https://aframe.io/releases/1.3.0/aframe.min.js',
   'https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js',
   'https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js',
-  'https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js'
+  'https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js',
+  // Decodificadores Draco y Basis para model-viewer en modo offline (CRÍTICO para GLB)
+  'https://www.gstatic.com/draco/versioned/decoders/1.5.6/draco_wasm_wrapper.js',
+  'https://www.gstatic.com/draco/versioned/decoders/1.5.6/draco_decoder.wasm',
+  'https://www.gstatic.com/draco/versioned/decoders/1.5.6/draco_decoder.js',
+  'https://www.gstatic.com/basis-universal/versioned/2021-04-15-ba1c3e4/basis_transcoder.js',
+  'https://www.gstatic.com/basis-universal/versioned/2021-04-15-ba1c3e4/basis_transcoder.wasm'
 ];
 
 self.addEventListener('install', (event) => {
@@ -119,7 +125,7 @@ self.addEventListener('fetch', (event) => {
 
         return networkResponse;
       }).catch(() => {
-        // Solo devolver index.html para navegación web, NUNCA para modelos 3D (.glb), scripts o imágenes
+        // Solo devolver index.html para navegación web, NUNCA para modelos 3D (.glb), decodificadores wasm o scripts
         if (event.request.mode === 'navigate' || event.request.destination === 'document') {
           return caches.match('./index.html');
         }

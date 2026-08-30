@@ -306,7 +306,13 @@ const OFFLINE_ASSETS_TO_PRELOAD = [
   'https://aframe.io/releases/1.3.0/aframe.min.js',
   'https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js',
   'https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js',
-  'https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js'
+  'https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js',
+  // Decodificadores Draco y Basis para model-viewer en modo offline
+  'https://www.gstatic.com/draco/versioned/decoders/1.5.6/draco_wasm_wrapper.js',
+  'https://www.gstatic.com/draco/versioned/decoders/1.5.6/draco_decoder.wasm',
+  'https://www.gstatic.com/draco/versioned/decoders/1.5.6/draco_decoder.js',
+  'https://www.gstatic.com/basis-universal/versioned/2021-04-15-ba1c3e4/basis_transcoder.js',
+  'https://www.gstatic.com/basis-universal/versioned/2021-04-15-ba1c3e4/basis_transcoder.wasm'
 ];
 
 
