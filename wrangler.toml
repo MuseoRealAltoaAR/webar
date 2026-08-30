@@ -1,6 +1,9 @@
-name = "webar"
+name = "realalto-webar"
 compatibility_date = "2024-01-01"
 
-# Servir archivos estáticos desde la raíz
 [assets]
 directory = "."
+not_found_handling = "single-page-application"
+
+[assets.serve_directly]
+exclude_pattern = [".git/**", ".wrangler/**", "tests/**", "node_modules/**"]
