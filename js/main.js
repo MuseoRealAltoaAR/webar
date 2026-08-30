@@ -7,8 +7,21 @@ function initializeApp() {
   hideLoadingScreen();
   initOfflineSupport();
 
-  // Precargar componente 3D model-viewer en segundo plano
+  // Precargar componente 3D model-viewer y assets de experiencia en segundo plano
   ensureModelViewerLoaded().catch(console.warn);
+
+  if (typeof fetch !== 'undefined' && typeof experiences !== 'undefined') {
+    experiences.forEach(exp => {
+      if (exp.layer?.elements) {
+        exp.layer.elements.forEach(el => {
+          if (el.glb) fetch(el.glb).catch(() => {});
+          if (el.png) fetch(el.png).catch(() => {});
+        });
+      }
+      if (exp.layer?.backgroundImage) fetch(exp.layer.backgroundImage).catch(() => {});
+      if (exp.layer?.foregroundImage) fetch(exp.layer.foregroundImage).catch(() => {});
+    });
+  }
 
   // 2. Configurar botones de cambio de idioma
   document.querySelectorAll('.lang-btn').forEach(btn => {
