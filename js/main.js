@@ -1,0 +1,138 @@
+// ============================================================
+// main.js — Punto de entrada: inicialización y event listeners
+// ============================================================
+
+function initializeApp() {
+  // 1. Ocultar splash y activar Service Worker en segundo plano
+  hideLoadingScreen();
+  initOfflineSupport();
+
+  // 2. Configurar botones de cambio de idioma
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      setLanguage(btn.dataset.lang);
+    });
+  });
+
+  // 3. Configurar Sidebar Drawer
+  const sidebarWrapper = document.getElementById('sidebar-wrapper');
+  const homeMenuBtn = document.getElementById('home-menu-btn');
+  const infoMenuBtn = document.getElementById('info-menu-btn');
+  const exitBtn = document.getElementById('btn-sidebar-exit');
+
+  const openSidebar = () => sidebarWrapper.classList.add('open');
+  const closeSidebar = () => sidebarWrapper.classList.remove('open');
+
+  if (homeMenuBtn) homeMenuBtn.addEventListener('click', openSidebar);
+  if (infoMenuBtn) infoMenuBtn.addEventListener('click', openSidebar);
+  if (sidebarWrapper) {
+    sidebarWrapper.addEventListener('click', (e) => {
+      if (e.target === sidebarWrapper) closeSidebar();
+    });
+  }
+  if (exitBtn) exitBtn.addEventListener('click', closeSidebar);
+
+  // Tabs del Sidebar
+  document.getElementById('nav-inicio')?.addEventListener('click', () => {
+    closeSidebar();
+    showScreen('inicio');
+  });
+  document.getElementById('nav-informacion')?.addEventListener('click', () => {
+    closeSidebar();
+    showScreen('informacion');
+  });
+  document.getElementById('nav-ar')?.addEventListener('click', () => {
+    closeSidebar();
+    showScreen('ar');
+  });
+
+  // 4. Botón Iniciar WebAR en el Home
+  document.getElementById('start-ar-btn')?.addEventListener('click', () => {
+    showScreen('ar');
+  });
+
+  // 5. Botones de la barra superior AR
+  document.getElementById('ar-back-home-btn')?.addEventListener('click', () => {
+    showScreen('inicio');
+  });
+  document.getElementById('ar-reset-btn')?.addEventListener('click', () => {
+    resetExperience();
+  });
+
+  // 6. Desplegable de marcadores
+  const markerToggle = document.getElementById('marker-dropdown-toggle');
+  const markerContent = document.getElementById('marker-dropdown-content');
+  const markerArrow = document.getElementById('marker-arrow');
+
+  if (markerToggle) {
+    markerToggle.addEventListener('click', () => {
+      state.isMarkerMenuOpen = !state.isMarkerMenuOpen;
+      markerContent.classList.toggle('hidden', !state.isMarkerMenuOpen);
+      markerArrow.classList.toggle('open', state.isMarkerMenuOpen);
+    });
+  }
+
+  // 7. Botón Entrar a la choza
+  document.getElementById('enter-choza-btn')?.addEventListener('click', () => {
+    enterInteriorCabin();
+  });
+
+  // 8. Botón Volver a escanear
+  document.getElementById('back-to-scan-btn')?.addEventListener('click', () => {
+    exitInteriorCabin();
+  });
+
+  // 9. Cerrar modal 3D
+  document.getElementById('close-dialog-btn')?.addEventListener('click', () => {
+    closeModelDialog();
+  });
+
+  // 10. Eventos de marcadores AR desde A-Frame
+  window.addEventListener('ar-marker-found', handleMarkerFound);
+  window.addEventListener('ar-marker-lost', handleMarkerLost);
+
+  // 11. Resize / orientación
+  window.addEventListener('resize', checkOrientation);
+  window.addEventListener('orientationchange', checkOrientation);
+
+  // 12. Touch controls para interior 360
+  setupTouchPanControls();
+
+  // 13. Render inicial
+  setLanguage(state.lang);
+  renderMarkerMenu();
+  checkOrientation();
+}
+
+// Arrancar cuando el DOM esté listo
+if (typeof window !== 'undefined' && typeof document !== 'undefined' && typeof process === 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeApp);
+  } else {
+    initializeApp();
+  }
+}
+
+// Exportar para tests (Node/CommonJS)
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    i18n,
+    experiences,
+    state,
+    t,
+    setLanguage,
+    showScreen,
+    getActiveExperience,
+    selectExperience,
+    resetExperience,
+    updateStatusText,
+    handleMarkerFound,
+    handleMarkerLost,
+    enterInteriorCabin,
+    exitInteriorCabin,
+    loadScript,
+    ensureARScriptsLoaded,
+    ensureModelViewerLoaded,
+    OFFLINE_ASSETS_TO_PRELOAD
+  };
+}

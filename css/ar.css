@@ -1,0 +1,219 @@
+/* ============================================================
+   ar.css — HUD de AR, overlay choza fija, marcadores
+   ============================================================ */
+
+/* AR View HUD & Overlay */
+.ui-ar-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 20px;
+  gap: 12px;
+}
+
+.ar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.ar-header .badge {
+  flex: 1;
+  justify-content: center;
+}
+
+.badge {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #94a3b8;
+}
+
+.status-dot.active {
+  background-color: #10b981;
+  box-shadow: 0 0 8px #10b981;
+}
+
+.btn-secondary {
+  padding: 10px 18px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #f8fafc;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:active {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.orientation-warning {
+  align-self: center;
+  width: min(520px, calc(100% - 48px));
+  padding: 10px 14px;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #f8fafc;
+}
+
+/* Menú desplegable de marcadores */
+.marker-dropdown {
+  align-self: flex-start;
+  width: min(320px, calc(100% - 48px));
+  pointer-events: auto;
+}
+
+.marker-dropdown-toggle {
+  width: 100%;
+  padding: 9px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #f8fafc;
+  background: rgba(15, 23, 42, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.marker-dropdown-arrow {
+  transition: transform 0.2s ease;
+}
+
+.marker-dropdown-arrow.open {
+  transform: rotate(180deg);
+}
+
+.marker-dropdown-content {
+  margin-top: 8px;
+  padding: 10px;
+  border-radius: 14px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.marker-pill {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  color: #f8fafc;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.marker-pill.active {
+  background: var(--primary);
+  color: #000;
+  border-color: var(--primary);
+}
+
+/* Overlay fija al detectar marcador */
+.fixed-choza-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 10px 0 max(16px, env(safe-area-inset-bottom)) 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.fixed-choza-image {
+  width: 100vw !important;
+  max-width: 100% !important;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: calc(100dvh - 85px) !important;
+  object-fit: contain !important;
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.85));
+  display: block;
+}
+
+.fixed-choza-controls {
+  flex-shrink: 0;
+  margin-top: 8px;
+  z-index: 75;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+.enter-choza-button {
+  width: auto;
+  min-width: 200px;
+  padding: 12px 32px;
+  background: var(--primary);
+  color: #000000;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(255, 159, 28, 0.6);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  letter-spacing: 0.3px;
+  pointer-events: auto !important;
+}
+
+.enter-choza-button:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 10px rgba(255, 159, 28, 0.4);
+}
+
+/* Responsive landscape AR */
+@media (orientation: landscape) {
+  .fixed-choza-overlay {
+    padding: 6px 0 max(10px, env(safe-area-inset-bottom)) 0;
+  }
+
+  .fixed-choza-image {
+    width: 100vw !important;
+    max-width: 100% !important;
+    max-height: calc(100dvh - 65px) !important;
+    object-fit: contain !important;
+  }
+
+  .fixed-choza-controls {
+    margin-top: 4px;
+  }
+
+  .enter-choza-button {
+    min-width: 180px;
+    padding: 9px 24px;
+    font-size: 0.92rem;
+  }
+}

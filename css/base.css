@@ -1,0 +1,194 @@
+/* ============================================================
+   base.css — Variables, reset global, utilidades
+   ============================================================ */
+
+/* Variables de diseño */
+:root {
+  --primary: #ff9f1c;
+  --primary-hover: #e08a13;
+  --bg-dark: #0d0c0b;
+  --bg-glass: rgba(15, 23, 42, 0.75);
+  --border-glass: rgba(255, 255, 255, 0.15);
+  --text-primary: #ffffff;
+  --text-secondary: #94a3b8;
+  --accent: #10b981;
+}
+
+/* Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  position: fixed;
+  inset: 0;
+}
+
+/* Utilidades */
+.hidden {
+  display: none !important;
+}
+
+.interactive {
+  pointer-events: auto !important;
+}
+
+/* Glassmorphism */
+.glass {
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-glass);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Background overlay con blur (Home & Info) */
+.background-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('../assets/img/background.webp');
+  background-size: cover;
+  background-position: center;
+  filter: blur(8px) brightness(0.45);
+  transform: scale(1.1);
+  z-index: -1;
+}
+
+/* App Screen base */
+.app-screen {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  background-color: var(--bg-dark);
+  overflow-y: auto;
+}
+
+/* Header base */
+.home-header, .info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  width: 100%;
+  z-index: 20;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Botón hamburguesa */
+.menu-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
+}
+
+.menu-btn:active {
+  transform: scale(0.95);
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.menu-icon {
+  font-size: 22px;
+}
+
+/* Badge Complejo Cultural */
+.badge-complejo {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1.5px solid #ff9f1c;
+  padding: 8px 16px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 10px rgba(255, 159, 28, 0.2);
+}
+
+.badge-complejo span {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #ffd18e;
+}
+
+/* Selector de idioma */
+.language-switcher {
+  display: inline-flex;
+  border: 1.5px solid rgba(255, 159, 28, 0.6);
+  border-radius: 999px;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+}
+
+.lang-btn {
+  border: none;
+  background: rgba(15, 23, 42, 0.8);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  min-width: 38px;
+  height: 32px;
+  padding: 0 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lang-btn.active {
+  background: var(--primary);
+  color: #000000;
+  font-weight: 900;
+}
+
+/* A-Frame escena */
+#ar-scene-container,
+a-scene {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 1 !important;
+}
+
+video {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  z-index: -1 !important;
+}
+
+/* Animación fadeIn reutilizable */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
