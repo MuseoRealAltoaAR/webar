@@ -237,7 +237,7 @@ const experiences = [
           nameKey: 'element.valdivia.name',
           descKey: 'element.valdivia.desc',
           glb: 'assets/models/valdivia.glb',
-          png: 'assets/models/valdivia.png'
+          png: 'assets/models/valdivia.webp'
         }
       ]
     }
@@ -295,7 +295,7 @@ const OFFLINE_ASSETS_TO_PRELOAD = [
   './assets/img/logovaldivia.webp',
   './assets/entorno/mesa.png',
   './assets/models/valdivia.glb',
-  './assets/models/valdivia.png',
+  './assets/models/valdivia.webp',
   './assets/i18n/es.json',
   './assets/i18n/en.json',
   './assets/i18n/main.json',
