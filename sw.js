@@ -1,7 +1,7 @@
 /**
  * Real Alto WebAR - Service Worker para Experiencia 100% Offline
  */
-const CACHE_NAME = 'realalto-offline-v5';
+const CACHE_NAME = 'realalto-offline-v6';
 
 const PRECACHE_ASSETS = [
   './',
@@ -21,10 +21,11 @@ const PRECACHE_ASSETS = [
   './js/interior.js',
   './js/ui.js',
   './js/main.js',
-  // Otros recursos
+  // Metadatos y SEO
   './robots.txt',
   './sitemap.xml',
   './llms.txt',
+  // Assets visuales
   './assets/img/choza.webp',
   './assets/img/background.webp',
   './assets/img/interiorchoza.webp',
@@ -40,6 +41,7 @@ const PRECACHE_ASSETS = [
   './assets/i18n/main.json',
   './assets/icon/favicon.ico',
   './assets/shapes.svg',
+  // CDNs externos
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap',
   'https://aframe.io/releases/1.3.0/aframe.min.js',
   'https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js',
@@ -51,18 +53,24 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then(async (cache) => {
-      console.log('[SW] Precargando recursos offline...');
+      console.log('[SW] Precargando todos los recursos para modo offline...');
       for (const asset of PRECACHE_ASSETS) {
         try {
-          const response = await fetch(asset, { mode: asset.startsWith('http') ? 'cors' : 'same-origin' });
+          const req = new Request(asset, { mode: asset.startsWith('http') ? 'cors' : 'same-origin' });
+          const response = await fetch(req);
           if (response && (response.ok || response.type === 'opaque')) {
-            await cache.put(asset, response);
+            await cache.put(req, response.clone());
+            // Si es relativo, también guardar con URL absoluta para garantizar coincidencias
+            if (!asset.startsWith('http')) {
+              const fullUrl = new URL(asset, self.location.href).href;
+              await cache.put(fullUrl, response);
+            }
           }
         } catch (err) {
-          console.warn('[SW] No se pudo precargar:', asset, err);
+          console.warn('[SW] No se pudo precargar recurso:', asset, err);
         }
       }
-      console.log('[SW] Todos los recursos precargados.');
+      console.log('[SW] Todos los recursos precargados con éxito.');
     })
   );
 });
@@ -86,17 +94,41 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
-    caches.match(event.request, { ignoreSearch: true }).then((cachedResponse) => {
-      if (cachedResponse) return cachedResponse;
+    caches.match(event.request, { ignoreSearch: true }).then(async (cachedResponse) => {
+      if (cachedResponse) {
+        return cachedResponse;
+      }
 
+      // Intentar coincidir por pathname si la URL difiere ligeramente
+      try {
+        const url = new URL(event.request.url);
+        const pathMatch = await caches.match(url.pathname, { ignoreSearch: true });
+        if (pathMatch) return pathMatch;
+      } catch (e) {}
+
+      // Intentar red
       return fetch(event.request).then((networkResponse) => {
         if (!networkResponse || (!networkResponse.ok && networkResponse.type !== 'opaque')) {
           return networkResponse;
         }
+
         const responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, responseToCache);
+        });
+
         return networkResponse;
-      }).catch(() => caches.match('./index.html'));
+      }).catch(() => {
+        // Solo devolver index.html para navegación web, NUNCA para modelos 3D (.glb), scripts o imágenes
+        if (event.request.mode === 'navigate' || event.request.destination === 'document') {
+          return caches.match('./index.html');
+        }
+        return new Response('Offline resource not found', {
+          status: 404,
+          statusText: 'Not Found',
+          headers: { 'Content-Type': 'text/plain' }
+        });
+      });
     })
   );
 });

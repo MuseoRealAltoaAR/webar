@@ -40,3 +40,7 @@ function setLanguage(lang) {
     updateStatusText();
   }
 }
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { t, setLanguage };
+}

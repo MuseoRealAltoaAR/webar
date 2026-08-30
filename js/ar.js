@@ -238,3 +238,7 @@ function checkOrientation() {
     updateStatusText();
   }
 }
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { getActiveExperience, startARTracking, resetExperience, renderMarkerMenu, selectExperience, updateStatusText, handleMarkerFound, handleMarkerLost, showFixedChozaOverlay, checkOrientation };
+}

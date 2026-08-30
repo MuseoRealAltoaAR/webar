@@ -55,10 +55,25 @@ async function ensureARScriptsLoaded() {
 }
 
 let modelViewerLoaded = false;
+let modelViewerLoadingPromise = null;
 async function ensureModelViewerLoaded() {
-  if (modelViewerLoaded || customElements.get('model-viewer')) return;
-  await loadScript('https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js');
-  modelViewerLoaded = true;
+  if (modelViewerLoaded || (typeof customElements !== 'undefined' && customElements.get('model-viewer'))) {
+    modelViewerLoaded = true;
+    return;
+  }
+  if (modelViewerLoadingPromise) return modelViewerLoadingPromise;
+
+  modelViewerLoadingPromise = loadScript('https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js')
+    .then(() => {
+      modelViewerLoaded = true;
+      console.log('[WebAR] Visor 3D model-viewer listo.');
+    })
+    .catch((err) => {
+      modelViewerLoadingPromise = null;
+      console.warn('[WebAR] Error cargando script model-viewer:', err);
+    });
+
+  return modelViewerLoadingPromise;
 }
 
 // --- GESTIÓN DE SERVICE WORKER Y MODO OFFLINE ---
@@ -72,4 +87,8 @@ function initOfflineSupport() {
       });
     });
   }
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { loadScript, ensureARScriptsLoaded, ensureModelViewerLoaded, initOfflineSupport };
 }

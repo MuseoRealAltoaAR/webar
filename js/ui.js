@@ -51,3 +51,7 @@ function hideLoadingScreen() {
     }, 150);
   }
 }
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { showScreen, hideLoadingScreen };
+}

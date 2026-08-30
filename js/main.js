@@ -7,6 +7,9 @@ function initializeApp() {
   hideLoadingScreen();
   initOfflineSupport();
 
+  // Precargar componente 3D model-viewer en segundo plano
+  ensureModelViewerLoaded().catch(console.warn);
+
   // 2. Configurar botones de cambio de idioma
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -116,23 +119,6 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined' && typeof p
 // Exportar para tests (Node/CommonJS)
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
-    i18n,
-    experiences,
-    state,
-    t,
-    setLanguage,
-    showScreen,
-    getActiveExperience,
-    selectExperience,
-    resetExperience,
-    updateStatusText,
-    handleMarkerFound,
-    handleMarkerLost,
-    enterInteriorCabin,
-    exitInteriorCabin,
-    loadScript,
-    ensureARScriptsLoaded,
-    ensureModelViewerLoaded,
-    OFFLINE_ASSETS_TO_PRELOAD
+    initializeApp
   };
 }

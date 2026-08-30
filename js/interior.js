@@ -79,7 +79,11 @@ async function openModelDialog(elem) {
   if (viewer) {
     const absoluteGlbUrl = new URL(elem.glb, window.location.href).href;
     console.log('[3D Viewer] Cargando modelo GLB desde:', absoluteGlbUrl);
+    viewer.src = absoluteGlbUrl;
     viewer.setAttribute('src', absoluteGlbUrl);
+    if (typeof viewer.dismissPoster === 'function') {
+      viewer.dismissPoster();
+    }
   }
 }
 
@@ -89,7 +93,10 @@ function closeModelDialog() {
   const interiorBg = document.getElementById('interior-bg');
 
   if (modal) modal.classList.add('hidden');
-  if (viewer) viewer.removeAttribute('src');
+  if (viewer) {
+    viewer.src = '';
+    viewer.removeAttribute('src');
+  }
   if (interiorBg) interiorBg.classList.remove('blurred');
 }
 
@@ -175,4 +182,8 @@ async function requestDeviceOrientation() {
   } else {
     window.addEventListener('deviceorientation', handleDeviceOrientation);
   }
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { enterInteriorCabin, exitInteriorCabin, renderInteriorElements, openModelDialog, closeModelDialog, handleDeviceOrientation, setupTouchPanControls, requestDeviceOrientation };
 }

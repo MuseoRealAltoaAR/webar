@@ -266,16 +266,29 @@ const state = {
 const OFFLINE_ASSETS_TO_PRELOAD = [
   './',
   './index.html',
-  './style.css',
-  './app.js',
+  // CSS por capas
+  './css/base.css',
+  './css/loading.css',
+  './css/home.css',
+  './css/ar.css',
+  './css/interior.css',
+  './css/sidebar.css',
+  // JS por capas
+  './js/config.js',
+  './js/loader.js',
+  './js/i18n.js',
+  './js/ar.js',
+  './js/interior.js',
+  './js/ui.js',
+  './js/main.js',
+  // Metadatos y SEO
   './robots.txt',
   './sitemap.xml',
   './llms.txt',
+  // Assets visuales
   './assets/img/choza.webp',
-  './assets/img/choza2.webp',
   './assets/img/background.webp',
   './assets/img/interiorchoza.webp',
-  './assets/img/interiorchoza2.webp',
   './assets/img/logo.webp',
   './assets/img/logohome.webp',
   './assets/img/logoside.webp',
@@ -283,16 +296,20 @@ const OFFLINE_ASSETS_TO_PRELOAD = [
   './assets/entorno/mesa.png',
   './assets/models/valdivia.glb',
   './assets/models/valdivia.png',
-  './assets/models/duck.glb',
-  './assets/models/duck.png',
   './assets/i18n/es.json',
   './assets/i18n/en.json',
   './assets/i18n/main.json',
   './assets/icon/favicon.ico',
   './assets/shapes.svg',
+  // CDNs externos
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap',
   'https://aframe.io/releases/1.3.0/aframe.min.js',
   'https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js',
   'https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js',
   'https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js'
 ];
+
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { i18n, experiences, state, OFFLINE_ASSETS_TO_PRELOAD };
+}

@@ -5,9 +5,9 @@ const path = require('node:path');
 const { experiences, getActiveExperience, state } = require('../app.js');
 
 describe('Estructura de Datos e Integridad de Experiencias WebAR', () => {
-  it('debe contener al menos 2 experiencias arqueológicas', () => {
+  it('debe contener al menos 1 experiencia arqueológica activa', () => {
     assert.ok(Array.isArray(experiences), 'experiences debe ser un Array');
-    assert.ok(experiences.length >= 2, 'Deben existir al menos 2 experiencias configuradas');
+    assert.ok(experiences.length >= 1, 'Debe existir al menos 1 experiencia configurada');
   });
 
   it('cada experiencia debe tener ID, preset de marcador, scanImage y capa de entorno', () => {
@@ -51,14 +51,9 @@ describe('Estructura de Datos e Integridad de Experiencias WebAR', () => {
 
   it('getActiveExperience debe retornar la experiencia activa correspondiente al estado', () => {
     state.activeExperienceId = 'choza_realalto';
-    let active = getActiveExperience();
+    const active = getActiveExperience();
     assert.strictEqual(active.id, 'choza_realalto');
     assert.strictEqual(active.markerPreset, 'hiro');
-
-    state.activeExperienceId = 'choza2_realalto';
-    active = getActiveExperience();
-    assert.strictEqual(active.id, 'choza2_realalto');
-    assert.strictEqual(active.markerPreset, 'kanji');
   });
 
   it('getActiveExperience debe tener fallback a la primera experiencia si el ID no existe', () => {
