@@ -1,7 +1,7 @@
 /**
  * Real Alto WebAR - Service Worker para Experiencia 100% Offline
  */
-const CACHE_NAME = 'realalto-offline-v8';
+const CACHE_NAME = 'realalto-offline-v12';
 
 const PRECACHE_ASSETS = [
   './',
@@ -64,10 +64,13 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then(async (cache) => {
-      console.log('[SW] Precargando todos los recursos para modo offline...');
+      console.log('[SW] Precargando todos los recursos para modo offline (v9)...');
       for (const asset of PRECACHE_ASSETS) {
         try {
-          const req = new Request(asset, { mode: asset.startsWith('http') ? 'cors' : 'same-origin' });
+          const req = new Request(asset, {
+            mode: asset.startsWith('http') ? 'cors' : 'same-origin',
+            cache: 'reload'
+          });
           const response = await fetch(req);
           if (response && (response.ok || response.type === 'opaque')) {
             await cache.put(req, response.clone());
@@ -104,6 +107,24 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
+  // Para navegación HTML (documentos), intentar red primero para ver cambios al instante
+  if (event.request.mode === 'navigate' || event.request.destination === 'document') {
+    event.respondWith(
+      fetch(event.request).then((networkResponse) => {
+        if (networkResponse && networkResponse.ok) {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
+          return networkResponse;
+        }
+        return caches.match(event.request).then((c) => c || caches.match('./index.html'));
+      }).catch(() => caches.match(event.request).then((c) => c || caches.match('./index.html')))
+    );
+    return;
+  }
+
+  // Para otros recursos: caché primero con fallback a red
   event.respondWith(
     caches.match(event.request, { ignoreSearch: true }).then(async (cachedResponse) => {
       if (cachedResponse) {
@@ -130,7 +151,6 @@ self.addEventListener('fetch', (event) => {
 
         return networkResponse;
       }).catch(() => {
-        // Solo devolver index.html para navegación web, NUNCA para modelos 3D (.glb), decodificadores wasm o scripts
         if (event.request.mode === 'navigate' || event.request.destination === 'document') {
           return caches.match('./index.html');
         }

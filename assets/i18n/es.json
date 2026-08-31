@@ -54,6 +54,12 @@
     "backToScan": "Volver a escanear",
     "tableAlt": "Mesa"
   },
+  "modal": {
+    "dimensions": "Dimensiones",
+    "weight": "Peso",
+    "material": "Material",
+    "location": "Ubicación"
+  },
   "experience": {
     "choza_realalto": {
       "name": "Choza Real Alto",
@@ -66,20 +72,36 @@
   },
   "element": {
     "valdivia": {
-      "name": "Estatuilla Valdivia",
-      "desc": "Figura cerámica de la cultura Valdivia, representando la fertilidad y el arte precolombino."
+      "name": "Cabeza de Figurina Valdivia",
+      "desc": "Pieza correspondiente a una cabeza de figurina con tocado en forma de máscara encontrada en el Montículo de la Cabeza. Presenta deformación craneana occipital y acabado alisado y pulido.",
+      "dimensions": "36,7 × 44,55 × 24 mm",
+      "weight": "35,8 g",
+      "material": "Arcilla / Alisado y pulido",
+      "location": "Montículo de la Cabeza"
     },
     "vasija": {
       "name": "Vasija Cerámica Valdivia",
-      "desc": "Recipiente ceremonial de cerámica característico de la cultura Valdivia con motivos ancestrales."
+      "desc": "Recipiente ceremonial de cerámica tradicional de la cultura Valdivia con engobe rojizo y acabado alisado.",
+      "dimensions": "120 × 120 × 85 mm",
+      "weight": "185,4 g",
+      "material": "Arcilla cocida / Engobe rojo",
+      "location": "Montículo de las Ofrendas"
     },
     "vasija2": {
       "name": "Cuenco Valdivia Decorado",
-      "desc": "Cuenco cerámico pulido y decorado con incisiones geométricas de la cultura Valdivia."
+      "desc": "Cuenco cerámico pulido y decorado con incisiones geométricas de la cultura Valdivia.",
+      "dimensions": "145 × 145 × 92 mm",
+      "weight": "210,0 g",
+      "material": "Cerámica incisa / Pulido fino",
+      "location": "Plaza Central Real Alto"
     },
     "choza2_realalto": {
       "name": "Choza Valdivia",
-      "desc": "Representación 3D de la Choza Valdivia."
+      "desc": "Representación 3D de la Choza Valdivia precolombina.",
+      "dimensions": "8,5 × 4,2 × 3,8 m",
+      "weight": "N/A",
+      "material": "Madera, caña y paja",
+      "location": "Sector Residencial"
     }
   }
 }

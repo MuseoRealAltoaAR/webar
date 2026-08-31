@@ -29,25 +29,25 @@
   <link rel="preload" as="image" href="assets/img/logo.webp" fetchpriority="high" type="image/webp">
 
   <!-- Estilos por capas -->
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/loading.css">
-  <link rel="stylesheet" href="css/home.css">
-  <link rel="stylesheet" href="css/ar.css">
-  <link rel="stylesheet" href="css/interior.css">
-  <link rel="stylesheet" href="css/sidebar.css">
+  <link rel="stylesheet" href="css/base.css?v=12">
+  <link rel="stylesheet" href="css/loading.css?v=12">
+  <link rel="stylesheet" href="css/home.css?v=12">
+  <link rel="stylesheet" href="css/ar.css?v=12">
+  <link rel="stylesheet" href="css/interior.css?v=12">
+  <link rel="stylesheet" href="css/sidebar.css?v=12">
 
 
   <!-- Google Model Viewer (Web Component 3D) -->
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 
   <!-- Scripts por capas (cargados en orden de dependencia) -->
-  <script defer src="js/config.js"></script>
-  <script defer src="js/loader.js"></script>
-  <script defer src="js/i18n.js"></script>
-  <script defer src="js/ar.js"></script>
-  <script defer src="js/interior.js"></script>
-  <script defer src="js/ui.js"></script>
-  <script defer src="js/main.js"></script>
+  <script defer src="js/config.js?v=12"></script>
+  <script defer src="js/loader.js?v=12"></script>
+  <script defer src="js/i18n.js?v=12"></script>
+  <script defer src="js/ar.js?v=12"></script>
+  <script defer src="js/interior.js?v=12"></script>
+  <script defer src="js/ui.js?v=12"></script>
+  <script defer src="js/main.js?v=12"></script>
 </head>
 <body style="margin: 0; overflow: hidden;">
 
@@ -231,6 +231,68 @@
         <div class="modal-info-card">
           <h2 id="modal-piece-title" class="modal-title">Título</h2>
           <p id="modal-piece-desc" class="modal-desc">Descripción detallada</p>
+
+          <!-- Ficha de Datos Técnicos con Iconos (2 columnas x 2 filas) -->
+          <div class="modal-specs-grid">
+            <div class="spec-item">
+              <div class="spec-icon-wrapper" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21.3 8.7 8.7 21.3a1 1 0 0 1-1.4 0l-6-6a1 1 0 0 1 0-1.4L13.9 1.3a1 1 0 0 1 1.4 0l6 6a1 1 0 0 1 0 1.4Z"/>
+                  <path d="m14.5 3.5 2 2"/>
+                  <path d="m11.5 6.5 2 2"/>
+                  <path d="m8.5 9.5 2 2"/>
+                  <path d="m5.5 12.5 2 2"/>
+                </svg>
+              </div>
+              <div class="spec-content">
+                <span class="spec-label" data-i18n="modal.dimensions">Dimensiones</span>
+                <span id="modal-piece-dimensions" class="spec-value">—</span>
+              </div>
+            </div>
+
+            <div class="spec-item">
+              <div class="spec-icon-wrapper" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
+                  <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
+                  <path d="M7 21h10"/>
+                  <path d="M12 3v18"/>
+                  <path d="M3 7h18"/>
+                </svg>
+              </div>
+              <div class="spec-content">
+                <span class="spec-label" data-i18n="modal.weight">Peso</span>
+                <span id="modal-piece-weight" class="spec-value">—</span>
+              </div>
+            </div>
+
+            <div class="spec-item">
+              <div class="spec-icon-wrapper" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M8 3h8a2 2 0 0 1 2 2v2a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V5a2 2 0 0 1 2-2Z"/>
+                  <path d="M6 11c0 4.4 2.7 8 6 8s6-3.6 6-8"/>
+                  <path d="M9 19v2h6v-2"/>
+                </svg>
+              </div>
+              <div class="spec-content">
+                <span class="spec-label" data-i18n="modal.material">Material</span>
+                <span id="modal-piece-material" class="spec-value">—</span>
+              </div>
+            </div>
+
+            <div class="spec-item">
+              <div class="spec-icon-wrapper" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+              </div>
+              <div class="spec-content">
+                <span class="spec-label" data-i18n="modal.location">Ubicación</span>
+                <span id="modal-piece-location" class="spec-value">—</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

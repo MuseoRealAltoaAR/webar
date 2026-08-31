@@ -62,6 +62,12 @@ const i18n = {
       backToScan: 'Volver a escanear',
       tableAlt: 'Mesa'
     },
+    modal: {
+      dimensions: 'Dimensiones',
+      weight: 'Peso',
+      material: 'Material',
+      location: 'Ubicación'
+    },
     experience: {
       choza_realalto: {
         name: 'Choza Real Alto',
@@ -74,20 +80,36 @@ const i18n = {
     },
     element: {
       valdivia: {
-        name: 'Estatuilla Valdivia',
-        desc: 'Figura cerámica de la cultura Valdivia, representando la fertilidad y el arte precolombino.'
+        name: 'Cabeza de Figurina Valdivia',
+        desc: 'Pieza correspondiente a una cabeza de figurina con tocado en forma de máscara encontrada en el Montículo de la Cabeza. Presenta deformación craneana occipital y acabado alisado y pulido.',
+        dimensions: '36,7 × 44,55 × 24 mm',
+        weight: '35,8 g',
+        material: 'Arcilla / Alisado y pulido',
+        location: 'Montículo de la Cabeza'
       },
       vasija: {
         name: 'Vasija Cerámica Valdivia',
-        desc: 'Recipiente ceremonial de cerámica característico de la cultura Valdivia con motivos ancestrales.'
+        desc: 'Recipiente ceremonial de cerámica tradicional de la cultura Valdivia con engobe rojizo y acabado alisado.',
+        dimensions: '120 × 120 × 85 mm',
+        weight: '185,4 g',
+        material: 'Arcilla cocida / Engobe rojo',
+        location: 'Montículo de las Ofrendas'
       },
       vasija2: {
         name: 'Cuenco Valdivia Decorado',
-        desc: 'Cuenco cerámico pulido y decorado con incisiones geométricas de la cultura Valdivia.'
+        desc: 'Cuenco cerámico pulido y decorado con incisiones geométricas de la cultura Valdivia.',
+        dimensions: '145 × 145 × 92 mm',
+        weight: '210,0 g',
+        material: 'Cerámica incisa / Pulido fino',
+        location: 'Plaza Central Real Alto'
       },
       choza2_realalto: {
         name: 'Choza Valdivia',
-        desc: 'Representación 3D de la Choza Valdivia precolombina.'
+        desc: 'Representación 3D de la Choza Valdivia precolombina.',
+        dimensions: '8,5 × 4,2 × 3,8 m',
+        weight: 'N/A',
+        material: 'Madera, caña y paja',
+        location: 'Sector Residencial'
       }
     }
   },
@@ -149,6 +171,12 @@ const i18n = {
       backToScan: 'Back to scan',
       tableAlt: 'Table'
     },
+    modal: {
+      dimensions: 'Dimensions',
+      weight: 'Weight',
+      material: 'Material',
+      location: 'Location'
+    },
     experience: {
       choza_realalto: {
         name: 'Real Alto Hut',
@@ -161,20 +189,36 @@ const i18n = {
     },
     element: {
       valdivia: {
-        name: 'Valdivia Figurine',
-        desc: 'Ceramic figurine from the Valdivia culture, representing fertility and pre-Columbian art.'
+        name: 'Valdivia Figurine Head',
+        desc: 'Figurine head with a mask-shaped headdress found at the Head Mound. Features occipital cranial deformation and a smoothed, polished finish.',
+        dimensions: '36.7 × 44.55 × 24 mm',
+        weight: '35.8 g',
+        material: 'Clay / Smoothed & polished',
+        location: 'Head Mound'
       },
       vasija: {
         name: 'Valdivia Ceramic Vessel',
-        desc: 'Traditional ceremonial ceramic vessel from the Valdivia culture with ancestral motifs.'
+        desc: 'Traditional ceremonial ceramic vessel from the Valdivia culture with red slip and smoothed finish.',
+        dimensions: '120 × 120 × 85 mm',
+        weight: '185.4 g',
+        material: 'Fired clay / Red slip',
+        location: 'Offering Mound'
       },
       vasija2: {
         name: 'Decorated Valdivia Bowl',
-        desc: 'Polished ceramic bowl decorated with geometric incisions from the Valdivia culture.'
+        desc: 'Polished ceramic bowl decorated with geometric incisions from the Valdivia culture.',
+        dimensions: '145 × 145 × 92 mm',
+        weight: '210.0 g',
+        material: 'Incised ceramic / Fine polish',
+        location: 'Real Alto Central Plaza'
       },
       choza2_realalto: {
         name: 'Valdivia Hut',
-        desc: '3D representation of the pre-Columbian Valdivia Hut.'
+        desc: '3D representation of the pre-Columbian Valdivia Hut.',
+        dimensions: '8.5 × 4.2 × 3.8 m',
+        weight: 'N/A',
+        material: 'Wood, cane & thatch',
+        location: 'Residential Sector'
       }
     }
   }

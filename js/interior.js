@@ -68,10 +68,18 @@ async function openModelDialog(elem) {
   const viewer = document.getElementById('main-model-viewer');
   const titleEl = document.getElementById('modal-piece-title');
   const descEl = document.getElementById('modal-piece-desc');
+  const dimEl = document.getElementById('modal-piece-dimensions');
+  const weightEl = document.getElementById('modal-piece-weight');
+  const materialEl = document.getElementById('modal-piece-material');
+  const locationEl = document.getElementById('modal-piece-location');
   const interiorBg = document.getElementById('interior-bg');
 
   if (titleEl) titleEl.textContent = t(elem.nameKey);
   if (descEl) descEl.textContent = t(elem.descKey);
+  if (dimEl) dimEl.textContent = t(`element.${elem.id}.dimensions`) || '—';
+  if (weightEl) weightEl.textContent = t(`element.${elem.id}.weight`) || '—';
+  if (materialEl) materialEl.textContent = t(`element.${elem.id}.material`) || '—';
+  if (locationEl) locationEl.textContent = t(`element.${elem.id}.location`) || '—';
   if (interiorBg) interiorBg.classList.add('blurred');
 
   if (modal) modal.classList.remove('hidden');

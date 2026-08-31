@@ -81,6 +81,7 @@ function initOfflineSupport() {
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./sw.js').then(reg => {
+        reg.update().catch(() => {});
         console.log('[App] Service Worker registrado para offline:', reg.scope);
       }).catch(err => {
         console.warn('[App] Error al registrar Service Worker:', err);
