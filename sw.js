@@ -1,7 +1,7 @@
 /**
  * Real Alto WebAR - Service Worker para Experiencia 100% Offline
  */
-const CACHE_NAME = 'realalto-offline-v34';
+const CACHE_NAME = 'realalto-offline-v35';
 
 const PRECACHE_ASSETS = [
   './',
@@ -21,6 +21,11 @@ const PRECACHE_ASSETS = [
   './js/interior.js',
   './js/ui.js',
   './js/main.js',
+  // Librerías Vendor Locales (100% Offline)
+  './assets/vendor/aframe.min.js',
+  './assets/vendor/aframe-ar.js',
+  './assets/vendor/aframe-extras.min.js',
+  './assets/vendor/model-viewer.min.js',
   // Metadatos y SEO
   './robots.txt',
   './sitemap.xml',

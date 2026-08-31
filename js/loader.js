@@ -33,8 +33,12 @@ async function ensureARScriptsLoaded() {
   if (arLoadingPromise) return arLoadingPromise;
 
   arLoadingPromise = (async () => {
-    console.log('[WebAR] Cargando A-Frame...');
-    await loadScript('https://aframe.io/releases/1.3.0/aframe.min.js');
+    console.log('[WebAR] Cargando A-Frame local...');
+    try {
+      await loadScript('./assets/vendor/aframe.min.js');
+    } catch (e) {
+      await loadScript('https://aframe.io/releases/1.3.0/aframe.min.js');
+    }
 
     // Registrar componente registerevents inmediatamente después de AFRAME
     if (typeof AFRAME !== 'undefined' && !AFRAME.components['registerevents']) {
@@ -55,12 +59,21 @@ async function ensureARScriptsLoaded() {
       });
     }
 
-    console.log('[WebAR] Cargando AR.js y complementos...');
-    await loadScript('https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js');
-    await loadScript('https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js');
+    console.log('[WebAR] Cargando AR.js y complementos locales...');
+    try {
+      await loadScript('./assets/vendor/aframe-ar.js');
+    } catch (e) {
+      await loadScript('https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/aframe/build/aframe-ar.js');
+    }
+
+    try {
+      await loadScript('./assets/vendor/aframe-extras.min.js');
+    } catch (e) {
+      await loadScript('https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js');
+    }
 
     arScriptsLoaded = true;
-    console.log('[WebAR] Motor WebAR listo.');
+    console.log('[WebAR] Motor WebAR 100% Offline listo.');
   })();
 
   return arLoadingPromise;
@@ -75,7 +88,8 @@ async function ensureModelViewerLoaded() {
   }
   if (modelViewerLoadingPromise) return modelViewerLoadingPromise;
 
-  modelViewerLoadingPromise = loadScript('https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js')
+  modelViewerLoadingPromise = loadScript('./assets/vendor/model-viewer.min.js')
+    .catch(() => loadScript('https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js'))
     .then(() => {
       modelViewerLoaded = true;
       console.log('[WebAR] Visor 3D model-viewer listo.');

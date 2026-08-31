@@ -71,7 +71,8 @@ function buildARScene() {
   container.innerHTML = '';
 
   const markerHTML = experiences.map(function(exp) {
-    return '<a-marker id="marker-' + exp.id + '" preset="' + (exp.markerPreset || 'hiro') + '" registerevents></a-marker>';
+    const patternUrl = exp.markerUrl || ('assets/markers/patt.' + (exp.markerPreset || 'hiro'));
+    return '<a-marker id="marker-' + exp.id + '" type="pattern" url="' + patternUrl + '" preset="' + (exp.markerPreset || 'hiro') + '" registerevents></a-marker>';
   }).join('\n    ');
 
   container.innerHTML =
