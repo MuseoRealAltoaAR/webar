@@ -106,17 +106,9 @@ function initializeApp() {
     enterInteriorCabin();
   });
 
-  // 8. Botón 3D (superior derecha en interior) — abre el modelo de la experiencia activa
+  // 8. Botón 3D Choza (superior derecha en interior) — solo visible en experiencia choza
   document.getElementById('choza-3d-btn')?.addEventListener('click', () => {
-    const activeExp = getActiveExperience();
-    // Buscar el primer elemento con GLB en la experiencia activa
-    const firstElem = activeExp.layer?.elements?.find(el => el.glb);
-    if (firstElem) {
-      openModelDialog(firstElem);
-    } else {
-      // Fallback: abrir el modelo de la choza si no hay otro
-      openChozaModelDialog();
-    }
+    openChozaModelDialog();
   });
 
   // 9. Botón Volver a escanear
