@@ -429,7 +429,8 @@ const OFFLINE_ASSETS_TO_PRELOAD = [
   './robots.txt',
   './sitemap.xml',
   './llms.txt',
-  // Patrones AR locales
+  // Patrones AR y calibración de cámara local
+  './assets/data/camera_para.dat',
   './assets/markers/patt.hiro',
   './assets/markers/patt.kanji',
   // Assets visuales

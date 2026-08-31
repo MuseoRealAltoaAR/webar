@@ -67,9 +67,6 @@ async function ensureARScriptsLoaded() {
 
     console.log('[WebAR] Cargando AR.js y complementos...');
     await loadScript('https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js');
-    if (typeof THREEx !== 'undefined' && THREEx.ArToolkitContext) {
-      THREEx.ArToolkitContext.baseURL = './assets/markers/';
-    }
     await loadScript('https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js');
 
     arScriptsLoaded = true;
