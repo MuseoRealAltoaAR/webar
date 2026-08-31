@@ -12,6 +12,12 @@ function enterInteriorCabin() {
   document.getElementById('fixed-choza-overlay')?.classList.add('hidden');
   document.getElementById('ui-ar')?.classList.add('hidden');
 
+  // Pausar el renderer de A-Frame mientras el interior está activo
+  var scene = document.getElementById('aframe-scene');
+  if (scene && typeof scene.pause === 'function') {
+    scene.pause();
+  }
+
   // Configurar y mostrar interior
   const interiorOverlay = document.getElementById('interior-overlay');
   const interiorBg = document.getElementById('interior-bg');
@@ -69,7 +75,7 @@ function exitInteriorCabin() {
     document.body.classList.add('ar-mode');
   }
 
-  // Activar cooldown para evitar que se reabra inmediatamente
+  // Cooldown para evitar que se reabra inmediatamente
   if (typeof setMarkerCooldown === 'function') {
     setMarkerCooldown(1500);
   }
@@ -77,15 +83,45 @@ function exitInteriorCabin() {
   state.statusMode = 'scanning';
   updateStatusText();
 
-  // Reconstruir la escena A-Frame completa para liberar el contexto congelado de la cámara
-  // Esta es la solución definitiva al bug de "cámara pegada en la última posición del mapa 3D"
-  if (typeof buildARScene === 'function') {
-    // Pequeño delay para que el DOM procese la ocultación del interior-overlay primero
-    setTimeout(function() {
-      buildARScene();
-    }, 100);
-  }
+  // Reanudar la escena A-Frame SIN destruirla (evita pantalla negra)
+  setTimeout(function() {
+    if (typeof document === 'undefined') return;
+
+    // 1. Video de cámara visible y reproduciéndose
+    var video = document.getElementById('arjs-video') || document.querySelector('video');
+    if (video && video.style) {
+      video.style.display = 'block';
+      video.style.visibility = 'visible';
+      video.style.opacity = '1';
+      if (video.paused) {
+        video.play().catch(function() {});
+      }
+    }
+
+    // 2. Canvas de A-Frame visible
+    var canvas = document.querySelector('#aframe-scene canvas, a-scene canvas');
+    if (canvas && canvas.style) {
+      canvas.style.display = 'block';
+      canvas.style.visibility = 'visible';
+      canvas.style.opacity = '1';
+    }
+
+    // 3. Reanudar el renderer de A-Frame si estaba pausado
+    var scene = document.getElementById('aframe-scene');
+    if (scene) {
+      if (typeof scene.play === 'function' && scene.paused) {
+        scene.play();
+      }
+      if (scene.renderer && scene.renderer.setSize) {
+        scene.renderer.setSize(window.innerWidth, window.innerHeight);
+      }
+    }
+
+    // 4. Forzar resize para recalibrar el viewport
+    window.dispatchEvent(new Event('resize'));
+  }, 150);
 }
+
 
 // --- RENDER DE PIEZAS INTERACTIVAS EN LA MESA / TERRENO ---
 function renderInteriorElements(elements) {
