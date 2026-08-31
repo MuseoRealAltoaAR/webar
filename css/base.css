@@ -189,7 +189,12 @@ video {
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
-  z-index: -1 !important;
+  z-index: 0 !important;
+}
+
+/* Canvas de A-Frame debe ser transparente para mostrar el video debajo */
+a-scene canvas {
+  background: transparent !important;
 }
 
 /* Animación fadeIn reutilizable */

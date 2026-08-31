@@ -12,12 +12,6 @@ function enterInteriorCabin() {
   document.getElementById('fixed-choza-overlay')?.classList.add('hidden');
   document.getElementById('ui-ar')?.classList.add('hidden');
 
-  // Pausar el renderer de A-Frame mientras el interior está activo
-  var scene = document.getElementById('aframe-scene');
-  if (scene && typeof scene.pause === 'function') {
-    scene.pause();
-  }
-
   // Configurar y mostrar interior
   const interiorOverlay = document.getElementById('interior-overlay');
   const interiorBg = document.getElementById('interior-bg');
@@ -83,43 +77,21 @@ function exitInteriorCabin() {
   state.statusMode = 'scanning';
   updateStatusText();
 
-  // Reanudar la escena A-Frame SIN destruirla (evita pantalla negra)
-  setTimeout(function() {
-    if (typeof document === 'undefined') return;
-
-    // 1. Video de cámara visible y reproduciéndose
-    var video = document.getElementById('arjs-video') || document.querySelector('video');
-    if (video && video.style) {
-      video.style.display = 'block';
-      video.style.visibility = 'visible';
-      video.style.opacity = '1';
-      if (video.paused) {
-        video.play().catch(function() {});
-      }
-    }
-
-    // 2. Canvas de A-Frame visible
-    var canvas = document.querySelector('#aframe-scene canvas, a-scene canvas');
-    if (canvas && canvas.style) {
-      canvas.style.display = 'block';
-      canvas.style.visibility = 'visible';
-      canvas.style.opacity = '1';
-    }
-
-    // 3. Reanudar el renderer de A-Frame si estaba pausado
-    var scene = document.getElementById('aframe-scene');
-    if (scene) {
-      if (typeof scene.play === 'function' && scene.paused) {
-        scene.play();
-      }
-      if (scene.renderer && scene.renderer.setSize) {
-        scene.renderer.setSize(window.innerWidth, window.innerHeight);
-      }
-    }
-
-    // 4. Forzar resize para recalibrar el viewport
-    window.dispatchEvent(new Event('resize'));
-  }, 150);
+  // La escena AR sigue corriendo en fondo — solo asegurar que el video esté activo
+  if (typeof document !== 'undefined') {
+    // Pequeño delay para que el browser procese el cambio de DOM
+    [100, 400, 800].forEach(function(ms) {
+      setTimeout(function() {
+        var video = document.getElementById('arjs-video') || document.querySelector('video');
+        if (video && video.style) {
+          video.style.display = 'block';
+          video.style.visibility = 'visible';
+          if (video.paused) { video.play().catch(function(){}); }
+        }
+        window.dispatchEvent(new Event('resize'));
+      }, ms);
+    });
+  }
 }
 
 
