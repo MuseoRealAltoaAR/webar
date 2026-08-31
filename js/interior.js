@@ -49,9 +49,15 @@ function enterInteriorCabin() {
     tableContainer.classList.toggle('no-table', !activeExp.layer.foregroundImage);
   }
 
-  // El botón 3D de la choza solo aparece en la experiencia de la choza
+  // El botón 3D siempre visible — imagen y datos de la experiencia activa
   if (choza3dBtn) {
-    choza3dBtn.classList.toggle('hidden', activeExp.id !== 'choza_realalto');
+    choza3dBtn.classList.remove('hidden');
+    choza3dBtn.dataset.expId = activeExp.id;
+    const firstElem = activeExp.layer?.elements?.find(el => el.glb);
+    const btnImg = document.getElementById('choza-3d-btn-img');
+    if (btnImg) {
+      btnImg.src = firstElem?.png || activeExp.scanImage || 'assets/models/chozauno.webp';
+    }
   }
 
   renderInteriorElements(activeExp.layer.elements);

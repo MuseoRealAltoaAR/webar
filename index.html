@@ -29,25 +29,25 @@
   <link rel="preload" as="image" href="assets/img/logo.webp" fetchpriority="high" type="image/webp">
 
   <!-- Estilos por capas -->
-  <link rel="stylesheet" href="css/base.css?v=25">
-  <link rel="stylesheet" href="css/loading.css?v=25">
-  <link rel="stylesheet" href="css/home.css?v=25">
-  <link rel="stylesheet" href="css/ar.css?v=25">
-  <link rel="stylesheet" href="css/interior.css?v=25">
-  <link rel="stylesheet" href="css/sidebar.css?v=25">
+  <link rel="stylesheet" href="css/base.css?v=26">
+  <link rel="stylesheet" href="css/loading.css?v=26">
+  <link rel="stylesheet" href="css/home.css?v=26">
+  <link rel="stylesheet" href="css/ar.css?v=26">
+  <link rel="stylesheet" href="css/interior.css?v=26">
+  <link rel="stylesheet" href="css/sidebar.css?v=26">
 
 
   <!-- Google Model Viewer (Web Component 3D) -->
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 
   <!-- Scripts por capas (cargados en orden de dependencia) -->
-  <script defer src="js/config.js?v=25"></script>
-  <script defer src="js/loader.js?v=25"></script>
-  <script defer src="js/i18n.js?v=25"></script>
-  <script defer src="js/ar.js?v=25"></script>
-  <script defer src="js/interior.js?v=25"></script>
-  <script defer src="js/ui.js?v=25"></script>
-  <script defer src="js/main.js?v=25"></script>
+  <script defer src="js/config.js?v=26"></script>
+  <script defer src="js/loader.js?v=26"></script>
+  <script defer src="js/i18n.js?v=26"></script>
+  <script defer src="js/ar.js?v=26"></script>
+  <script defer src="js/interior.js?v=26"></script>
+  <script defer src="js/ui.js?v=26"></script>
+  <script defer src="js/main.js?v=26"></script>
 </head>
 <body style="margin: 0; overflow: hidden;">
 
@@ -191,9 +191,9 @@
     <!-- Botón Volver a escanear (arriba izquierda) -->
     <button id="back-to-scan-btn" class="back-to-scan-btn interactive" data-i18n="cabin.backToScan">Volver a escanear</button>
     
-    <!-- Botón 3D Choza (arriba derecha) -->
-    <button id="choza-3d-btn" class="choza-3d-btn interactive" aria-label="Ver Choza 3D" title="Ver Choza 3D">
-      <img src="assets/models/chozauno.webp" alt="Choza 3D" class="choza-3d-btn-img" width="56" height="56">
+    <!-- Botón 3D (arriba derecha) — abre el modelo de la experiencia activa -->
+    <button id="choza-3d-btn" class="choza-3d-btn interactive" aria-label="Ver modelo 3D" title="Ver modelo 3D">
+      <img id="choza-3d-btn-img" src="assets/models/chozauno.webp" alt="Ver 3D" class="choza-3d-btn-img" width="56" height="56">
       <span class="choza-3d-btn-badge">3D</span>
     </button>
 
