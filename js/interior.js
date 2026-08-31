@@ -170,8 +170,7 @@ async function openModelDialog(elem) {
       viewer.cameraOrbit = '45deg 55deg 2.5m';
     }
 
-    // Aplicar escala personalizada para evitar modelos gigantescos en Google AR
-    const modelScale = elem.scale || '0.2 0.2 0.2';
+    const modelScale = elem.scale || '1 1 1';
     viewer.setAttribute('scale', modelScale);
     viewer.scale = modelScale;
 
@@ -306,8 +305,7 @@ function openChozaModelDialog() {
     nameKey: 'element.choza.name',
     descKey: 'element.choza.desc',
     glb: 'assets/models/choza.glb',
-    png: 'assets/models/chozauno.webp',
-    scale: '0.15 0.15 0.15'
+    png: 'assets/models/chozauno.webp'
   };
   return openModelDialog(chozaElem);
 }
