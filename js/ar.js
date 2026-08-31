@@ -123,8 +123,7 @@ async function startARTracking() {
         
         <!-- Marcadores generados automáticamente desde experiences[] en config.js -->
         ${experiences.map(exp => {
-          const markerUrl = exp.markerUrl || `assets/markers/patt.${exp.markerPreset || 'hiro'}`;
-          return `<a-marker id="marker-${exp.id}" type="pattern" url="${markerUrl}" registerevents></a-marker>`;
+          return `<a-marker id="marker-${exp.id}" preset="${exp.markerPreset || 'hiro'}" registerevents></a-marker>`;
         }).join('\n        ')}
 
         <a-entity camera>
@@ -200,9 +199,15 @@ function selectExperience(expId) {
   resetExperience();
 }
 
+let markerCooldownUntil = 0;
+
+function setMarkerCooldown(ms = 1200) {
+  markerCooldownUntil = Date.now() + ms;
+}
+
 // --- DETECCIÓN DE MARCADORES (Custom Events desde A-Frame) ---
 function handleMarkerFound(event) {
-  if (!state.arStarted || state.interiorActive) return;
+  if (!state.arStarted || state.interiorActive || Date.now() < markerCooldownUntil) return;
 
   const detail = event.detail || {};
   const detectedPreset = (detail.preset || '').toLowerCase();
@@ -288,5 +293,5 @@ function checkOrientation() {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { getActiveExperience, startARTracking, resumeARVideoFeed, resetExperience, renderMarkerMenu, selectExperience, updateStatusText, handleMarkerFound, handleMarkerLost, showFixedChozaOverlay, checkOrientation };
+  module.exports = { getActiveExperience, startARTracking, resumeARVideoFeed, setMarkerCooldown, resetExperience, renderMarkerMenu, selectExperience, updateStatusText, handleMarkerFound, handleMarkerLost, showFixedChozaOverlay, checkOrientation };
 }

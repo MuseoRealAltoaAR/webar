@@ -19,6 +19,7 @@ if (typeof module !== 'undefined' && module.exports) {
   global.getActiveExperience = ar.getActiveExperience;
   global.startARTracking = ar.startARTracking;
   global.resumeARVideoFeed = ar.resumeARVideoFeed;
+  global.setMarkerCooldown = ar.setMarkerCooldown;
   global.resetExperience = ar.resetExperience;
   global.renderMarkerMenu = ar.renderMarkerMenu;
   global.selectExperience = ar.selectExperience;

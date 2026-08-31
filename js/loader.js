@@ -51,16 +51,6 @@ async function ensureARScriptsLoaded() {
             var id = marker.id || '';
             window.dispatchEvent(new CustomEvent('ar-marker-lost', { detail: { id: id, preset: preset } }));
           });
-        },
-        tick: function () {
-          var marker = this.el;
-          if (marker.object3D && marker.object3D.visible) {
-            if (typeof state !== 'undefined' && !state.interiorActive && state.arStarted && !state.markerVisible) {
-              var preset = marker.getAttribute('preset') || '';
-              var id = marker.id || '';
-              window.dispatchEvent(new CustomEvent('ar-marker-found', { detail: { id: id, preset: preset } }));
-            }
-          }
         }
       });
     }

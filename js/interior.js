@@ -69,6 +69,20 @@ function exitInteriorCabin() {
     document.body.classList.add('ar-mode');
   }
 
+  // Activar cooldown para evitar que se reabra inmediatamente el entorno
+  if (typeof setMarkerCooldown === 'function') {
+    setMarkerCooldown(1200);
+  }
+
+  // Resetear visibilidad de marcadores en A-Frame
+  if (typeof document !== 'undefined') {
+    document.querySelectorAll('a-marker').forEach(marker => {
+      if (marker.object3D) {
+        marker.object3D.visible = false;
+      }
+    });
+  }
+
   state.statusMode = 'scanning';
   updateStatusText();
 
