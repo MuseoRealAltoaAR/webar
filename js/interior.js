@@ -52,7 +52,9 @@ function enterInteriorCabin() {
   // El botón 3D siempre visible — imagen y datos de la experiencia activa
   if (choza3dBtn) {
     choza3dBtn.classList.remove('hidden');
-    choza3dBtn.dataset.expId = activeExp.id;
+    if (choza3dBtn.dataset) {
+      choza3dBtn.dataset.expId = activeExp.id;
+    }
     const firstElem = activeExp.layer?.elements?.find(el => el.glb);
     const btnImg = document.getElementById('choza-3d-btn-img');
     if (btnImg) {
