@@ -177,6 +177,12 @@ async function openModelDialog(elem) {
       viewer.cameraOrbit = '45deg 55deg 2.5m';
     }
 
+    // Habilitar soporte AR (Google Scene Viewer / WebXR / Quick Look)
+    viewer.setAttribute('ar', '');
+    viewer.setAttribute('ar-modes', 'webxr scene-viewer quick-look');
+    viewer.setAttribute('ar-scale', 'auto');
+    viewer.setAttribute('ar-placement', 'floor');
+
     if (typeof viewer.dismissPoster === 'function') {
       viewer.dismissPoster();
     }
