@@ -29,6 +29,7 @@ before(() => {
         textContent: '',
         src: '',
         setAttribute(k, v) { this[k] = v; },
+        getAttribute(k) { return this[k]; },
         removeAttribute(k) { delete this[k]; },
         appendChild(child) {},
         addEventListener(event, fn) {}
@@ -166,7 +167,7 @@ describe('Lógica de Estado, Eventos de Marcador y Vistas de la Aplicación', ()
     assert.strictEqual(titleEl.textContent, 'Choza Real Alto');
   });
 
-  it('openModelDialog con elemento entierro debe cargar y mostrar entierro.glb', async () => {
+  it('openModelDialog con elemento entierro debe cargar y mostrar entierro.glb con rotacion -90deg', async () => {
     const activeExp = experiences.find(e => e.id === 'entierro_realalto');
     const entierroElem = activeExp.layer.elements[0];
     await openModelDialog(entierroElem);
@@ -175,6 +176,7 @@ describe('Lógica de Estado, Eventos de Marcador y Vistas de la Aplicación', ()
     const titleEl = document.getElementById('modal-piece-title');
     assert.ok(modal.classList.contains('hidden') === false, 'El modal 3D debe mostrarse');
     assert.ok(viewer.src.includes('entierro.glb'), 'El viewer debe tener cargado el modelo entierro.glb');
+    assert.strictEqual(viewer.getAttribute('orientation'), '0deg -90deg 0deg');
     assert.strictEqual(titleEl.textContent, 'Entierro y Fardo Funerario Valdivia');
   });
 

@@ -60,9 +60,18 @@ function enterInteriorCabin() {
 
 function exitInteriorCabin() {
   state.interiorActive = false;
+  state.markerVisible = false;
   document.getElementById('interior-overlay')?.classList.add('hidden');
   showScreen('ar');
   resetExperience();
+
+  const video = document.querySelector('video') || document.getElementById('arjs-video');
+  if (video && video.paused) {
+    video.play().catch(console.warn);
+  }
+  setTimeout(() => {
+    window.dispatchEvent(new Event('resize'));
+  }, 100);
 }
 
 // --- RENDER DE PIEZAS INTERACTIVAS EN LA MESA / TERRENO ---
@@ -124,6 +133,24 @@ async function openModelDialog(elem) {
     console.log('[3D Viewer] Cargando modelo GLB desde:', absoluteGlbUrl);
     viewer.src = absoluteGlbUrl;
     viewer.setAttribute('src', absoluteGlbUrl);
+
+    // Aplicar rotación personalizada si existe (ej. entierro.glb rotado -90deg en eje Y)
+    if (elem.orientation) {
+      viewer.setAttribute('orientation', elem.orientation);
+      viewer.orientation = elem.orientation;
+    } else {
+      viewer.removeAttribute('orientation');
+      viewer.orientation = '0deg 0deg 0deg';
+    }
+
+    if (elem.cameraOrbit) {
+      viewer.setAttribute('camera-orbit', elem.cameraOrbit);
+      viewer.cameraOrbit = elem.cameraOrbit;
+    } else {
+      viewer.setAttribute('camera-orbit', '45deg 55deg 2.5m');
+      viewer.cameraOrbit = '45deg 55deg 2.5m';
+    }
+
     if (typeof viewer.dismissPoster === 'function') {
       viewer.dismissPoster();
     }
@@ -139,6 +166,8 @@ function closeModelDialog() {
   if (viewer) {
     viewer.src = '';
     viewer.removeAttribute('src');
+    viewer.removeAttribute('orientation');
+    viewer.orientation = '0deg 0deg 0deg';
   }
   if (interiorBg) interiorBg.classList.remove('blurred');
 }

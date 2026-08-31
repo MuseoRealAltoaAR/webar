@@ -379,7 +379,9 @@ const experiences = [
           nameKey: 'element.entierro.name',
           descKey: 'element.entierro.desc',
           glb: 'assets/models/entierro.glb',
-          png: 'assets/img/entierrop.webp'
+          png: 'assets/img/entierrop.webp',
+          orientation: '0deg -90deg 0deg',
+          cameraOrbit: '-90deg 75deg auto'
         }
       ]
     }

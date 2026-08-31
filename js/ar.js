@@ -47,23 +47,47 @@ async function requestCameraAccess() {
 // --- INICIO DEL TRACKING AR ---
 async function startARTracking() {
   state.arStarted = true;
+  checkOrientation();
+
+  // Si la escena AR ya fue inicializada, reanudamos el escaneo sin interrumpir la cámara
+  if (arSceneInitialized) {
+    state.statusMode = 'scanning';
+    updateStatusText();
+
+    const statusDot = document.getElementById('status-dot');
+    if (statusDot) statusDot.classList.add('active');
+
+    const video = document.querySelector('video') || document.getElementById('arjs-video');
+    if (video && video.paused) {
+      try {
+        await video.play();
+      } catch (e) {
+        console.warn('[WebAR] Reintentando reproducir video:', e);
+      }
+    }
+    setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 150);
+    return;
+  }
+
   state.statusMode = 'loading';
   updateStatusText();
 
   const statusDot = document.getElementById('status-dot');
   if (statusDot) statusDot.classList.add('active');
 
-  checkOrientation();
-
-  // 1. Solicitar permisos de cámara
-  const cameraGranted = await requestCameraAccess();
-  if (!cameraGranted) {
-    state.statusMode = 'cameraError';
-    updateStatusText();
-    alert(state.lang === 'es'
-      ? 'Se requiere acceso a la cámara para escanear marcadores WebAR. Por favor permite los permisos de cámara en tu navegador.'
-      : 'Camera permission is required to scan WebAR markers. Please grant permissions in your browser.');
-    return;
+  // 1. Solicitar permisos de cámara solo en el primer inicio
+  if (!cameraStreamActive) {
+    const cameraGranted = await requestCameraAccess();
+    if (!cameraGranted) {
+      state.statusMode = 'cameraError';
+      updateStatusText();
+      alert(state.lang === 'es'
+        ? 'Se requiere acceso a la cámara para escanear marcadores WebAR. Por favor permite los permisos de cámara en tu navegador.'
+        : 'Camera permission is required to scan WebAR markers. Please grant permissions in your browser.');
+      return;
+    }
   }
 
   // 2. Cargar librerías AR (A-Frame y AR.js)
@@ -91,11 +115,9 @@ async function startARTracking() {
         
         <!-- Marcadores generados automáticamente desde experiences[] en config.js -->
         ${experiences.map(exp => {
-          if (exp.markerType === 'pattern') {
-            // Marcador con patrón personalizado (.patt)
-            return `<a-marker id="marker-${exp.id}" type="pattern" url="${exp.markerUrl}" registerevents></a-marker>`;
+          if (exp.markerType === 'pattern' && exp.markerUrl) {
+            return `<a-marker id="marker-${exp.id}" type="pattern" url="${exp.markerUrl}" preset="${exp.markerPreset || ''}" registerevents></a-marker>`;
           }
-          // Marcador preset estándar de AR.js (hiro, kanji, etc.)
           return `<a-marker id="marker-${exp.id}" preset="${exp.markerPreset}" registerevents></a-marker>`;
         }).join('\n        ')}
 
@@ -122,16 +144,23 @@ async function startARTracking() {
 // --- RESET DE EXPERIENCIA ---
 function resetExperience() {
   state.markerVisible = false;
+  state.interiorActive = false;
   state.statusMode = 'resetting';
   updateStatusText();
 
   const fixedOverlay = document.getElementById('fixed-choza-overlay');
   if (fixedOverlay) fixedOverlay.classList.add('hidden');
 
+  const video = document.querySelector('video') || document.getElementById('arjs-video');
+  if (video && video.paused) {
+    video.play().catch(console.warn);
+  }
+
   setTimeout(() => {
     state.statusMode = 'scanning';
     updateStatusText();
-  }, 300);
+    window.dispatchEvent(new Event('resize'));
+  }, 200);
 }
 
 // --- MENÚ DE MARCADORES ---
