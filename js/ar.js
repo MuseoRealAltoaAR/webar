@@ -63,7 +63,7 @@ function buildARScene() {
 
   container.innerHTML =
     '<a-scene id="aframe-scene" embedded ' +
-    'arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3; cameraParametersUrl: assets/data/camera_para.dat;" ' +
+    'arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono;" ' +
     'vr-mode-ui="enabled: false" ' +
     'renderer="logarithmicDepthBuffer: true; colorManagement: true;">' +
     '\n    ' + markerHTML +
