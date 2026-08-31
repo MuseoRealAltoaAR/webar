@@ -18,7 +18,7 @@ if (typeof module !== 'undefined' && module.exports) {
   const ar = require('./js/ar.js');
   global.getActiveExperience = ar.getActiveExperience;
   global.startARTracking = ar.startARTracking;
-  global.resumeARVideoFeed = ar.resumeARVideoFeed;
+  global.buildARScene = ar.buildARScene;
   global.setMarkerCooldown = ar.setMarkerCooldown;
   global.resetExperience = ar.resetExperience;
   global.renderMarkerMenu = ar.renderMarkerMenu;

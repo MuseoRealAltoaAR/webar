@@ -69,32 +69,20 @@ function exitInteriorCabin() {
     document.body.classList.add('ar-mode');
   }
 
-  // Activar cooldown para evitar que se reabra inmediatamente el entorno
+  // Activar cooldown para evitar que se reabra inmediatamente
   if (typeof setMarkerCooldown === 'function') {
-    setMarkerCooldown(1200);
-  }
-
-  // Resetear visibilidad de marcadores en A-Frame
-  if (typeof document !== 'undefined') {
-    document.querySelectorAll('a-marker').forEach(marker => {
-      if (marker.object3D) {
-        marker.object3D.visible = false;
-      }
-    });
+    setMarkerCooldown(1500);
   }
 
   state.statusMode = 'scanning';
   updateStatusText();
 
-  if (typeof resumeARVideoFeed === 'function') {
-    resumeARVideoFeed();
-  } else {
-    const video = document.querySelector('video') || document.getElementById('arjs-video');
-    if (video && video.paused) {
-      video.play().catch(console.warn);
-    }
-    setTimeout(() => {
-      window.dispatchEvent(new Event('resize'));
+  // Reconstruir la escena A-Frame completa para liberar el contexto congelado de la cámara
+  // Esta es la solución definitiva al bug de "cámara pegada en la última posición del mapa 3D"
+  if (typeof buildARScene === 'function') {
+    // Pequeño delay para que el DOM procese la ocultación del interior-overlay primero
+    setTimeout(function() {
+      buildARScene();
     }, 100);
   }
 }
