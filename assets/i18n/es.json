@@ -69,6 +69,14 @@
       "name": "Estatuilla Valdivia",
       "desc": "Figura cerámica de la cultura Valdivia, representando la fertilidad y el arte precolombino."
     },
+    "vasija": {
+      "name": "Vasija Cerámica Valdivia",
+      "desc": "Recipiente ceremonial de cerámica característico de la cultura Valdivia con motivos ancestrales."
+    },
+    "vasija2": {
+      "name": "Cuenco Valdivia Decorado",
+      "desc": "Cuenco cerámico pulido y decorado con incisiones geométricas de la cultura Valdivia."
+    },
     "choza2_realalto": {
       "name": "Choza Valdivia",
       "desc": "Representación 3D de la Choza Valdivia."

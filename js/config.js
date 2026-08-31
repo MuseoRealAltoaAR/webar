@@ -77,6 +77,14 @@ const i18n = {
         name: 'Estatuilla Valdivia',
         desc: 'Figura cerámica de la cultura Valdivia, representando la fertilidad y el arte precolombino.'
       },
+      vasija: {
+        name: 'Vasija Cerámica Valdivia',
+        desc: 'Recipiente ceremonial de cerámica característico de la cultura Valdivia con motivos ancestrales.'
+      },
+      vasija2: {
+        name: 'Cuenco Valdivia Decorado',
+        desc: 'Cuenco cerámico pulido y decorado con incisiones geométricas de la cultura Valdivia.'
+      },
       choza2_realalto: {
         name: 'Choza Valdivia',
         desc: 'Representación 3D de la Choza Valdivia precolombina.'
@@ -155,6 +163,14 @@ const i18n = {
       valdivia: {
         name: 'Valdivia Figurine',
         desc: 'Ceramic figurine from the Valdivia culture, representing fertility and pre-Columbian art.'
+      },
+      vasija: {
+        name: 'Valdivia Ceramic Vessel',
+        desc: 'Traditional ceremonial ceramic vessel from the Valdivia culture with ancestral motifs.'
+      },
+      vasija2: {
+        name: 'Decorated Valdivia Bowl',
+        desc: 'Polished ceramic bowl decorated with geometric incisions from the Valdivia culture.'
       },
       choza2_realalto: {
         name: 'Valdivia Hut',
@@ -238,6 +254,20 @@ const experiences = [
           descKey: 'element.valdivia.desc',
           glb: 'assets/models/valdivia.glb',
           png: 'assets/models/valdivia.webp'
+        },
+        {
+          id: 'vasija',
+          nameKey: 'element.vasija.name',
+          descKey: 'element.vasija.desc',
+          glb: 'assets/models/bowl.glb',
+          png: 'assets/models/vasija.webp'
+        },
+        {
+          id: 'vasija2',
+          nameKey: 'element.vasija2.name',
+          descKey: 'element.vasija2.desc',
+          glb: 'assets/models/bowl2.glb',
+          png: 'assets/models/vasija2.webp'
         }
       ]
     }
@@ -296,6 +326,11 @@ const OFFLINE_ASSETS_TO_PRELOAD = [
   './assets/entorno/mesa.png',
   './assets/models/valdivia.glb',
   './assets/models/valdivia.webp',
+  './assets/models/bowl.glb',
+  './assets/models/bowl2.glb',
+  './assets/models/vasija.webp',
+  './assets/models/vasija1.webp',
+  './assets/models/vasija2.webp',
   './assets/i18n/es.json',
   './assets/i18n/en.json',
   './assets/i18n/main.json',

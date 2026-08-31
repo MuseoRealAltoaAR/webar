@@ -1,7 +1,7 @@
 /**
  * Real Alto WebAR - Service Worker para Experiencia 100% Offline
  */
-const CACHE_NAME = 'realalto-offline-v7';
+const CACHE_NAME = 'realalto-offline-v8';
 
 const PRECACHE_ASSETS = [
   './',
@@ -36,6 +36,11 @@ const PRECACHE_ASSETS = [
   './assets/entorno/mesa.png',
   './assets/models/valdivia.glb',
   './assets/models/valdivia.webp',
+  './assets/models/bowl.glb',
+  './assets/models/bowl2.glb',
+  './assets/models/vasija.webp',
+  './assets/models/vasija1.webp',
+  './assets/models/vasija2.webp',
   './assets/i18n/es.json',
   './assets/i18n/en.json',
   './assets/i18n/main.json',

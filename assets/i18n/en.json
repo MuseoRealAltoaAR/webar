@@ -69,6 +69,14 @@
       "name": "Valdivia Figurine",
       "desc": "Ceramic figurine from the Valdivia culture, representing fertility and pre-Columbian art."
     },
+    "vasija": {
+      "name": "Valdivia Ceramic Vessel",
+      "desc": "Traditional ceremonial ceramic vessel from the Valdivia culture with ancestral motifs."
+    },
+    "vasija2": {
+      "name": "Decorated Valdivia Bowl",
+      "desc": "Polished ceramic bowl decorated with geometric incisions from the Valdivia culture."
+    },
     "choza2_realalto": {
       "name": "Valdivia Hut",
       "desc": "3D representation of the Valdivia Hut."
