@@ -51,12 +51,25 @@ async function ensureARScriptsLoaded() {
             var id = marker.id || '';
             window.dispatchEvent(new CustomEvent('ar-marker-lost', { detail: { id: id, preset: preset } }));
           });
+        },
+        tick: function () {
+          var marker = this.el;
+          if (marker.object3D && marker.object3D.visible) {
+            if (typeof state !== 'undefined' && !state.interiorActive && state.arStarted && !state.markerVisible) {
+              var preset = marker.getAttribute('preset') || '';
+              var id = marker.id || '';
+              window.dispatchEvent(new CustomEvent('ar-marker-found', { detail: { id: id, preset: preset } }));
+            }
+          }
         }
       });
     }
 
     console.log('[WebAR] Cargando AR.js y complementos...');
     await loadScript('https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js');
+    if (typeof THREEx !== 'undefined' && THREEx.ArToolkitContext) {
+      THREEx.ArToolkitContext.baseURL = './assets/markers/';
+    }
     await loadScript('https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js');
 
     arScriptsLoaded = true;

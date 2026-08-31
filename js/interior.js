@@ -62,8 +62,11 @@ function exitInteriorCabin() {
   state.interiorActive = false;
   state.markerVisible = false;
   document.getElementById('interior-overlay')?.classList.add('hidden');
-  showScreen('ar');
-  resetExperience();
+  document.getElementById('fixed-choza-overlay')?.classList.add('hidden');
+  document.getElementById('ui-ar')?.classList.remove('hidden');
+
+  state.statusMode = 'scanning';
+  updateStatusText();
 
   const video = document.querySelector('video') || document.getElementById('arjs-video');
   if (video && video.paused) {

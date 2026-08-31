@@ -115,10 +115,8 @@ async function startARTracking() {
         
         <!-- Marcadores generados automáticamente desde experiences[] en config.js -->
         ${experiences.map(exp => {
-          if (exp.markerType === 'pattern' && exp.markerUrl) {
-            return `<a-marker id="marker-${exp.id}" type="pattern" url="${exp.markerUrl}" preset="${exp.markerPreset || ''}" registerevents></a-marker>`;
-          }
-          return `<a-marker id="marker-${exp.id}" preset="${exp.markerPreset}" registerevents></a-marker>`;
+          const markerUrl = exp.markerUrl || `assets/markers/patt.${exp.markerPreset || 'hiro'}`;
+          return `<a-marker id="marker-${exp.id}" type="pattern" url="${markerUrl}" registerevents></a-marker>`;
         }).join('\n        ')}
 
         <a-entity camera>
@@ -226,15 +224,11 @@ function handleMarkerFound(event) {
   state.statusMode = 'detected';
   updateStatusText();
 
-  setTimeout(() => {
-    if (state.markerVisible && state.arStarted && !state.interiorActive) {
-      if (matchedExp.directInterior || matchedExp.id === 'entierro_realalto') {
-        enterInteriorCabin();
-      } else {
-        showFixedChozaOverlay(matchedExp);
-      }
-    }
-  }, 350);
+  if (matchedExp.directInterior || matchedExp.id === 'entierro_realalto') {
+    enterInteriorCabin();
+  } else {
+    showFixedChozaOverlay(matchedExp);
+  }
 }
 
 function handleMarkerLost(event) {
