@@ -66,6 +66,10 @@
       "name": "Real Alto Hut",
       "layerName": "Hut Environment"
     },
+    "entierro_realalto": {
+      "name": "Valdivia Burial",
+      "layerName": "Excavation & Burial Environment"
+    },
     "choza2_realalto": {
       "name": "Valdivia Hut",
       "layerName": "Valdivia Hut Environment"
@@ -111,6 +115,14 @@
       "weight": "N/A",
       "material": "Wood, cane & thatch",
       "location": "Residential Sector"
+    },
+    "entierro": {
+      "name": "Valdivia Burial & Funerary Bundle",
+      "desc": "Pre-Hispanic funerary context discovered at the Real Alto archaeological site, featuring the flexed individual within a ceremonial bundle with lithic offerings.",
+      "dimensions": "1.2 × 0.8 × 0.6 m",
+      "weight": "N/A",
+      "material": "Vegetal bundle, skeletal remains & stone",
+      "location": "Real Alto Funerary Area"
     }
   }
 }

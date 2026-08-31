@@ -15,9 +15,12 @@ function initializeApp() {
     fetch('https://www.gstatic.com/draco/versioned/decoders/1.5.6/draco_wasm_wrapper.js').catch(() => {});
     fetch('https://www.gstatic.com/draco/versioned/decoders/1.5.6/draco_decoder.wasm').catch(() => {});
 
-    // Precargar modelo 3D y miniatura de la choza
+    // Precargar modelo 3D y miniatura de la choza y del entierro
     fetch('assets/models/choza.glb').catch(() => {});
     fetch('assets/models/chozauno.webp').catch(() => {});
+    fetch('assets/models/entierro.glb').catch(() => {});
+    fetch('assets/img/entierrop.webp').catch(() => {});
+    fetch('assets/img/terreno.webp').catch(() => {});
 
     if (typeof experiences !== 'undefined') {
       experiences.forEach(exp => {

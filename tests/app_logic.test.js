@@ -39,6 +39,7 @@ before(() => {
 
   global.document = {
     getElementById: (id) => getOrCreateEl(id),
+    querySelector: () => ({ classList: { toggle: ()=>{} } }),
     querySelectorAll: () => [],
     createElement: (tag) => ({
       tagName: tag,
@@ -108,16 +109,30 @@ describe('Lógica de Estado, Eventos de Marcador y Vistas de la Aplicación', ()
     assert.strictEqual(state.statusMode, 'detected');
   });
 
-  it('handleMarkerFound debe ignorar un marcador que no coincide con la experiencia activa', () => {
+  it('handleMarkerFound debe ignorar un marcador no registrado en las experiencias', () => {
     state.arStarted = true;
     state.isLandscape = true;
     state.interiorActive = false;
-    state.activeExperienceId = 'choza_realalto'; // Requiere 'hiro'
+    state.activeExperienceId = 'choza_realalto';
 
-    // Evento con preset KANJI (no coincide)
-    handleMarkerFound({ detail: { preset: 'kanji', id: 'marker-kanji' } });
+    // Evento con preset desconocido (no coincide)
+    handleMarkerFound({ detail: { preset: 'desconocido', id: 'marker-desconocido' } });
 
     assert.strictEqual(state.markerVisible, false);
+  });
+
+  it('handleMarkerFound con marcador kanji debe sincronizar entierro_realalto', () => {
+    state.arStarted = true;
+    state.isLandscape = true;
+    state.interiorActive = false;
+    state.activeExperienceId = 'choza_realalto';
+
+    // Evento con preset KANJI (segundo marcador)
+    handleMarkerFound({ detail: { preset: 'kanji', id: 'marker-entierro_realalto' } });
+
+    assert.strictEqual(state.activeExperienceId, 'entierro_realalto');
+    assert.strictEqual(state.markerVisible, true);
+    assert.strictEqual(state.statusMode, 'detected');
   });
 
   it('handleMarkerLost debe actualizar el estado a búsqueda cuando se pierde el marcador', () => {
@@ -149,5 +164,25 @@ describe('Lógica de Estado, Eventos de Marcador y Vistas de la Aplicación', ()
     assert.ok(modal.classList.contains('hidden') === false, 'El modal 3D debe mostrarse');
     assert.ok(viewer.src.includes('choza.glb'), 'El viewer debe tener cargado el modelo choza.glb');
     assert.strictEqual(titleEl.textContent, 'Choza Real Alto');
+  });
+
+  it('openModelDialog con elemento entierro debe cargar y mostrar entierro.glb', async () => {
+    const activeExp = experiences.find(e => e.id === 'entierro_realalto');
+    const entierroElem = activeExp.layer.elements[0];
+    await openModelDialog(entierroElem);
+    const modal = document.getElementById('model-dialog');
+    const viewer = document.getElementById('main-model-viewer');
+    const titleEl = document.getElementById('modal-piece-title');
+    assert.ok(modal.classList.contains('hidden') === false, 'El modal 3D debe mostrarse');
+    assert.ok(viewer.src.includes('entierro.glb'), 'El viewer debe tener cargado el modelo entierro.glb');
+    assert.strictEqual(titleEl.textContent, 'Entierro y Fardo Funerario Valdivia');
+  });
+
+  it('enterInteriorCabin con experiencia entierro_realalto debe activar fondo estático', () => {
+    state.activeExperienceId = 'entierro_realalto';
+    enterInteriorCabin();
+    const bg = document.getElementById('interior-bg');
+    assert.ok(bg.classList.contains('static-bg'), 'El fondo debe tener la clase static-bg');
+    assert.strictEqual(bg.style.backgroundPosition, 'center center');
   });
 });

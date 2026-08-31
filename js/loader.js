@@ -42,10 +42,14 @@ async function ensureARScriptsLoaded() {
         init: function () {
           var marker = this.el;
           marker.addEventListener('markerFound', function () {
-            window.dispatchEvent(new CustomEvent('ar-marker-found', { detail: { id: marker.id, preset: marker.getAttribute('preset') } }));
+            var preset = marker.getAttribute('preset') || '';
+            var id = marker.id || '';
+            window.dispatchEvent(new CustomEvent('ar-marker-found', { detail: { id: id, preset: preset } }));
           });
           marker.addEventListener('markerLost', function () {
-            window.dispatchEvent(new CustomEvent('ar-marker-lost', { detail: { id: marker.id, preset: marker.getAttribute('preset') } }));
+            var preset = marker.getAttribute('preset') || '';
+            var id = marker.id || '';
+            window.dispatchEvent(new CustomEvent('ar-marker-lost', { detail: { id: id, preset: preset } }));
           });
         }
       });

@@ -9,36 +9,63 @@ function enterInteriorCabin() {
   state.lastYawDeg = null;
 
   // Ocultar AR overlay
-  document.getElementById('fixed-choza-overlay').classList.add('hidden');
-  document.getElementById('ui-ar').classList.add('hidden');
+  document.getElementById('fixed-choza-overlay')?.classList.add('hidden');
+  document.getElementById('ui-ar')?.classList.add('hidden');
 
   // Configurar y mostrar interior
   const interiorOverlay = document.getElementById('interior-overlay');
   const interiorBg = document.getElementById('interior-bg');
   const mesaImg = document.getElementById('mesa-img');
+  const tableContainer = (typeof document !== 'undefined' && typeof document.querySelector === 'function')
+    ? document.querySelector('.table-container')
+    : null;
+  const choza3dBtn = document.getElementById('choza-3d-btn');
   const activeExp = getActiveExperience();
 
   if (interiorBg) {
     interiorBg.style.backgroundImage = `url('${activeExp.layer.backgroundImage}')`;
-    interiorBg.style.backgroundPosition = '0px 50%';
     interiorBg.classList.remove('blurred');
+    if (activeExp.staticBackground || activeExp.id === 'entierro_realalto') {
+      interiorBg.classList.add('static-bg');
+      interiorBg.style.backgroundPosition = 'center center';
+    } else {
+      interiorBg.classList.remove('static-bg');
+      interiorBg.style.backgroundPosition = '0px 50%';
+    }
   }
 
+  // Si no hay mesa (ej. en el terreno), ocultamos la imagen de la mesa
   if (mesaImg) {
-    mesaImg.src = activeExp.layer.foregroundImage;
+    if (activeExp.layer.foregroundImage) {
+      mesaImg.src = activeExp.layer.foregroundImage;
+      mesaImg.classList.remove('hidden');
+    } else {
+      mesaImg.src = '';
+      mesaImg.classList.add('hidden');
+    }
+  }
+
+  if (tableContainer) {
+    tableContainer.classList.toggle('no-table', !activeExp.layer.foregroundImage);
+  }
+
+  // El botón 3D de la choza solo aparece en la experiencia de la choza
+  if (choza3dBtn) {
+    choza3dBtn.classList.toggle('hidden', activeExp.id !== 'choza_realalto');
   }
 
   renderInteriorElements(activeExp.layer.elements);
-  interiorOverlay.classList.remove('hidden');
+  if (interiorOverlay) interiorOverlay.classList.remove('hidden');
 }
 
 function exitInteriorCabin() {
   state.interiorActive = false;
-  document.getElementById('interior-overlay').classList.add('hidden');
+  document.getElementById('interior-overlay')?.classList.add('hidden');
   showScreen('ar');
+  resetExperience();
 }
 
-// --- RENDER DE PIEZAS INTERACTIVAS EN LA MESA ---
+// --- RENDER DE PIEZAS INTERACTIVAS EN LA MESA / TERRENO ---
 function renderInteriorElements(elements) {
   const container = document.getElementById('elements-horizontal-container');
   if (!container) return;
@@ -48,9 +75,10 @@ function renderInteriorElements(elements) {
     const imgBtn = document.createElement('img');
     imgBtn.src = elem.png;
     imgBtn.alt = t(elem.nameKey);
-    imgBtn.className = 'valdivia-btn interactive';
-    imgBtn.width = 75;
-    imgBtn.height = 75;
+    const isSingleBig = elem.id === 'entierro' || elements.length === 1;
+    imgBtn.className = `${isSingleBig ? 'entierro-btn' : 'valdivia-btn'} interactive`;
+    imgBtn.width = isSingleBig ? 160 : 75;
+    imgBtn.height = isSingleBig ? 260 : 75;
     imgBtn.loading = 'lazy';
     imgBtn.addEventListener('click', () => {
       openModelDialog(elem);
@@ -118,6 +146,8 @@ function closeModelDialog() {
 // --- GIROSCOPIO PARA PANORAMA 360 ---
 function handleDeviceOrientation(event) {
   if (!state.interiorActive || state.isDragging) return;
+  const activeExp = getActiveExperience();
+  if (activeExp.staticBackground || activeExp.id === 'entierro_realalto') return;
 
   const anyEvent = event;
   let yaw = null;
@@ -155,6 +185,8 @@ function setupTouchPanControls() {
 
   overlay.addEventListener('touchstart', (e) => {
     if (!state.interiorActive) return;
+    const activeExp = getActiveExperience();
+    if (activeExp.staticBackground || activeExp.id === 'entierro_realalto') return;
     state.isDragging = true;
     state.startTouchX = e.touches[0].clientX;
     state.dragStartOffsetX = state.panoramaOffsetX;
@@ -162,6 +194,8 @@ function setupTouchPanControls() {
 
   overlay.addEventListener('touchmove', (e) => {
     if (!state.isDragging || !state.interiorActive) return;
+    const activeExp = getActiveExperience();
+    if (activeExp.staticBackground || activeExp.id === 'entierro_realalto') return;
     const currentX = e.touches[0].clientX;
     const deltaX = currentX - state.startTouchX;
     const currentOffset = state.dragStartOffsetX + deltaX * 1.2;
@@ -174,6 +208,11 @@ function setupTouchPanControls() {
 
   overlay.addEventListener('touchend', (e) => {
     if (!state.isDragging) return;
+    const activeExp = getActiveExperience();
+    if (activeExp.staticBackground || activeExp.id === 'entierro_realalto') {
+      state.isDragging = false;
+      return;
+    }
     state.isDragging = false;
     const touch = e.changedTouches?.[0];
     if (touch) {

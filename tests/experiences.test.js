@@ -17,7 +17,7 @@ describe('Estructura de Datos e Integridad de Experiencias WebAR', () => {
       assert.ok(exp.scanImage, `Experiencia #${idx} debe tener scanImage`);
       assert.ok(exp.layer, `Experiencia #${idx} debe tener layer`);
       assert.ok(exp.layer.backgroundImage, `Experiencia #${idx} debe tener layer.backgroundImage`);
-      assert.ok(exp.layer.foregroundImage, `Experiencia #${idx} debe tener layer.foregroundImage`);
+      assert.ok(exp.layer.foregroundImage !== undefined, `Experiencia #${idx} debe tener layer.foregroundImage`);
       assert.ok(Array.isArray(exp.layer.elements), `Experiencia #${idx} debe tener un arreglo de elements`);
     });
   });
@@ -34,9 +34,11 @@ describe('Estructura de Datos e Integridad de Experiencias WebAR', () => {
       const bgImgPath = path.join(rootDir, exp.layer.backgroundImage);
       assert.ok(fs.existsSync(bgImgPath), `layer.backgroundImage no encontrada: ${exp.layer.backgroundImage}`);
 
-      // 3. Mesa / Primer plano
-      const fgImgPath = path.join(rootDir, exp.layer.foregroundImage);
-      assert.ok(fs.existsSync(fgImgPath), `layer.foregroundImage no encontrada: ${exp.layer.foregroundImage}`);
+      // 3. Mesa / Primer plano (si aplica)
+      if (exp.layer.foregroundImage) {
+        const fgImgPath = path.join(rootDir, exp.layer.foregroundImage);
+        assert.ok(fs.existsSync(fgImgPath), `layer.foregroundImage no encontrada: ${exp.layer.foregroundImage}`);
+      }
 
       // 4. Elementos 3D y miniaturas
       exp.layer.elements.forEach(elem => {

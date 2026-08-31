@@ -167,28 +167,45 @@ function selectExperience(expId) {
 
 // --- DETECCIÓN DE MARCADORES (Custom Events desde A-Frame) ---
 function handleMarkerFound(event) {
-  if (!state.isLandscape || !state.arStarted || state.interiorActive) return;
+  if (!state.arStarted || state.interiorActive) return;
 
   const detail = event.detail || {};
-  const activeExp = getActiveExperience();
   const detectedPreset = (detail.preset || '').toLowerCase();
   const detectedId = (detail.id || '').toLowerCase();
 
-  // Coincide si el id del nodo A-Frame o el preset baten con la experiencia activa
-  const isMatching = detectedId === `marker-${activeExp.id}` ||
-                     detectedPreset === (activeExp.markerPreset || '').toLowerCase();
+  // Buscar si el marcador corresponde a alguna de las experiencias configuradas
+  let matchedExp = experiences.find(exp => 
+    (detectedId && detectedId === `marker-${exp.id}`.toLowerCase()) || 
+    (detectedPreset && detectedPreset === (exp.markerPreset || '').toLowerCase()) ||
+    (detectedId && detectedId.includes(exp.id.toLowerCase()))
+  );
 
-  if (isMatching) {
-    state.markerVisible = true;
-    state.statusMode = 'detected';
-    updateStatusText();
-
-    setTimeout(() => {
-      if (state.markerVisible && state.arStarted && !state.interiorActive) {
-        showFixedChozaOverlay(activeExp);
-      }
-    }, 400);
+  if (!matchedExp) {
+    const activeExp = getActiveExperience();
+    const isMatching = detectedId === `marker-${activeExp.id}`.toLowerCase() ||
+                       detectedPreset === (activeExp.markerPreset || '').toLowerCase();
+    if (!isMatching) return;
+    matchedExp = activeExp;
   }
+
+  if (state.activeExperienceId !== matchedExp.id) {
+    state.activeExperienceId = matchedExp.id;
+    renderMarkerMenu();
+  }
+
+  state.markerVisible = true;
+  state.statusMode = 'detected';
+  updateStatusText();
+
+  setTimeout(() => {
+    if (state.markerVisible && state.arStarted && !state.interiorActive) {
+      if (matchedExp.directInterior || matchedExp.id === 'entierro_realalto') {
+        enterInteriorCabin();
+      } else {
+        showFixedChozaOverlay(matchedExp);
+      }
+    }
+  }, 350);
 }
 
 function handleMarkerLost(event) {
@@ -198,7 +215,8 @@ function handleMarkerLost(event) {
   const detectedId = (detail.id || '').toLowerCase();
 
   const isMatching = detectedId === `marker-${activeExp.id}` ||
-                     detectedPreset === (activeExp.markerPreset || '').toLowerCase();
+                     detectedPreset === (activeExp.markerPreset || '').toLowerCase() ||
+                     (detectedId && detectedId.includes(activeExp.id.toLowerCase()));
 
   if (isMatching) {
     state.markerVisible = false;
@@ -226,16 +244,13 @@ function checkOrientation() {
   const dropdownEl = document.getElementById('marker-dropdown-wrapper');
 
   if (warningEl) {
-    warningEl.classList.toggle('hidden', state.isLandscape);
+    warningEl.classList.add('hidden');
   }
   if (dropdownEl) {
-    dropdownEl.classList.toggle('hidden', !state.isLandscape);
+    dropdownEl.classList.remove('hidden');
   }
 
-  if (!state.isLandscape && state.arStarted) {
-    state.statusMode = 'paused';
-    updateStatusText();
-  } else if (state.isLandscape && state.arStarted) {
+  if (state.arStarted) {
     state.statusMode = 'scanning';
     updateStatusText();
   }

@@ -66,6 +66,10 @@
       "name": "Choza Real Alto",
       "layerName": "Entorno Choza"
     },
+    "entierro_realalto": {
+      "name": "Excavación y Entierro",
+      "layerName": "Entorno Excavación y Entierro"
+    },
     "choza2_realalto": {
       "name": "Choza Valdivia",
       "layerName": "Entorno Choza Valdivia"
@@ -111,6 +115,14 @@
       "weight": "N/A",
       "material": "Madera, caña y paja",
       "location": "Sector Residencial"
+    },
+    "entierro": {
+      "name": "Entierro y Fardo Funerario Valdivia",
+      "desc": "Contexto funerario prehispánico hallado en el yacimiento arqueológico de Real Alto, donde el individuo yace en posición flexionada dentro de un fardo ceremonial con ofrendas líticas y cerámicas.",
+      "dimensions": "1,2 × 0,8 × 0,6 m",
+      "weight": "N/A",
+      "material": "Fardo vegetal, osamenta y líticos",
+      "location": "Área Funeraria Real Alto"
     }
   }
 }

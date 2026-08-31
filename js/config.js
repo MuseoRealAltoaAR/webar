@@ -74,6 +74,10 @@ const i18n = {
         name: 'Choza Real Alto',
         layerName: 'Entorno Choza'
       },
+      entierro_realalto: {
+        name: 'Excavación y Entierro',
+        layerName: 'Entorno Excavación y Entierro'
+      },
       choza2_realalto: {
         name: 'Choza Valdivia',
         layerName: 'Entorno Choza Valdivia'
@@ -119,6 +123,14 @@ const i18n = {
         weight: 'N/A',
         material: 'Madera, caña y paja',
         location: 'Sector Residencial'
+      },
+      entierro: {
+        name: 'Entierro y Fardo Funerario Valdivia',
+        desc: 'Contexto funerario prehispánico hallado en el yacimiento arqueológico de Real Alto, donde el individuo yace en posición flexionada dentro de un fardo ceremonial con ofrendas líticas y cerámicas.',
+        dimensions: '1,2 × 0,8 × 0,6 m',
+        weight: 'N/A',
+        material: 'Fardo vegetal, osamenta y líticos',
+        location: 'Área Funeraria Real Alto'
       }
     }
   },
@@ -192,6 +204,10 @@ const i18n = {
         name: 'Real Alto Hut',
         layerName: 'Hut Environment'
       },
+      entierro_realalto: {
+        name: 'Valdivia Burial',
+        layerName: 'Excavation & Burial Environment'
+      },
       choza2_realalto: {
         name: 'Valdivia Hut',
         layerName: 'Valdivia Hut Environment'
@@ -237,6 +253,14 @@ const i18n = {
         weight: 'N/A',
         material: 'Wood, cane & thatch',
         location: 'Residential Sector'
+      },
+      entierro: {
+        name: 'Valdivia Burial & Funerary Bundle',
+        desc: 'Pre-Hispanic funerary context discovered at the Real Alto archaeological site, featuring the flexed individual within a ceremonial bundle with lithic offerings.',
+        dimensions: '1.2 × 0.8 × 0.6 m',
+        weight: 'N/A',
+        material: 'Vegetal bundle, skeletal remains & stone',
+        location: 'Real Alto Funerary Area'
       }
     }
   }
@@ -304,6 +328,8 @@ const experiences = [
     id: 'choza_realalto',
     nameKey: 'experience.choza_realalto.name',
     markerPreset: 'hiro',
+    markerType: 'pattern',
+    markerUrl: 'assets/markers/patt.hiro',
     markerLabel: 'Hiro',
     scanImage: 'assets/img/choza.webp',
     layer: {
@@ -334,6 +360,30 @@ const experiences = [
       ]
     }
   },
+  {
+    id: 'entierro_realalto',
+    nameKey: 'experience.entierro_realalto.name',
+    markerPreset: 'kanji',
+    markerType: 'pattern',
+    markerUrl: 'assets/markers/patt.kanji',
+    markerLabel: 'Kanji',
+    scanImage: 'assets/img/terreno.webp',
+    directInterior: true,
+    staticBackground: true,
+    layer: {
+      backgroundImage: 'assets/img/terreno.webp',
+      foregroundImage: '',
+      elements: [
+        {
+          id: 'entierro',
+          nameKey: 'element.entierro.name',
+          descKey: 'element.entierro.desc',
+          glb: 'assets/models/entierro.glb',
+          png: 'assets/img/entierrop.webp'
+        }
+      ]
+    }
+  }
 ];
 
 // --- ESTADO GLOBAL DE LA APLICACIÓN ---
@@ -377,10 +427,15 @@ const OFFLINE_ASSETS_TO_PRELOAD = [
   './robots.txt',
   './sitemap.xml',
   './llms.txt',
+  // Patrones AR locales
+  './assets/markers/patt.hiro',
+  './assets/markers/patt.kanji',
   // Assets visuales
   './assets/img/choza.webp',
   './assets/img/background.webp',
   './assets/img/interiorchoza.webp',
+  './assets/img/terreno.webp',
+  './assets/img/entierrop.webp',
   './assets/img/logo.webp',
   './assets/img/logohome.webp',
   './assets/img/logoside.webp',
@@ -392,6 +447,7 @@ const OFFLINE_ASSETS_TO_PRELOAD = [
   './assets/models/bowl2.glb',
   './assets/models/choza.glb',
   './assets/models/chozauno.webp',
+  './assets/models/entierro.glb',
   './assets/models/vasija.webp',
   './assets/models/vasija1.webp',
   './assets/models/vasija2.webp',

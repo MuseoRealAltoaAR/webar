@@ -1,7 +1,7 @@
 /**
  * Real Alto WebAR - Service Worker para Experiencia 100% Offline
  */
-const CACHE_NAME = 'realalto-offline-v13';
+const CACHE_NAME = 'realalto-offline-v16';
 
 const PRECACHE_ASSETS = [
   './',
@@ -25,10 +25,15 @@ const PRECACHE_ASSETS = [
   './robots.txt',
   './sitemap.xml',
   './llms.txt',
+  // Patrones AR locales
+  './assets/markers/patt.hiro',
+  './assets/markers/patt.kanji',
   // Assets visuales
   './assets/img/choza.webp',
   './assets/img/background.webp',
   './assets/img/interiorchoza.webp',
+  './assets/img/terreno.webp',
+  './assets/img/entierrop.webp',
   './assets/img/logo.webp',
   './assets/img/logohome.webp',
   './assets/img/logoside.webp',
@@ -40,6 +45,7 @@ const PRECACHE_ASSETS = [
   './assets/models/bowl2.glb',
   './assets/models/choza.glb',
   './assets/models/chozauno.webp',
+  './assets/models/entierro.glb',
   './assets/models/vasija.webp',
   './assets/models/vasija1.webp',
   './assets/models/vasija2.webp',
