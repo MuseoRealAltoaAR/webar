@@ -25,7 +25,7 @@ function updateStatusText() {
 }
 
 function setMarkerCooldown(ms) {
-  if (ms === undefined) ms = 1500;
+  if (ms === undefined) ms = 400;
   markerCooldownUntil = Date.now() + ms;
 }
 
@@ -181,7 +181,18 @@ function selectExperience(expId) {
 
 // --- DETECCIÓN DE MARCADORES ---
 function handleMarkerFound(event) {
-  if (!state.arStarted || state.interiorActive || Date.now() < markerCooldownUntil) return;
+  if (!state.arStarted || state.interiorActive) return;
+
+  // Si aún estamos en cooldown del botón volver a escanear, diferir la detección para no perder el evento único de AR.js
+  if (Date.now() < markerCooldownUntil) {
+    const remaining = Math.max(50, markerCooldownUntil - Date.now() + 50);
+    setTimeout(function() {
+      if (state.arStarted && !state.interiorActive) {
+        handleMarkerFound(event);
+      }
+    }, remaining);
+    return;
+  }
 
   const detail = event.detail || {};
   const detectedId = (detail.id || '').toLowerCase();

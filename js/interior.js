@@ -74,9 +74,9 @@ function exitInteriorCabin() {
     document.body.classList.add('ar-mode');
   }
 
-  // Activar cooldown para evitar que se reabra inmediatamente
+  // Activar cooldown breve para evitar re-aperturas instantáneas
   if (typeof setMarkerCooldown === 'function') {
-    setMarkerCooldown(1500);
+    setMarkerCooldown(400);
   }
 
   state.statusMode = 'scanning';
