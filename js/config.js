@@ -343,21 +343,24 @@ const experiences = [
           nameKey: 'element.valdivia.name',
           descKey: 'element.valdivia.desc',
           glb: 'assets/models/valdivia.glb',
-          png: 'assets/models/valdivia.webp'
+          png: 'assets/models/valdivia.webp',
+          scale: '0.15 0.15 0.15'
         },
         {
           id: 'vasija',
           nameKey: 'element.vasija.name',
           descKey: 'element.vasija.desc',
           glb: 'assets/models/bowl.glb',
-          png: 'assets/models/vasija.webp'
+          png: 'assets/models/vasija.webp',
+          scale: '0.2 0.2 0.2'
         },
         {
           id: 'vasija2',
           nameKey: 'element.vasija2.name',
           descKey: 'element.vasija2.desc',
           glb: 'assets/models/bowl2.glb',
-          png: 'assets/models/vasija2.webp'
+          png: 'assets/models/vasija2.webp',
+          scale: '0.2 0.2 0.2'
         }
       ]
     }
@@ -383,6 +386,7 @@ const experiences = [
           glb: 'assets/models/entierro.glb',
           png: 'assets/img/entierrop.webp',
           orientation: '0deg -90deg 0deg',
+          scale: '0.35 0.35 0.35',
           cameraOrbit: '-90deg 75deg auto'
         }
       ]

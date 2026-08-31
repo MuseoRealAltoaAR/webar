@@ -169,9 +169,14 @@ async function openModelDialog(elem) {
       viewer.cameraOrbit = '45deg 55deg 2.5m';
     }
 
-    // Habilitar soporte AR (Google Scene Viewer / WebXR / Quick Look)
+    // Aplicar escala personalizada para evitar modelos gigantescos en Google AR
+    const modelScale = elem.scale || '0.2 0.2 0.2';
+    viewer.setAttribute('scale', modelScale);
+    viewer.scale = modelScale;
+
+    // Habilitar soporte AR (WebXR primero para rotación y escala exactas en navegador, Scene Viewer y Quick Look)
     viewer.setAttribute('ar', '');
-    viewer.setAttribute('ar-modes', 'scene-viewer webxr quick-look');
+    viewer.setAttribute('ar-modes', 'webxr scene-viewer quick-look');
     viewer.setAttribute('ar-scale', 'auto');
     viewer.setAttribute('ar-placement', 'floor');
 
@@ -191,7 +196,9 @@ function closeModelDialog() {
     viewer.src = '';
     viewer.removeAttribute('src');
     viewer.removeAttribute('orientation');
+    viewer.removeAttribute('scale');
     viewer.orientation = '0deg 0deg 0deg';
+    viewer.scale = '1 1 1';
   }
   if (interiorBg) interiorBg.classList.remove('blurred');
 }
@@ -298,7 +305,8 @@ function openChozaModelDialog() {
     nameKey: 'element.choza.name',
     descKey: 'element.choza.desc',
     glb: 'assets/models/choza.glb',
-    png: 'assets/models/chozauno.webp'
+    png: 'assets/models/chozauno.webp',
+    scale: '0.15 0.15 0.15'
   };
   return openModelDialog(chozaElem);
 }

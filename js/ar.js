@@ -55,6 +55,19 @@ function buildARScene() {
   const container = document.getElementById('ar-scene-container');
   if (!container) return;
 
+  // Limpiar videos anteriores creados por AR.js en el body para evitar streams huérfanos
+  if (typeof document !== 'undefined') {
+    const oldVideos = document.querySelectorAll('video#arjs-video, body > video');
+    oldVideos.forEach(function(v) {
+      try {
+        if (v.srcObject) {
+          v.srcObject.getTracks().forEach(function(t) { t.stop(); });
+        }
+      } catch (e) {}
+      v.remove();
+    });
+  }
+
   container.innerHTML = '';
 
   const markerHTML = experiences.map(function(exp) {
@@ -253,6 +266,8 @@ function handleMarkerLost(event) {
     if (state.arStarted && !state.interiorActive) {
       state.statusMode = 'searching';
       updateStatusText();
+      const fixedOverlay = document.getElementById('fixed-choza-overlay');
+      if (fixedOverlay) fixedOverlay.classList.add('hidden');
     }
   }
 }
