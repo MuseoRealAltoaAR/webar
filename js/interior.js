@@ -66,6 +66,7 @@ function enterInteriorCabin() {
 function exitInteriorCabin() {
   state.interiorActive = false;
   state.markerVisible = false;
+  closeModelDialog();
   document.getElementById('interior-overlay')?.classList.add('hidden');
   document.getElementById('fixed-choza-overlay')?.classList.add('hidden');
   document.getElementById('ui-ar')?.classList.remove('hidden');
@@ -174,9 +175,9 @@ async function openModelDialog(elem) {
     viewer.setAttribute('scale', modelScale);
     viewer.scale = modelScale;
 
-    // Habilitar soporte AR (WebXR primero para rotación y escala exactas en navegador, Scene Viewer y Quick Look)
+    // Habilitar soporte Google AR (Scene Viewer nativo con mapa de escaneo de suelo)
     viewer.setAttribute('ar', '');
-    viewer.setAttribute('ar-modes', 'webxr scene-viewer quick-look');
+    viewer.setAttribute('ar-modes', 'scene-viewer webxr quick-look');
     viewer.setAttribute('ar-scale', 'auto');
     viewer.setAttribute('ar-placement', 'floor');
 

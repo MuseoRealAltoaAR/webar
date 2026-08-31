@@ -136,6 +136,15 @@ function initializeApp() {
   setLanguage(state.lang);
   renderMarkerMenu();
   checkOrientation();
+
+  // 14. Recuperación automática al regresar de Google Scene Viewer / cambio de app
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && state.arStarted && !state.interiorActive) {
+      if (typeof buildARScene === 'function') {
+        buildARScene();
+      }
+    }
+  });
 }
 
 // Arrancar cuando el DOM esté listo
