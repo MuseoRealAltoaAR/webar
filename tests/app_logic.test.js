@@ -64,7 +64,8 @@ const {
   handleMarkerFound,
   handleMarkerLost,
   enterInteriorCabin,
-  exitInteriorCabin
+  exitInteriorCabin,
+  openChozaModelDialog
 } = require('../app.js');
 
 describe('Lógica de Estado, Eventos de Marcador y Vistas de la Aplicación', () => {
@@ -138,5 +139,15 @@ describe('Lógica de Estado, Eventos de Marcador y Vistas de la Aplicación', ()
 
     exitInteriorCabin();
     assert.strictEqual(state.interiorActive, false);
+  });
+
+  it('openChozaModelDialog debe cargar y configurar el modelo choza.glb en el visor 3D', async () => {
+    await openChozaModelDialog();
+    const modal = document.getElementById('model-dialog');
+    const viewer = document.getElementById('main-model-viewer');
+    const titleEl = document.getElementById('modal-piece-title');
+    assert.ok(modal.classList.contains('hidden') === false, 'El modal 3D debe mostrarse');
+    assert.ok(viewer.src.includes('choza.glb'), 'El viewer debe tener cargado el modelo choza.glb');
+    assert.strictEqual(titleEl.textContent, 'Choza Real Alto');
   });
 });

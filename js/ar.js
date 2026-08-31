@@ -109,7 +109,9 @@ async function startARTracking() {
 
   state.statusMode = 'scanning';
   updateStatusText();
-  requestDeviceOrientation();
+  if (typeof requestDeviceOrientation === 'function') {
+    requestDeviceOrientation();
+  }
 
   // Forzar resize para que AR.js calibre el feed de la cámara
   setTimeout(() => {

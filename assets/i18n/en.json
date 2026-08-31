@@ -52,7 +52,8 @@
   },
   "cabin": {
     "backToScan": "Back to scan",
-    "tableAlt": "Table"
+    "tableAlt": "Table",
+    "viewChoza": "3D Hut"
   },
   "modal": {
     "dimensions": "Dimensions",
@@ -98,6 +99,14 @@
     "choza2_realalto": {
       "name": "Valdivia Hut",
       "desc": "3D representation of the pre-Columbian Valdivia Hut.",
+      "dimensions": "8.5 × 4.2 × 3.8 m",
+      "weight": "N/A",
+      "material": "Wood, cane & thatch",
+      "location": "Residential Sector"
+    },
+    "choza": {
+      "name": "Real Alto Hut",
+      "desc": "Communal residential and ceremonial structure of the Valdivia culture at Real Alto, built with wooden posts, praise cane, and thatch roofing.",
       "dimensions": "8.5 × 4.2 × 3.8 m",
       "weight": "N/A",
       "material": "Wood, cane & thatch",

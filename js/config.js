@@ -60,7 +60,8 @@ const i18n = {
     },
     cabin: {
       backToScan: 'Volver a escanear',
-      tableAlt: 'Mesa'
+      tableAlt: 'Mesa',
+      viewChoza: 'Choza 3D'
     },
     modal: {
       dimensions: 'Dimensiones',
@@ -106,6 +107,14 @@ const i18n = {
       choza2_realalto: {
         name: 'Choza Valdivia',
         desc: 'Representación 3D de la Choza Valdivia precolombina.',
+        dimensions: '8,5 × 4,2 × 3,8 m',
+        weight: 'N/A',
+        material: 'Madera, caña y paja',
+        location: 'Sector Residencial'
+      },
+      choza: {
+        name: 'Choza Real Alto',
+        desc: 'Estructura habitacional y ceremonial comunal de la cultura Valdivia en Real Alto, construida con postes de madera, caña guadua y techumbre vegetal.',
         dimensions: '8,5 × 4,2 × 3,8 m',
         weight: 'N/A',
         material: 'Madera, caña y paja',
@@ -169,7 +178,8 @@ const i18n = {
     },
     cabin: {
       backToScan: 'Back to scan',
-      tableAlt: 'Table'
+      tableAlt: 'Table',
+      viewChoza: '3D Hut'
     },
     modal: {
       dimensions: 'Dimensions',
@@ -215,6 +225,14 @@ const i18n = {
       choza2_realalto: {
         name: 'Valdivia Hut',
         desc: '3D representation of the pre-Columbian Valdivia Hut.',
+        dimensions: '8.5 × 4.2 × 3.8 m',
+        weight: 'N/A',
+        material: 'Wood, cane & thatch',
+        location: 'Residential Sector'
+      },
+      choza: {
+        name: 'Real Alto Hut',
+        desc: 'Communal residential and ceremonial structure of the Valdivia culture at Real Alto, built with wooden posts, praise cane, and thatch roofing.',
         dimensions: '8.5 × 4.2 × 3.8 m',
         weight: 'N/A',
         material: 'Wood, cane & thatch',
@@ -372,6 +390,8 @@ const OFFLINE_ASSETS_TO_PRELOAD = [
   './assets/models/valdivia.webp',
   './assets/models/bowl.glb',
   './assets/models/bowl2.glb',
+  './assets/models/choza.glb',
+  './assets/models/chozauno.webp',
   './assets/models/vasija.webp',
   './assets/models/vasija1.webp',
   './assets/models/vasija2.webp',

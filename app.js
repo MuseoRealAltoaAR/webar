@@ -7,6 +7,10 @@ if (typeof module !== 'undefined' && module.exports) {
   global.OFFLINE_ASSETS_TO_PRELOAD = config.OFFLINE_ASSETS_TO_PRELOAD;
 
   const loader = require('./js/loader.js');
+  global.loadScript = loader.loadScript;
+  global.ensureARScriptsLoaded = loader.ensureARScriptsLoaded;
+  global.ensureModelViewerLoaded = loader.ensureModelViewerLoaded;
+  global.initOfflineSupport = loader.initOfflineSupport;
   const i18nModule = require('./js/i18n.js');
   global.t = i18nModule.t;
   global.setLanguage = i18nModule.setLanguage;
@@ -29,6 +33,10 @@ if (typeof module !== 'undefined' && module.exports) {
   global.renderInteriorElements = interior.renderInteriorElements;
   global.openModelDialog = interior.openModelDialog;
   global.closeModelDialog = interior.closeModelDialog;
+  global.openChozaModelDialog = interior.openChozaModelDialog;
+  global.requestDeviceOrientation = interior.requestDeviceOrientation;
+  global.setupTouchPanControls = interior.setupTouchPanControls;
+  global.handleDeviceOrientation = interior.handleDeviceOrientation;
 
   const ui = require('./js/ui.js');
   global.showScreen = ui.showScreen;

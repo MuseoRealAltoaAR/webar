@@ -52,7 +52,8 @@
   },
   "cabin": {
     "backToScan": "Volver a escanear",
-    "tableAlt": "Mesa"
+    "tableAlt": "Mesa",
+    "viewChoza": "Choza 3D"
   },
   "modal": {
     "dimensions": "Dimensiones",
@@ -98,6 +99,14 @@
     "choza2_realalto": {
       "name": "Choza Valdivia",
       "desc": "Representación 3D de la Choza Valdivia precolombina.",
+      "dimensions": "8,5 × 4,2 × 3,8 m",
+      "weight": "N/A",
+      "material": "Madera, caña y paja",
+      "location": "Sector Residencial"
+    },
+    "choza": {
+      "name": "Choza Real Alto",
+      "desc": "Estructura habitacional y ceremonial comunal de la cultura Valdivia en Real Alto, construida con postes de madera, caña guadua y techumbre vegetal.",
       "dimensions": "8,5 × 4,2 × 3,8 m",
       "weight": "N/A",
       "material": "Madera, caña y paja",

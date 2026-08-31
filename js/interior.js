@@ -62,7 +62,13 @@ function renderInteriorElements(elements) {
 // --- DIÁLOGO MODAL 3D (Google model-viewer) ---
 async function openModelDialog(elem) {
   // Cargar <model-viewer> bajo demanda
-  await ensureModelViewerLoaded();
+  if (typeof ensureModelViewerLoaded === 'function') {
+    try {
+      await ensureModelViewerLoaded();
+    } catch (err) {
+      console.warn('[3D Viewer] Error cargando componente:', err);
+    }
+  }
 
   const modal = document.getElementById('model-dialog');
   const viewer = document.getElementById('main-model-viewer');
@@ -85,7 +91,8 @@ async function openModelDialog(elem) {
   if (modal) modal.classList.remove('hidden');
 
   if (viewer) {
-    const absoluteGlbUrl = new URL(elem.glb, window.location.href).href;
+    const baseUrl = (typeof window !== 'undefined' && window.location?.href) ? window.location.href : 'http://localhost/';
+    const absoluteGlbUrl = new URL(elem.glb, baseUrl).href;
     console.log('[3D Viewer] Cargando modelo GLB desde:', absoluteGlbUrl);
     viewer.src = absoluteGlbUrl;
     viewer.setAttribute('src', absoluteGlbUrl);
@@ -192,6 +199,28 @@ async function requestDeviceOrientation() {
   }
 }
 
+// --- APERTURA DEL MODELO 3D DE LA CHOZA ---
+function openChozaModelDialog() {
+  const chozaElem = {
+    id: 'choza',
+    nameKey: 'element.choza.name',
+    descKey: 'element.choza.desc',
+    glb: 'assets/models/choza.glb',
+    png: 'assets/models/chozauno.webp'
+  };
+  return openModelDialog(chozaElem);
+}
+
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { enterInteriorCabin, exitInteriorCabin, renderInteriorElements, openModelDialog, closeModelDialog, handleDeviceOrientation, setupTouchPanControls, requestDeviceOrientation };
+  module.exports = {
+    enterInteriorCabin,
+    exitInteriorCabin,
+    renderInteriorElements,
+    openModelDialog,
+    closeModelDialog,
+    openChozaModelDialog,
+    handleDeviceOrientation,
+    setupTouchPanControls,
+    requestDeviceOrientation
+  };
 }

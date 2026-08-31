@@ -15,6 +15,10 @@ function initializeApp() {
     fetch('https://www.gstatic.com/draco/versioned/decoders/1.5.6/draco_wasm_wrapper.js').catch(() => {});
     fetch('https://www.gstatic.com/draco/versioned/decoders/1.5.6/draco_decoder.wasm').catch(() => {});
 
+    // Precargar modelo 3D y miniatura de la choza
+    fetch('assets/models/choza.glb').catch(() => {});
+    fetch('assets/models/chozauno.webp').catch(() => {});
+
     if (typeof experiences !== 'undefined') {
       experiences.forEach(exp => {
         if (exp.layer?.elements) {
@@ -99,12 +103,17 @@ function initializeApp() {
     enterInteriorCabin();
   });
 
-  // 8. Botón Volver a escanear
+  // 8. Botón Choza 3D (superior derecha en interior)
+  document.getElementById('choza-3d-btn')?.addEventListener('click', () => {
+    openChozaModelDialog();
+  });
+
+  // 9. Botón Volver a escanear
   document.getElementById('back-to-scan-btn')?.addEventListener('click', () => {
     exitInteriorCabin();
   });
 
-  // 9. Cerrar modal 3D
+  // 10. Cerrar modal 3D
   document.getElementById('close-dialog-btn')?.addEventListener('click', () => {
     closeModelDialog();
   });

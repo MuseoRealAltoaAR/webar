@@ -30,6 +30,63 @@
   backdrop-filter: blur(10px);
 }
 
+/* Botón Choza 3D superior derecha */
+.choza-3d-btn {
+  position: fixed;
+  top: max(16px, env(safe-area-inset-top));
+  right: 16px;
+  z-index: 10000;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 159, 28, 0.85);
+  background: rgba(15, 23, 42, 0.88);
+  color: #fff;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6), 0 0 14px rgba(255, 159, 28, 0.35);
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s ease, border-color 0.25s ease;
+  padding: 4px;
+}
+
+.choza-3d-btn:hover {
+  transform: scale(1.12);
+  border-color: #ff9f1c;
+  box-shadow: 0 6px 24px rgba(255, 159, 28, 0.65), 0 0 16px rgba(255, 159, 28, 0.5);
+}
+
+.choza-3d-btn:active {
+  transform: scale(0.92);
+}
+
+.choza-3d-btn-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.6));
+  pointer-events: none;
+}
+
+.choza-3d-btn-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  background: #ff9f1c;
+  color: #0d0c0b;
+  font-size: 0.62rem;
+  font-weight: 900;
+  padding: 1px 5px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
 /* Fondo panorámico */
 .interior-bg {
   position: absolute;
@@ -299,6 +356,23 @@ model-viewer {
 
 /* Responsive landscape interior */
 @media (orientation: landscape) {
+  .choza-3d-btn {
+    top: max(12px, env(safe-area-inset-top));
+    right: 16px;
+    width: 52px;
+    height: 52px;
+  }
+
+  .choza-3d-btn-img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .choza-3d-btn-badge {
+    font-size: 0.56rem;
+    padding: 1px 4px;
+  }
+
   .table-container {
     max-width: min(50vw, 540px);
     height: 32%;
