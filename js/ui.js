@@ -18,6 +18,10 @@ function showScreen(tabName) {
     item.classList.toggle('active', item.dataset.tab === tabName);
   });
 
+  if (typeof document !== 'undefined' && document.body) {
+    document.body.classList.toggle('ar-mode', tabName === 'ar');
+  }
+
   if (tabName === 'inicio') {
     document.getElementById('home-screen').classList.remove('hidden');
     state.arStarted = false;

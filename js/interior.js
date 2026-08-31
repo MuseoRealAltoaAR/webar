@@ -65,16 +65,24 @@ function exitInteriorCabin() {
   document.getElementById('fixed-choza-overlay')?.classList.add('hidden');
   document.getElementById('ui-ar')?.classList.remove('hidden');
 
+  if (typeof document !== 'undefined' && document.body) {
+    document.body.classList.add('ar-mode');
+  }
+
   state.statusMode = 'scanning';
   updateStatusText();
 
-  const video = document.querySelector('video') || document.getElementById('arjs-video');
-  if (video && video.paused) {
-    video.play().catch(console.warn);
+  if (typeof resumeARVideoFeed === 'function') {
+    resumeARVideoFeed();
+  } else {
+    const video = document.querySelector('video') || document.getElementById('arjs-video');
+    if (video && video.paused) {
+      video.play().catch(console.warn);
+    }
+    setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 100);
   }
-  setTimeout(() => {
-    window.dispatchEvent(new Event('resize'));
-  }, 100);
 }
 
 // --- RENDER DE PIEZAS INTERACTIVAS EN LA MESA / TERRENO ---

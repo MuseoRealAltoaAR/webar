@@ -34,6 +34,11 @@ html, body {
   inset: 0;
 }
 
+body.ar-mode {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
 /* Utilidades */
 .hidden {
   display: none !important;

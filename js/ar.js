@@ -44,6 +44,24 @@ async function requestCameraAccess() {
   }
 }
 
+function resumeARVideoFeed() {
+  const video = document.getElementById('arjs-video') || document.querySelector('video');
+  if (video) {
+    video.style.display = 'block';
+    video.style.visibility = 'visible';
+    if (video.paused) {
+      video.play().catch(console.warn);
+    }
+  }
+  const scene = document.getElementById('aframe-scene');
+  if (scene && typeof scene.play === 'function' && scene.isPaused) {
+    scene.play();
+  }
+  setTimeout(() => {
+    window.dispatchEvent(new Event('resize'));
+  }, 100);
+}
+
 // --- INICIO DEL TRACKING AR ---
 async function startARTracking() {
   state.arStarted = true;
@@ -57,17 +75,7 @@ async function startARTracking() {
     const statusDot = document.getElementById('status-dot');
     if (statusDot) statusDot.classList.add('active');
 
-    const video = document.querySelector('video') || document.getElementById('arjs-video');
-    if (video && video.paused) {
-      try {
-        await video.play();
-      } catch (e) {
-        console.warn('[WebAR] Reintentando reproducir video:', e);
-      }
-    }
-    setTimeout(() => {
-      window.dispatchEvent(new Event('resize'));
-    }, 150);
+    resumeARVideoFeed();
     return;
   }
 
@@ -280,5 +288,5 @@ function checkOrientation() {
 }
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { getActiveExperience, startARTracking, resetExperience, renderMarkerMenu, selectExperience, updateStatusText, handleMarkerFound, handleMarkerLost, showFixedChozaOverlay, checkOrientation };
+  module.exports = { getActiveExperience, startARTracking, resumeARVideoFeed, resetExperience, renderMarkerMenu, selectExperience, updateStatusText, handleMarkerFound, handleMarkerLost, showFixedChozaOverlay, checkOrientation };
 }
