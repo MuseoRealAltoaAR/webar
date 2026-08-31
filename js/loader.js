@@ -56,8 +56,8 @@ async function ensureARScriptsLoaded() {
     }
 
     console.log('[WebAR] Cargando AR.js y complementos...');
-    // Versión estable 3.4.5 — soporta preset hiro y kanji de forma nativa
-    await loadScript('https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/aframe/build/aframe-ar.js');
+    await loadScript('https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js');
+    await loadScript('https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js');
 
     arScriptsLoaded = true;
     console.log('[WebAR] Motor WebAR listo.');
