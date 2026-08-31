@@ -74,7 +74,7 @@ function exitInteriorCabin() {
     document.body.classList.add('ar-mode');
   }
 
-  // Cooldown para evitar que se reabra inmediatamente
+  // Activar cooldown para evitar que se reabra inmediatamente
   if (typeof setMarkerCooldown === 'function') {
     setMarkerCooldown(1500);
   }
@@ -82,20 +82,12 @@ function exitInteriorCabin() {
   state.statusMode = 'scanning';
   updateStatusText();
 
-  // La escena AR sigue corriendo en fondo — solo asegurar que el video esté activo
-  if (typeof document !== 'undefined') {
-    // Pequeño delay para que el browser procese el cambio de DOM
-    [100, 400, 800].forEach(function(ms) {
-      setTimeout(function() {
-        var video = document.getElementById('arjs-video') || document.querySelector('video');
-        if (video && video.style) {
-          video.style.display = 'block';
-          video.style.visibility = 'visible';
-          if (video.paused) { video.play().catch(function(){}); }
-        }
-        window.dispatchEvent(new Event('resize'));
-      }, ms);
-    });
+  // Reconstruir la escena A-Frame completa para liberar el contexto congelado de la cámara
+  // Esta es la solución exacta que funcionó en el commit 9a7fde4
+  if (typeof buildARScene === 'function') {
+    setTimeout(function() {
+      buildARScene();
+    }, 100);
   }
 }
 
@@ -179,7 +171,7 @@ async function openModelDialog(elem) {
 
     // Habilitar soporte AR (Google Scene Viewer / WebXR / Quick Look)
     viewer.setAttribute('ar', '');
-    viewer.setAttribute('ar-modes', 'webxr scene-viewer quick-look');
+    viewer.setAttribute('ar-modes', 'scene-viewer webxr quick-look');
     viewer.setAttribute('ar-scale', 'auto');
     viewer.setAttribute('ar-placement', 'floor');
 

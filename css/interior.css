@@ -319,6 +319,37 @@ model-viewer {
   outline: none;
   --poster-color: transparent;
   background-color: transparent;
+  position: relative;
+}
+
+.custom-google-ar-btn {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: var(--primary);
+  color: #000000;
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 100;
+  letter-spacing: 0.2px;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.custom-google-ar-btn:active {
+  transform: scale(0.95);
+  background: var(--primary-hover);
+}
+
+.ar-btn-icon {
+  font-size: 1rem;
 }
 
 .modal-info-card {

@@ -67,7 +67,8 @@ const i18n = {
       dimensions: 'Dimensiones',
       weight: 'Peso',
       material: 'Material',
-      location: 'Ubicación'
+      location: 'Ubicación',
+      viewInSpace: 'Ver en tu espacio (Google AR)'
     },
     experience: {
       choza_realalto: {
@@ -197,7 +198,8 @@ const i18n = {
       dimensions: 'Dimensions',
       weight: 'Weight',
       material: 'Material',
-      location: 'Location'
+      location: 'Location',
+      viewInSpace: 'View in your space (Google AR)'
     },
     experience: {
       choza_realalto: {

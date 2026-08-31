@@ -29,25 +29,25 @@
   <link rel="preload" as="image" href="assets/img/logo.webp" fetchpriority="high" type="image/webp">
 
   <!-- Estilos por capas -->
-  <link rel="stylesheet" href="css/base.css?v=29">
-  <link rel="stylesheet" href="css/loading.css?v=29">
-  <link rel="stylesheet" href="css/home.css?v=29">
-  <link rel="stylesheet" href="css/ar.css?v=29">
-  <link rel="stylesheet" href="css/interior.css?v=29">
-  <link rel="stylesheet" href="css/sidebar.css?v=29">
+  <link rel="stylesheet" href="css/base.css?v=30">
+  <link rel="stylesheet" href="css/loading.css?v=30">
+  <link rel="stylesheet" href="css/home.css?v=30">
+  <link rel="stylesheet" href="css/ar.css?v=30">
+  <link rel="stylesheet" href="css/interior.css?v=30">
+  <link rel="stylesheet" href="css/sidebar.css?v=30">
 
 
   <!-- Google Model Viewer (Web Component 3D) -->
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 
   <!-- Scripts por capas (cargados en orden de dependencia) -->
-  <script defer src="js/config.js?v=29"></script>
-  <script defer src="js/loader.js?v=29"></script>
-  <script defer src="js/i18n.js?v=29"></script>
-  <script defer src="js/ar.js?v=29"></script>
-  <script defer src="js/interior.js?v=29"></script>
-  <script defer src="js/ui.js?v=29"></script>
-  <script defer src="js/main.js?v=29"></script>
+  <script defer src="js/config.js?v=30"></script>
+  <script defer src="js/loader.js?v=30"></script>
+  <script defer src="js/i18n.js?v=30"></script>
+  <script defer src="js/ar.js?v=30"></script>
+  <script defer src="js/interior.js?v=30"></script>
+  <script defer src="js/ui.js?v=30"></script>
+  <script defer src="js/main.js?v=30"></script>
 </head>
 <body style="margin: 0; overflow: hidden;">
 
@@ -228,7 +228,7 @@
             touch-action="pan-y"
             auto-rotate
             ar
-            ar-modes="webxr scene-viewer quick-look"
+            ar-modes="scene-viewer webxr quick-look"
             ar-scale="auto"
             ar-placement="floor"
             bounds="tight"
@@ -236,6 +236,10 @@
             loading="eager"
             reveal="auto"
             alt="Modelo 3D Arqueológico">
+            <button slot="ar-button" id="custom-ar-btn" class="custom-google-ar-btn">
+              <span class="ar-btn-icon">📷</span>
+              <span data-i18n="modal.viewInSpace">Ver en tu espacio (Google AR)</span>
+            </button>
           </model-viewer>
         </div>
 
