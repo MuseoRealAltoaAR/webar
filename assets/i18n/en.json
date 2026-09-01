@@ -117,12 +117,12 @@
       "location": "Residential Sector"
     },
     "entierro": {
-      "name": "Valdivia Burial & Funerary Bundle",
-      "desc": "Pre-Hispanic funerary context discovered at the Real Alto archaeological site, featuring the flexed individual within a ceremonial bundle with lithic offerings.",
-      "dimensions": "1.2 × 0.8 × 0.6 m",
-      "weight": "N/A",
-      "material": "Vegetal bundle, skeletal remains & stone",
-      "location": "Real Alto Funerary Area"
+      "name": "Reconstruction of Principal Woman Burial (Tomb XXIV)",
+      "desc": "Funerary bundle with false head and Valdivia 3 ceramic mask of a high-ranking woman (~35 years old), within a tomb paved with grinding stones and metates. Accompanied by the burial of a young man (~20 years old) with a segmented skeleton, seven chert knives, and a deer mandible.",
+      "dimensions": "",
+      "weight": "",
+      "material": "",
+      "location": "Threshold of Structure 7, Charnel Mound (Trench B, Tomb B-XXIV)"
     }
   }
 }

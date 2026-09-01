@@ -145,19 +145,46 @@ async function openModelDialog(elem) {
   const locationEl = document.getElementById('modal-piece-location');
   const interiorBg = document.getElementById('interior-bg');
 
+  const dimVal = t(`element.${elem.id}.dimensions`);
+  const weightVal = t(`element.${elem.id}.weight`);
+  const materialVal = t(`element.${elem.id}.material`);
+  const locationVal = t(`element.${elem.id}.location`);
+
   if (titleEl) titleEl.textContent = t(elem.nameKey);
   if (descEl) descEl.textContent = t(elem.descKey);
-  if (dimEl) dimEl.textContent = t(`element.${elem.id}.dimensions`) || '—';
-  if (weightEl) weightEl.textContent = t(`element.${elem.id}.weight`) || '—';
-  if (materialEl) materialEl.textContent = t(`element.${elem.id}.material`) || '—';
-  if (locationEl) locationEl.textContent = t(`element.${elem.id}.location`) || '—';
+
+  if (dimEl) {
+    dimEl.textContent = dimVal || '—';
+    if (typeof dimEl.closest === 'function') {
+      dimEl.closest('.spec-item')?.classList.toggle('hidden', !dimVal || dimVal === '—');
+    }
+  }
+  if (weightEl) {
+    weightEl.textContent = weightVal || '—';
+    if (typeof weightEl.closest === 'function') {
+      weightEl.closest('.spec-item')?.classList.toggle('hidden', !weightVal || weightVal === '—');
+    }
+  }
+  if (materialEl) {
+    materialEl.textContent = materialVal || '—';
+    if (typeof materialEl.closest === 'function') {
+      materialEl.closest('.spec-item')?.classList.toggle('hidden', !materialVal || materialVal === '—');
+    }
+  }
+  if (locationEl) {
+    locationEl.textContent = locationVal || '—';
+    if (typeof locationEl.closest === 'function') {
+      locationEl.closest('.spec-item')?.classList.toggle('hidden', !locationVal || locationVal === '—');
+    }
+  }
+
   if (interiorBg) interiorBg.classList.add('blurred');
 
   if (modal) modal.classList.remove('hidden');
 
   if (viewer) {
     const baseUrl = (typeof window !== 'undefined' && window.location?.href) ? window.location.href : 'http://localhost/';
-    const glbWithVersion = elem.glb.includes('?') ? elem.glb : `${elem.glb}?v=39`;
+    const glbWithVersion = elem.glb.includes('?') ? elem.glb : `${elem.glb}?v=40`;
     const absoluteGlbUrl = new URL(glbWithVersion, baseUrl).href;
     console.log('[3D Viewer] Cargando modelo GLB desde:', absoluteGlbUrl);
     viewer.src = absoluteGlbUrl;

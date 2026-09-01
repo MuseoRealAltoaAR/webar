@@ -126,12 +126,12 @@ const i18n = {
         location: 'Sector Residencial'
       },
       entierro: {
-        name: 'Entierro y Fardo Funerario Valdivia',
-        desc: 'Contexto funerario prehispánico hallado en el yacimiento arqueológico de Real Alto, donde el individuo yace en posición flexionada dentro de un fardo ceremonial con ofrendas líticas y cerámicas.',
-        dimensions: '1,2 × 0,8 × 0,6 m',
-        weight: 'N/A',
-        material: 'Fardo vegetal, osamenta y líticos',
-        location: 'Área Funeraria Real Alto'
+        name: 'Reconstrucción Entierro de Mujer Principal (Tumba XXIV)',
+        desc: 'Fardo funerario con cabeza falsa y máscara de cerámica Valdivia 3 de una mujer de alto rango (~35 años), en tumba pavimentada de manos de moler y metates. Acompañado por el entierro de un hombre joven (~20 años) con esqueleto segmentado, siete cuchillos de sílice (chert) y una mandíbula de venado.',
+        dimensions: '',
+        weight: '',
+        material: '',
+        location: 'Umbral de la Estructura 7, Montículo del Osario (Trinchera B, Tumba B-XXIV)'
       }
     }
   },
@@ -257,12 +257,12 @@ const i18n = {
         location: 'Residential Sector'
       },
       entierro: {
-        name: 'Valdivia Burial & Funerary Bundle',
-        desc: 'Pre-Hispanic funerary context discovered at the Real Alto archaeological site, featuring the flexed individual within a ceremonial bundle with lithic offerings.',
-        dimensions: '1.2 × 0.8 × 0.6 m',
-        weight: 'N/A',
-        material: 'Vegetal bundle, skeletal remains & stone',
-        location: 'Real Alto Funerary Area'
+        name: 'Reconstruction of Principal Woman Burial (Tomb XXIV)',
+        desc: 'Funerary bundle with false head and Valdivia 3 ceramic mask of a high-ranking woman (~35 years old), within a tomb paved with grinding stones and metates. Accompanied by the burial of a young man (~20 years old) with a segmented skeleton, seven chert knives, and a deer mandible.',
+        dimensions: '',
+        weight: '',
+        material: '',
+        location: 'Threshold of Structure 7, Charnel Mound (Trench B, Tomb B-XXIV)'
       }
     }
   }

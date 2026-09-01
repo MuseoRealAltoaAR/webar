@@ -117,12 +117,12 @@
       "location": "Sector Residencial"
     },
     "entierro": {
-      "name": "Entierro y Fardo Funerario Valdivia",
-      "desc": "Contexto funerario prehispánico hallado en el yacimiento arqueológico de Real Alto, donde el individuo yace en posición flexionada dentro de un fardo ceremonial con ofrendas líticas y cerámicas.",
-      "dimensions": "1,2 × 0,8 × 0,6 m",
-      "weight": "N/A",
-      "material": "Fardo vegetal, osamenta y líticos",
-      "location": "Área Funeraria Real Alto"
+      "name": "Reconstrucción Entierro de Mujer Principal (Tumba XXIV)",
+      "desc": "Fardo funerario con cabeza falsa y máscara de cerámica Valdivia 3 de una mujer de alto rango (~35 años), en tumba pavimentada de manos de moler y metates. Acompañado por el entierro de un hombre joven (~20 años) con esqueleto segmentado, siete cuchillos de sílice (chert) y una mandíbula de venado.",
+      "dimensions": "",
+      "weight": "",
+      "material": "",
+      "location": "Umbral de la Estructura 7, Montículo del Osario (Trinchera B, Tumba B-XXIV)"
     }
   }
 }

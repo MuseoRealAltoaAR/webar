@@ -176,7 +176,7 @@ describe('Lógica de Estado, Eventos de Marcador y Vistas de la Aplicación', ()
     const titleEl = document.getElementById('modal-piece-title');
     assert.ok(modal.classList.contains('hidden') === false, 'El modal 3D debe mostrarse');
     assert.ok(viewer.src.includes('entierro.glb'), 'El viewer debe tener cargado el modelo entierro.glb');
-    assert.strictEqual(titleEl.textContent, 'Entierro y Fardo Funerario Valdivia');
+    assert.strictEqual(titleEl.textContent, 'Reconstrucción Entierro de Mujer Principal (Tumba XXIV)');
   });
 
   it('enterInteriorCabin con experiencia entierro_realalto debe activar fondo estático', () => {
