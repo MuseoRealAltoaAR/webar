@@ -1,7 +1,7 @@
 /**
  * Real Alto WebAR - Service Worker para Experiencia 100% Offline
  */
-const CACHE_NAME = 'realalto-offline-v37';
+const CACHE_NAME = 'realalto-offline-v38';
 
 const PRECACHE_ASSETS = [
   './',
