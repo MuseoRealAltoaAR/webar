@@ -55,6 +55,17 @@ async function ensureARScriptsLoaded() {
             var id = marker.id || '';
             window.dispatchEvent(new CustomEvent('ar-marker-lost', { detail: { id: id, preset: preset } }));
           });
+        },
+        tick: function () {
+          if (this.el.object3D && this.el.object3D.visible) {
+            if (typeof state !== 'undefined' && state.arStarted && !state.interiorActive && !state.markerVisible) {
+              if (typeof markerCooldownUntil === 'undefined' || Date.now() >= markerCooldownUntil) {
+                var preset = this.el.getAttribute('preset') || '';
+                var id = this.el.id || '';
+                window.dispatchEvent(new CustomEvent('ar-marker-found', { detail: { id: id, preset: preset } }));
+              }
+            }
+          }
         }
       });
     }

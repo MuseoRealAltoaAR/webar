@@ -83,12 +83,21 @@ function exitInteriorCabin() {
   state.statusMode = 'scanning';
   updateStatusText();
 
-  // Reconstruir la escena A-Frame completa para liberar el contexto congelado de la cámara
-  // Esta es la solución exacta que funcionó en el commit 9a7fde4
-  if (typeof buildARScene === 'function') {
-    setTimeout(function() {
-      buildARScene();
-    }, 100);
+  // Resetear visibilidad de marcadores y asegurar reproducción del stream
+  if (typeof document !== 'undefined') {
+    const markers = document.querySelectorAll('a-marker');
+    markers.forEach(function(m) {
+      if (m.object3D) m.object3D.visible = false;
+    });
+
+    const video = document.querySelector('video#arjs-video, body > video');
+    if (video && video.paused) {
+      video.play().catch(function() {});
+    }
+  }
+
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('resize'));
   }
 }
 
@@ -148,7 +157,7 @@ async function openModelDialog(elem) {
 
   if (viewer) {
     const baseUrl = (typeof window !== 'undefined' && window.location?.href) ? window.location.href : 'http://localhost/';
-    const glbWithVersion = elem.glb.includes('?') ? elem.glb : `${elem.glb}?v=36`;
+    const glbWithVersion = elem.glb.includes('?') ? elem.glb : `${elem.glb}?v=37`;
     const absoluteGlbUrl = new URL(glbWithVersion, baseUrl).href;
     console.log('[3D Viewer] Cargando modelo GLB desde:', absoluteGlbUrl);
     viewer.src = absoluteGlbUrl;
