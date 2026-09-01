@@ -148,7 +148,7 @@ async function openModelDialog(elem) {
 
   if (viewer) {
     const baseUrl = (typeof window !== 'undefined' && window.location?.href) ? window.location.href : 'http://localhost/';
-    const glbWithVersion = elem.glb.includes('?') ? elem.glb : `${elem.glb}?v=35`;
+    const glbWithVersion = elem.glb.includes('?') ? elem.glb : `${elem.glb}?v=36`;
     const absoluteGlbUrl = new URL(glbWithVersion, baseUrl).href;
     console.log('[3D Viewer] Cargando modelo GLB desde:', absoluteGlbUrl);
     viewer.src = absoluteGlbUrl;
