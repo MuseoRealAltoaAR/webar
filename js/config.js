@@ -86,28 +86,28 @@ const i18n = {
     },
     element: {
       valdivia: {
-        name: 'Cabeza de Figurina Valdivia',
-        desc: 'Pieza correspondiente a una cabeza de figurina con tocado en forma de máscara encontrada en el Montículo de la Cabeza. Presenta deformación craneana occipital y acabado alisado y pulido.',
+        name: 'Figurina FS-3312 (Valdivia V)',
+        desc: 'Cabeza de figurina con deformación craneana occipital oblicua y tocado de arcilla en forma de máscara sobre la nariz. Superficie alisada y pulida con tonalidades amarillo-rojizas (Munsell 5YR 7/6–7/8), ojos y boca definidos por incisiones profundas.',
         dimensions: '36,7 × 44,55 × 24 mm',
         weight: '35,8 g',
-        material: 'Arcilla / Alisado y pulido',
-        location: 'Montículo de la Cabeza'
+        material: 'Arcilla pulida / Ahumado y quema',
+        location: 'Montículo de la Cabeza (Unidad N238.240W155.1S8)'
       },
       vasija: {
-        name: 'Vasija Cerámica Valdivia',
-        desc: 'Recipiente ceremonial de cerámica tradicional de la cultura Valdivia con engobe rojizo y acabado alisado.',
-        dimensions: '120 × 120 × 85 mm',
-        weight: '185,4 g',
-        material: 'Arcilla cocida / Engobe rojo',
-        location: 'Montículo de las Ofrendas'
+        name: 'Vasija E-3 / Artefacto N.º 350 (Valdivia Fase IV)',
+        desc: 'Vasija globular de cuello campaniforme y cuerpo esferoide. Presenta labio redondeado, borde evertido y cuello decorado con incisiones en zig-zag. Acabado pulido con engobe rojo en el labio y cuello interior.',
+        dimensions: 'Boca: Ø 160 mm | Espesor: 8 mm',
+        weight: 'N/A',
+        material: 'Cerámica con engobe rojo / Incisiones en zig-zag',
+        location: 'Estructura S-MH-1 (Rasgo F-295)'
       },
       vasija2: {
-        name: 'Cuenco Valdivia Decorado',
-        desc: 'Cuenco cerámico pulido y decorado con incisiones geométricas de la cultura Valdivia.',
-        dimensions: '145 × 145 × 92 mm',
-        weight: '210,0 g',
-        material: 'Cerámica incisa / Pulido fino',
-        location: 'Plaza Central Real Alto'
+        name: 'Olla Artefacto N.º 181 (Valdivia Fase III-VII)',
+        desc: 'Olla globular profunda de cuello corto y recto con labio de filo agudo y borde evertido. Clasificada como Valdivia inciso de línea ancha (tipo 16), con pulido exterior e interior, engobe rojo claro en el exterior y café claro en el interior.',
+        dimensions: 'Mediana / Globular profunda',
+        weight: 'N/A',
+        material: 'Cerámica pulida / Engobe rojo y café / Inciso línea ancha',
+        location: 'Estructura S-MH-2 (Rasgo F-263.4)'
       },
       choza2_realalto: {
         name: 'Choza Valdivia',
@@ -217,28 +217,28 @@ const i18n = {
     },
     element: {
       valdivia: {
-        name: 'Valdivia Figurine Head',
-        desc: 'Figurine head with a mask-shaped headdress found at the Head Mound. Features occipital cranial deformation and a smoothed, polished finish.',
+        name: 'Figurine FS-3312 (Valdivia V)',
+        desc: 'Figurine head with oblique occipital cranial deformation and a clay mask-shaped headdress extending over the nose. Smoothed and polished surface with reddish-yellow tones (Munsell 5YR 7/6–7/8), deeply incised eyes and mouth.',
         dimensions: '36.7 × 44.55 × 24 mm',
         weight: '35.8 g',
-        material: 'Clay / Smoothed & polished',
-        location: 'Head Mound'
+        material: 'Polished clay / Smoked & fired',
+        location: 'Head Mound (Unit N238.240W155.1S8)'
       },
       vasija: {
-        name: 'Valdivia Ceramic Vessel',
-        desc: 'Traditional ceremonial ceramic vessel from the Valdivia culture with red slip and smoothed finish.',
-        dimensions: '120 × 120 × 85 mm',
-        weight: '185.4 g',
-        material: 'Fired clay / Red slip',
-        location: 'Offering Mound'
+        name: 'Vessel E-3 / Artifact No. 350 (Valdivia Phase IV)',
+        desc: 'Globular vessel with bell-shaped neck and spheroid body. Features rounded lip, everted rim, and neck decorated with zig-zag incisions. Polished finish with red slip on the lip and inner neck.',
+        dimensions: 'Mouth: Ø 160 mm | Thickness: 8 mm',
+        weight: 'N/A',
+        material: 'Red-slipped ceramic / Zig-zag incisions',
+        location: 'Structure S-MH-1 (Feature F-295)'
       },
       vasija2: {
-        name: 'Decorated Valdivia Bowl',
-        desc: 'Polished ceramic bowl decorated with geometric incisions from the Valdivia culture.',
-        dimensions: '145 × 145 × 92 mm',
-        weight: '210.0 g',
-        material: 'Incised ceramic / Fine polish',
-        location: 'Real Alto Central Plaza'
+        name: 'Pot Artifact No. 181 (Valdivia Phase III-VII)',
+        desc: 'Deep globular pot with short straight neck, sharp lip, and everted rim. Classified as Valdivia broad-line incised (Type 16), polished surfaces, light-red slip exterior and light-brown interior.',
+        dimensions: 'Medium / Deep globular',
+        weight: 'N/A',
+        material: 'Polished ceramic / Red & brown slip / Broad-line incised',
+        location: 'Structure S-MH-2 (Feature F-263.4)'
       },
       choza2_realalto: {
         name: 'Valdivia Hut',

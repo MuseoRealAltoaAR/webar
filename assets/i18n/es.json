@@ -77,28 +77,28 @@
   },
   "element": {
     "valdivia": {
-      "name": "Cabeza de Figurina Valdivia",
-      "desc": "Pieza correspondiente a una cabeza de figurina con tocado en forma de máscara encontrada en el Montículo de la Cabeza. Presenta deformación craneana occipital y acabado alisado y pulido.",
+      "name": "Figurina FS-3312 (Valdivia V)",
+      "desc": "Cabeza de figurina con deformación craneana occipital oblicua y tocado de arcilla en forma de máscara sobre la nariz. Superficie alisada y pulida con tonalidades amarillo-rojizas (Munsell 5YR 7/6–7/8), ojos y boca definidos por incisiones profundas.",
       "dimensions": "36,7 × 44,55 × 24 mm",
       "weight": "35,8 g",
-      "material": "Arcilla / Alisado y pulido",
-      "location": "Montículo de la Cabeza"
+      "material": "Arcilla pulida / Ahumado y quema",
+      "location": "Montículo de la Cabeza (Unidad N238.240W155.1S8)"
     },
     "vasija": {
-      "name": "Vasija Cerámica Valdivia",
-      "desc": "Recipiente ceremonial de cerámica tradicional de la cultura Valdivia con engobe rojizo y acabado alisado.",
-      "dimensions": "120 × 120 × 85 mm",
-      "weight": "185,4 g",
-      "material": "Arcilla cocida / Engobe rojo",
-      "location": "Montículo de las Ofrendas"
+      "name": "Vasija E-3 / Artefacto N.º 350 (Valdivia Fase IV)",
+      "desc": "Vasija globular de cuello campaniforme y cuerpo esferoide. Presenta labio redondeado, borde evertido y cuello decorado con incisiones en zig-zag. Acabado pulido con engobe rojo en el labio y cuello interior.",
+      "dimensions": "Boca: Ø 160 mm | Espesor: 8 mm",
+      "weight": "N/A",
+      "material": "Cerámica con engobe rojo / Incisiones en zig-zag",
+      "location": "Estructura S-MH-1 (Rasgo F-295)"
     },
     "vasija2": {
-      "name": "Cuenco Valdivia Decorado",
-      "desc": "Cuenco cerámico pulido y decorado con incisiones geométricas de la cultura Valdivia.",
-      "dimensions": "145 × 145 × 92 mm",
-      "weight": "210,0 g",
-      "material": "Cerámica incisa / Pulido fino",
-      "location": "Plaza Central Real Alto"
+      "name": "Olla Artefacto N.º 181 (Valdivia Fase III-VII)",
+      "desc": "Olla globular profunda de cuello corto y recto con labio de filo agudo y borde evertido. Clasificada como Valdivia inciso de línea ancha (tipo 16), con pulido exterior e interior, engobe rojo claro en el exterior y café claro en el interior.",
+      "dimensions": "Mediana / Globular profunda",
+      "weight": "N/A",
+      "material": "Cerámica pulida / Engobe rojo y café / Inciso línea ancha",
+      "location": "Estructura S-MH-2 (Rasgo F-263.4)"
     },
     "choza2_realalto": {
       "name": "Choza Valdivia",
