@@ -184,7 +184,7 @@ async function openModelDialog(elem) {
 
   if (viewer) {
     const baseUrl = (typeof window !== 'undefined' && window.location?.href) ? window.location.href : 'http://localhost/';
-    const glbWithVersion = elem.glb.includes('?') ? elem.glb : `${elem.glb}?v=40`;
+    const glbWithVersion = elem.glb.includes('?') ? elem.glb : `${elem.glb}?v=44`;
     const absoluteGlbUrl = new URL(glbWithVersion, baseUrl).href;
     console.log('[3D Viewer] Cargando modelo GLB desde:', absoluteGlbUrl);
     viewer.src = absoluteGlbUrl;
@@ -211,9 +211,9 @@ async function openModelDialog(elem) {
     viewer.setAttribute('scale', modelScale);
     viewer.scale = modelScale;
 
-    // Habilitar soporte Google AR (Scene Viewer nativo con mapa de escaneo de suelo)
+    // Habilitar soporte AR nativo (Apple Quick Look en iOS / Scene Viewer en Android)
     viewer.setAttribute('ar', '');
-    viewer.setAttribute('ar-modes', 'scene-viewer webxr quick-look');
+    viewer.setAttribute('ar-modes', 'quick-look scene-viewer webxr');
     viewer.setAttribute('ar-scale', 'auto');
     viewer.setAttribute('ar-placement', 'floor');
 
