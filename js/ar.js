@@ -254,6 +254,14 @@ function handleMarkerFound(event) {
 }
 
 function handleMarkerLost(event) {
+  const fixedOverlay = typeof document !== 'undefined' ? document.getElementById('fixed-choza-overlay') : null;
+  const isFixedOpen = fixedOverlay && !fixedOverlay.classList.contains('hidden');
+
+  // Si la choza ya está fija en pantalla o estamos en la vista interior, mantenerla visible
+  if (isFixedOpen || state.interiorActive) {
+    return;
+  }
+
   const detail = event.detail || {};
   const activeExp = getActiveExperience();
   const detectedId = (detail.id || '').toLowerCase();
@@ -268,8 +276,6 @@ function handleMarkerLost(event) {
     if (state.arStarted && !state.interiorActive) {
       state.statusMode = 'searching';
       updateStatusText();
-      const fixedOverlay = document.getElementById('fixed-choza-overlay');
-      if (fixedOverlay) fixedOverlay.classList.add('hidden');
     }
   }
 }
@@ -281,6 +287,18 @@ function showFixedChozaOverlay(exp) {
   if (overlay && img) {
     img.src = exp.scanImage;
     overlay.classList.remove('hidden');
+  }
+}
+
+function hideFixedChozaOverlay() {
+  const overlay = document.getElementById('fixed-choza-overlay');
+  if (overlay) overlay.classList.add('hidden');
+  state.markerVisible = false;
+  setMarkerCooldown(800);
+  state.statusMode = 'scanning';
+  updateStatusText();
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('resize'));
   }
 }
 
@@ -312,6 +330,7 @@ if (typeof module !== 'undefined' && module.exports) {
     handleMarkerFound,
     handleMarkerLost,
     showFixedChozaOverlay,
+    hideFixedChozaOverlay,
     checkOrientation
   };
 }

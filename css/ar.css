@@ -149,47 +149,74 @@
   z-index: 70;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-  background: rgba(0, 0, 0, 0.4);
-  padding: 10px 0 max(16px, env(safe-area-inset-bottom)) 0;
+  background: rgba(0, 0, 0, 0.35);
   box-sizing: border-box;
   overflow: hidden;
   animation: fadeIn 0.3s ease-out;
 }
 
 .fixed-choza-image {
+  position: absolute;
+  bottom: 0;
+  left: 0;
   width: 100vw !important;
   max-width: 100% !important;
-  flex: 1 1 auto;
-  min-height: 0;
-  max-height: calc(100dvh - 85px) !important;
+  max-height: 75dvh !important;
   object-fit: contain !important;
-  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.85));
+  object-position: bottom center !important;
+  filter: drop-shadow(0 -4px 20px rgba(0, 0, 0, 0.75));
   display: block;
+  pointer-events: none;
 }
 
 .fixed-choza-controls {
-  flex-shrink: 0;
-  margin-top: 8px;
+  position: absolute;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  left: 0;
   z-index: 75;
   width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 12px;
   padding: 0 16px;
   box-sizing: border-box;
 }
 
+.rescan-choza-btn {
+  width: auto;
+  min-width: 140px;
+  padding: 12px 22px;
+  background: rgba(15, 23, 42, 0.88);
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease, background 0.2s ease;
+  pointer-events: auto !important;
+}
+
+.rescan-choza-btn:active {
+  transform: scale(0.96);
+  background: rgba(255, 255, 255, 0.2);
+}
+
 .enter-choza-button {
   width: auto;
-  min-width: 200px;
-  padding: 12px 32px;
+  min-width: 170px;
+  padding: 12px 28px;
   background: var(--primary);
   color: #000000;
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 999px;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 800;
   cursor: pointer;
   box-shadow: 0 6px 20px rgba(255, 159, 28, 0.6);
@@ -205,24 +232,24 @@
 
 /* Responsive landscape AR */
 @media (orientation: landscape) {
-  .fixed-choza-overlay {
-    padding: 6px 0 max(10px, env(safe-area-inset-bottom)) 0;
-  }
-
   .fixed-choza-image {
-    width: 100vw !important;
-    max-width: 100% !important;
-    max-height: calc(100dvh - 65px) !important;
-    object-fit: contain !important;
+    max-height: 85dvh !important;
   }
 
   .fixed-choza-controls {
-    margin-top: 4px;
+    bottom: max(10px, env(safe-area-inset-bottom));
+    gap: 12px;
+  }
+
+  .rescan-choza-btn {
+    min-width: 130px;
+    padding: 8px 18px;
+    font-size: 0.85rem;
   }
 
   .enter-choza-button {
-    min-width: 180px;
+    min-width: 160px;
     padding: 9px 24px;
-    font-size: 0.92rem;
+    font-size: 0.9rem;
   }
 }

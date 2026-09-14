@@ -27,6 +27,7 @@ if (typeof module !== 'undefined' && module.exports) {
   global.handleMarkerFound = ar.handleMarkerFound;
   global.handleMarkerLost = ar.handleMarkerLost;
   global.showFixedChozaOverlay = ar.showFixedChozaOverlay;
+  global.hideFixedChozaOverlay = ar.hideFixedChozaOverlay;
   global.checkOrientation = ar.checkOrientation;
 
   const interior = require('./js/interior.js');
