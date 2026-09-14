@@ -34,6 +34,7 @@ html, body {
   inset: 0;
 }
 
+html.ar-mode,
 body.ar-mode {
   background-color: transparent !important;
   background: transparent !important;
@@ -195,6 +196,16 @@ video {
 /* Canvas de A-Frame debe ser transparente para mostrar el video debajo */
 a-scene canvas {
   background: transparent !important;
+}
+
+/* Ocultar modales y botones inyectados por defecto por A-Frame */
+.a-modal,
+.a-dialog,
+.a-dialog-container,
+.a-enter-vr,
+.a-orientation-modal {
+  display: none !important;
+  pointer-events: none !important;
 }
 
 /* Animación fadeIn reutilizable */

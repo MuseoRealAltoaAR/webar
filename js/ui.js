@@ -18,8 +18,9 @@ function showScreen(tabName) {
     item.classList.toggle('active', item.dataset.tab === tabName);
   });
 
-  if (typeof document !== 'undefined' && document.body) {
-    document.body.classList.toggle('ar-mode', tabName === 'ar');
+  if (typeof document !== 'undefined') {
+    if (document.body) document.body.classList.toggle('ar-mode', tabName === 'ar');
+    if (document.documentElement) document.documentElement.classList.toggle('ar-mode', tabName === 'ar');
   }
 
   if (tabName === 'inicio') {
