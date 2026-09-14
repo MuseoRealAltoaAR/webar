@@ -121,6 +121,19 @@ function initializeApp() {
     closeModelDialog();
   });
 
+  // 11. Botón AR del modal 3D (Google AR en Android / Apple Quick Look en iOS)
+  document.getElementById('modal-ar-btn')?.addEventListener('click', () => {
+    const viewer = document.getElementById('main-model-viewer');
+    if (viewer) {
+      if (typeof viewer.activateAR === 'function') {
+        viewer.activateAR();
+      } else {
+        const slotBtn = viewer.querySelector('[slot="ar-button"]');
+        if (slotBtn) slotBtn.click();
+      }
+    }
+  });
+
   // 10. Eventos de marcadores AR desde A-Frame
   window.addEventListener('ar-marker-found', handleMarkerFound);
   window.addEventListener('ar-marker-lost', handleMarkerLost);

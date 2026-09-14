@@ -29,25 +29,25 @@
   <link rel="preload" as="image" href="assets/img/logo.webp" fetchpriority="high" type="image/webp">
 
   <!-- Estilos por capas -->
-  <link rel="stylesheet" href="css/base.css?v=44">
-  <link rel="stylesheet" href="css/loading.css?v=44">
-  <link rel="stylesheet" href="css/home.css?v=44">
-  <link rel="stylesheet" href="css/ar.css?v=44">
-  <link rel="stylesheet" href="css/interior.css?v=44">
-  <link rel="stylesheet" href="css/sidebar.css?v=44">
+  <link rel="stylesheet" href="css/base.css?v=45">
+  <link rel="stylesheet" href="css/loading.css?v=45">
+  <link rel="stylesheet" href="css/home.css?v=45">
+  <link rel="stylesheet" href="css/ar.css?v=45">
+  <link rel="stylesheet" href="css/interior.css?v=45">
+  <link rel="stylesheet" href="css/sidebar.css?v=45">
 
 
   <!-- Google Model Viewer (Web Component 3D - 100% Offline) -->
   <script type="module" src="assets/vendor/model-viewer.min.js"></script>
 
   <!-- Scripts por capas (cargados en orden de dependencia) -->
-  <script defer src="js/config.js?v=44"></script>
-  <script defer src="js/loader.js?v=44"></script>
-  <script defer src="js/i18n.js?v=44"></script>
-  <script defer src="js/ar.js?v=44"></script>
-  <script defer src="js/interior.js?v=44"></script>
-  <script defer src="js/ui.js?v=44"></script>
-  <script defer src="js/main.js?v=44"></script>
+  <script defer src="js/config.js?v=45"></script>
+  <script defer src="js/loader.js?v=45"></script>
+  <script defer src="js/i18n.js?v=45"></script>
+  <script defer src="js/ar.js?v=45"></script>
+  <script defer src="js/interior.js?v=45"></script>
+  <script defer src="js/ui.js?v=45"></script>
+  <script defer src="js/main.js?v=45"></script>
 </head>
 <body style="margin: 0; overflow: hidden;">
 
@@ -220,31 +220,36 @@
       </div>
 
       <div class="dialog-body">
-        <div class="model-viewer-container">
-          <!-- Google Model Viewer con soporte AR Scene Viewer / Quick Look -->
-          <model-viewer
-            id="main-model-viewer"
-            camera-controls
-            touch-action="pan-y"
-            auto-rotate
-            ar
-            ar-modes="quick-look scene-viewer webxr"
-            ar-scale="auto"
-            ar-placement="floor"
-            bounds="tight"
-            shadow-intensity="1"
-            loading="eager"
-            reveal="auto"
-            alt="Modelo 3D Arqueológico">
-            <button slot="ar-button" id="custom-ar-btn" class="custom-google-ar-btn">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="ar-btn-icon" aria-hidden="true">
-                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
-                <line x1="12" y1="22.08" x2="12" y2="12"/>
-              </svg>
-              <span data-i18n="modal.viewInSpace">Ver en AR</span>
-            </button>
-          </model-viewer>
+        <div class="modal-left-col">
+          <div class="model-viewer-container">
+            <!-- Google Model Viewer con soporte AR Scene Viewer / Quick Look -->
+            <model-viewer
+              id="main-model-viewer"
+              camera-controls
+              touch-action="pan-y"
+              auto-rotate
+              ar
+              ar-modes="quick-look scene-viewer webxr"
+              ar-scale="auto"
+              ar-placement="floor"
+              bounds="tight"
+              shadow-intensity="1"
+              loading="eager"
+              reveal="auto"
+              alt="Modelo 3D Arqueológico">
+              <button slot="ar-button" id="custom-ar-btn" style="display:none !important;" aria-hidden="true"></button>
+            </model-viewer>
+          </div>
+
+          <!-- Botón de Realidad Aumentada Principal -->
+          <button id="modal-ar-btn" class="modal-ar-action-btn interactive" type="button" aria-label="Ver en Realidad Aumentada">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="ar-action-icon" aria-hidden="true">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+              <line x1="12" y1="22.08" x2="12" y2="12"/>
+            </svg>
+            <span data-i18n="modal.viewInSpace">Ver en tu espacio (AR)</span>
+          </button>
         </div>
 
         <div class="modal-info-card">
