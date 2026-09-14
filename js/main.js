@@ -101,12 +101,9 @@ function initializeApp() {
     });
   }
 
-  // 7. Botones de la choza fija al escanear marcador
+  // 7. Botón Entrar a la choza al detectar marcador
   document.getElementById('enter-choza-btn')?.addEventListener('click', () => {
     enterInteriorCabin();
-  });
-  document.getElementById('rescan-from-choza-btn')?.addEventListener('click', () => {
-    hideFixedChozaOverlay();
   });
 
   // 8. Botón 3D Choza (superior derecha en interior) — solo visible en experiencia choza

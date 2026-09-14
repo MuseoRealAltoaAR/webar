@@ -301,8 +301,8 @@
 
 .model-viewer-container {
   width: 100%;
-  height: 270px;
-  min-height: 230px;
+  height: 290px;
+  min-height: 250px;
   background: radial-gradient(circle at 50% 50%, #ffffff 0%, #f1f5f9 100%);
   border: 1px solid #e2e8f0;
   border-radius: 14px;
@@ -314,7 +314,7 @@
 model-viewer {
   width: 100%;
   height: 100%;
-  min-height: 230px;
+  min-height: 250px;
   display: block;
   outline: none;
   --poster-color: transparent;
@@ -323,33 +323,52 @@ model-viewer {
 }
 
 .custom-google-ar-btn {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-  background: var(--primary);
-  color: #000000;
-  border: 1.5px solid rgba(255, 255, 255, 0.6);
-  border-radius: 999px;
-  padding: 8px 16px;
-  font-size: 0.82rem;
-  font-weight: 800;
-  cursor: pointer;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  z-index: 100;
-  letter-spacing: 0.2px;
-  transition: transform 0.2s ease, background-color 0.2s ease;
+  position: absolute !important;
+  bottom: 12px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: calc(100% - 28px) !important;
+  max-width: 320px !important;
+  height: 42px !important;
+  background: var(--primary) !important;
+  color: #000000 !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.6) !important;
+  border-radius: 12px !important;
+  padding: 0 16px !important;
+  font-size: 0.88rem !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  z-index: 1000 !important;
+  letter-spacing: 0.2px !important;
+  transition: transform 0.2s ease, background-color 0.2s ease !important;
+  -webkit-tap-highlight-color: transparent !important;
+  pointer-events: auto !important;
+  box-sizing: border-box !important;
+  white-space: nowrap !important;
 }
 
 .custom-google-ar-btn:active {
-  transform: scale(0.95);
-  background: var(--primary-hover);
+  transform: translateX(-50%) scale(0.97) !important;
+  background: var(--primary-hover) !important;
 }
 
-.ar-btn-icon {
-  font-size: 1rem;
+.custom-google-ar-btn span {
+  color: #000000 !important;
+  font-size: 0.88rem !important;
+  font-weight: 800 !important;
+  white-space: nowrap !important;
+}
+
+.custom-google-ar-btn svg,
+.custom-google-ar-btn .ar-btn-icon {
+  color: #000000 !important;
+  stroke: #000000 !important;
+  flex-shrink: 0 !important;
 }
 
 .modal-info-card {
